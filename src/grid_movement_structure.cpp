@@ -4457,7 +4457,7 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   vector<double> Svalue, Xcoord, Ycoord, Xcoord2, Ycoord2, Xcoord_Aux, Ycoord_Aux;
   bool AddBegin = true, AddEnd = true;
   double x_i, x_ip1, y_i, y_ip1;
-  char AirfoilFile[256];
+  string AirfoilFile;
   char AirfoilFormat[15];
   char MeshOrientation[15];
   char AirfoilClose[15];
@@ -4480,23 +4480,95 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
    edge to trailing edge.
    ---*/
   
-  /*--- Open the restart file, throw an error if this fails. ---*/
+  /*--- Open the airfoil data file, throw an error if this fails. ---*/
   
-  cout << "Enter the name of file with the airfoil information: ";
-  scanf ("%s", AirfoilFile);
-  airfoil_file.open(AirfoilFile, ios::in);
-  if (airfoil_file.fail()) {
-    cout << "There is no airfoil file!! "<< endl;
-    exit(1);
+  while(1) {
+    cout << "Enter the airfoil coordinate file: ";
+    cin >> AirfoilFile;
+    airfoil_file.open(AirfoilFile.c_str(), ios::in);
+    if (airfoil_file.fail()) {
+      cout << "File open error! "<< endl;
+    } else { 
+      break;
+    }
   }
-  cout << "Enter the format of the airfoil (Selig or Lednicer): ";
-  scanf ("%s", AirfoilFormat);
 
-  cout << "Thickness scaling (1.0 means no scaling)?: ";
-  scanf ("%lf", &AirfoilScale);
-  
-  cout << "Close the airfoil (Yes or No)?: ";
-  scanf ("%s", AirfoilClose);
+  cin.clear(); /*-- Clear the cin buffer (penalty for mixing types of cin calls)--*/
+  cin.ignore(INT_MAX,'\n');
+
+  /*-- Get coordinate file type --*/
+  int dat_file_type = 0;
+  string Input = "";
+  while(1) {
+
+    cout << endl;
+    cout << "   [0] Selig" << endl;
+    cout << "   [1] Lednicer"  << endl;
+    cout << "Select coordinate file type [0]: " ;
+    getline(cin, Input);
+
+    stringstream myStream(Input);
+
+    /*-- Handle default option --*/
+    if (Input.empty())
+      myStream << "0";
+
+    /*-- Check for valid input --*/
+    if (myStream >> dat_file_type) {
+      if (dat_file_type == 0) {
+          strcpy(AirfoilFormat, "Selig");
+          break;
+      } else if(dat_file_type == 1) {
+          strcpy(AirfoilFormat, "Lednicer");
+          break;
+      }
+    }
+  }
+
+
+  /*-- Get airfoil scaling --*/
+  while(1) {
+
+    cout << endl;
+    cout << "Enter airfoil scaling [1.0]: " ;
+    getline(cin, Input);
+
+    stringstream myStream(Input);
+
+    /*-- Handle default option --*/
+    if (Input.empty())
+      myStream << "1.0";
+
+    /*-- Check for valid input --*/
+    if (myStream >> AirfoilScale) {
+        break;
+    }
+    
+  }
+
+  /*-- Decide whether or not to close the airfoil --*/
+  while(1) {
+
+    cout << endl;
+    cout << "Close the airfoil (Y/N)? [Y]: ";
+
+    getline(cin, Input);
+
+    /*-- Handle default option --*/
+    if (Input.empty())
+      Input = "Y";
+
+    /*-- Check for valid input --*/
+    if (Input.compare("Y")==0) {
+      strcpy(AirfoilClose, "Yes");
+      break;
+    } else if (Input.compare("N")==0) {
+      strcpy(AirfoilClose, "No");
+      break;
+    } 
+    cout << "Repeating loop" << endl;
+
+  }
   
 //  cout << "Surface mesh orientation (clockwise, or anticlockwise): ";
 //  scanf ("%s", MeshOrientation);

@@ -29,6 +29,8 @@
 #endif
 #include <ctime>
 
+#include<string>
+
 #include "solver_structure.hpp"
 #include "integration_structure.hpp"
 #include "output_structure.hpp"

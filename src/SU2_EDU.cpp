@@ -67,13 +67,35 @@ int main(int argc, char *argv[]) {
   /*--- Load in the number of zones and spatial dimensions in the mesh file (If no config
    file is specified, default.cfg is used) ---*/
   
-  char config_file_name[200], InputKey[80];
-  do {
-    cout << "Set inviscid (Inv) or viscous (Visc) simulation: ";
-    fgets (InputKey,80,stdin);
-    if (strcmp (InputKey,"Inv\n") == 0) { strcpy(config_file_name, "Inviscid_ConfigFile.cfg"); }
-    if (strcmp (InputKey,"Visc\n") == 0) { strcpy(config_file_name, "Viscous_ConfigFile.cfg"); }
-  } while ((strcmp (InputKey,"Inv\n") != 0) && (strcmp (InputKey,"Visc\n") != 0));
+  /*-- Get user input for viscous/inviscid --*/
+  char config_file_name[200];
+  int SimType = 0;
+  string Input = "";
+  while(1) {
+
+    cout << endl;
+    cout << "   [0] Inviscid (Euler)" << endl;
+    cout << "   [1] Viscous (RANS)"  << endl;
+    cout << "Select simulation type [0]: " ;
+    getline(cin, Input);
+
+    stringstream myStream(Input);
+
+    /*-- Handle default option --*/
+    if (Input.empty())
+      myStream << "0";
+
+    /*-- Check for valid input --*/
+    if (myStream >> SimType) {
+      if (SimType == 0) {
+          strcpy(config_file_name, "Inviscid_ConfigFile.cfg");
+          break;
+      } else if(SimType == 1) {
+          strcpy(config_file_name, "Viscous_ConfigFile.cfg");
+          break;
+      }
+    }
+  }
   
   /*--- Definition and of the containers for a zone. ---*/
   nZone = 1; nDim  = 2;
