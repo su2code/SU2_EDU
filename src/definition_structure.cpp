@@ -451,7 +451,7 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
           
           /*--- Definition of the boundary condition method ---*/
           for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++)
-            numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoeArtComp_Flow(nDim, nVar_Flow, config);
+            numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwArtComp_Flow(nDim, nVar_Flow, config);
           
         }
         if (freesurface) {
@@ -480,8 +480,8 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
               
             case ROE_TURKEL_1ST : case ROE_TURKEL_2ND :
               for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwRoe_Turkel_Flow(nDim, nVar_Flow, config);
-                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoe_Turkel_Flow(nDim, nVar_Flow, config);
+                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwRoeTurkel_Flow(nDim, nVar_Flow, config);
+                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoeTurkel_Flow(nDim, nVar_Flow, config);
               }
               break;
               
@@ -502,8 +502,8 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
             case NO_UPWIND : cout << "No upwind scheme." << endl; break;
             case ROE_1ST : case ROE_2ND :
               for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwRoeArtComp_Flow(nDim, nVar_Flow, config);
-                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoeArtComp_Flow(nDim, nVar_Flow, config);
+                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwArtComp_Flow(nDim, nVar_Flow, config);
+                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwArtComp_Flow(nDim, nVar_Flow, config);
               }
               break;
             default : cout << "Upwind scheme not implemented." << endl; exit(1); break;
@@ -515,8 +515,8 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
             case NO_UPWIND : cout << "No upwind scheme." << endl; break;
             case ROE_1ST : case ROE_2ND :
               for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwRoeArtComp_FreeSurf_Flow(nDim, nVar_Flow, config);
-                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoeArtComp_FreeSurf_Flow(nDim, nVar_Flow, config);
+                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwArtComp_FreeSurf_Flow(nDim, nVar_Flow, config);
+                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwArtComp_FreeSurf_Flow(nDim, nVar_Flow, config);
               }
               break;
             default : cout << "Upwind scheme not implemented." << endl; exit(1); break;

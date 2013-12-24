@@ -553,15 +553,6 @@ public:
 	 * \brief A virtual member.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-	virtual void ComputeAirfoil_Section(double *Plane_P0, double *Plane_Normal, unsigned short iSection, CConfig *config,
-                                      vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, vector<unsigned long> &point1_Airfoil, vector<unsigned long> &point2_Airfoil, vector<double> &weight1_Airfoil, bool original_surface);
-  
-	virtual void ComputeAirfoil_Section(double *Plane_P0, double *Plane_Normal, unsigned short iSection, CConfig *config,
-                                      vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface);
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 */
   virtual double Compute_MaxThickness(double *Plane_P0, double *Plane_Normal, unsigned short iSection, vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface);
  
   /*!
@@ -1158,13 +1149,6 @@ public:
 	 */
 	vector<vector<unsigned long> > GetPlanarPoints();
   
-  /*!
-	 * \brief Compute the sections of a wing.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void ComputeAirfoil_Section(double *Plane_P0, double *Plane_Normal, unsigned short iSection, CConfig *config,
-                              vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, vector<unsigned long> &point1_Airfoil, vector<unsigned long> &point2_Airfoil, bool original_surface);
-  
 };
 
 /*! 
@@ -1374,20 +1358,6 @@ public:
 	 */
 	void SetBoundSensitivity(CConfig *config);
   
-	/*!
-	 * \brief Compute the sections of a wing.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void ComputeAirfoil_Section(double *Plane_P0, double *Plane_Normal, unsigned short iSection, CConfig *config,
-                              vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface);
-                              
-  /*!
-	 * \brief Compute the sections of a wing.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void ComputeAirfoil_Section(double *Plane_P0, double *Plane_Normal, unsigned short iSection, CConfig *config,
-                              vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, vector<unsigned long> &point1_Airfoil, vector<unsigned long> &point2_Airfoil, vector<double> &weight1_Airfoil, bool original_surface);
-
   /*!
 	 * \brief Compute the sections of a wing.
 	 * \param[in] config - Definition of the particular problem.

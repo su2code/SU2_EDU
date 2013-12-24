@@ -1,8 +1,8 @@
- /*!
+/*!
  * \file linear_solvers_structure.cpp
  * \brief Main classes required for solving linear systems of equations
  * \author Current Development: Stanford University.
- * \version 2.0.9
+ * \version 2.0.10
  *
  * Stanford University Unstructured (SU2).
  * Copyright (C) 2012-2013 Aerospace Design Laboratory (ADL).
@@ -63,7 +63,7 @@ void CSysSolve::solveReduced(const int & n, const vector<vector<double> > & Hsbg
                              const vector<double> & rhs, vector<double> & x) {
   // initialize...
   for (int i = 0; i < n; i++)
-    x[i] = rhs[i];
+  x[i] = rhs[i];
   // ... and backsolve
   for (int i = n-1; i >= 0; i--) {
     x[i] /= Hsbg[i][i];
@@ -79,7 +79,7 @@ void CSysSolve::modGramSchmidt(int i, vector<vector<double> > & Hsbg, vector<CSy
   static const double reorth = 0.98;
   
   /*--- get the norm of the vector being orthogonalized, and find the
-  threshold for re-orthogonalization ---*/
+   threshold for re-orthogonalization ---*/
   double nrm = dotProd(w[i+1],w[i+1]);
   double thr = nrm*reorth;
   if (nrm <= 0.0) {
@@ -220,33 +220,33 @@ unsigned long CSysSolve::ConjugateGradient(const CSysVector & b, CSysVector & x,
     p.Equals_AX_Plus_BY(beta, p, 1.0, z);
   }
   
-
+  
   
   if ((monitoring) && (rank == 0))  {
     cout << "# Conjugate Gradient final (true) residual:" << endl;
     cout << "# Iteration = " << i << ": |res|/|res0| = "  << norm_r/norm0 << endl;
   }
   
-//  /*--- Recalculate final residual (this should be optional) ---*/
-//  mat_vec(x, A_p);
-//  r = b;
-//  r -= A_p;
-//  double true_res = r.norm();
-//  
-//  if (fabs(true_res - norm_r) > tol*10.0) {
-//    if (rank == 0) {
-//      cout << "# WARNING in CSysSolve::ConjugateGradient(): " << endl;
-//      cout << "# true residual norm and calculated residual norm do not agree." << endl;
-//      cout << "# true_res - calc_res = " << true_res - norm_r << endl;
-//    }
-//  }
+  //  /*--- Recalculate final residual (this should be optional) ---*/
+  //  mat_vec(x, A_p);
+  //  r = b;
+  //  r -= A_p;
+  //  double true_res = r.norm();
+  //
+  //  if (fabs(true_res - norm_r) > tol*10.0) {
+  //    if (rank == 0) {
+  //      cout << "# WARNING in CSysSolve::ConjugateGradient(): " << endl;
+  //      cout << "# true residual norm and calculated residual norm do not agree." << endl;
+  //      cout << "# true_res - calc_res = " << true_res - norm_r << endl;
+  //    }
+  //  }
 	
 	return i;
   
 }
 
 unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVectorProduct & mat_vec,
-                               CPreconditioner & precond, double tol, unsigned long m, bool monitoring) {
+                                CPreconditioner & precond, double tol, unsigned long m, bool monitoring) {
 	
   int rank = 0;
 #ifndef NO_MPI
@@ -263,7 +263,7 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
     MPI::Finalize();
 #endif
   }
-
+  
   /*---  Check the subspace size ---*/
   if (m > 1000) {
     if (rank == 0) cerr << "CSysSolve::FGMRES: illegal value for subspace size (too high), m = " << m << endl;
@@ -311,7 +311,7 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
   
   /*--- Set the norm to the initial initial residual value ---*/
   norm0 = beta;
-
+  
   /*---  Output header information including initial residual ---*/
   int i = 0;
   if ((monitoring) && (rank == 0)) {
@@ -338,7 +338,7 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
 		 then generate the new Givens rotation matrix and apply it to
 		 the last two elements of H[:][i] and g ---*/
     for (int k = 0; k < i; k++)
-      applyGivens(sn[k], cs[k], H[k][i], H[k+1][i]);
+    applyGivens(sn[k], cs[k], H[k][i], H[k+1][i]);
     generateGivens(H[i][i], H[i+1][i], sn[i], cs[i]);
     applyGivens(sn[i], cs[i], g[i], g[i+1]);
     
@@ -348,7 +348,7 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
     /*---  Output the relative residual if necessary ---*/
     if ((((monitoring) && (rank == 0)) && ((i+1) % 100 == 0)) && (rank == 0)) writeHistory(i+1, beta, norm0);
   }
-
+  
   /*---  Solve the least-squares system and update solution ---*/
   solveReduced(i, H, g, y);
   for (int k = 0; k < i; k++) {
@@ -360,18 +360,18 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
     cout << "# Iteration = " << i << ": |res|/|res0| = " << beta/norm0 << endl;
   }
   
-//  /*---  Recalculate final (neg.) residual (this should be optional) ---*/
-//  mat_vec(x, w[0]);
-//  w[0] -= b;
-//  double res = w[0].norm();
-//  
-//  if (fabs(res - beta) > tol*10) {
-//    if (rank == 0) {
-//      cout << "# WARNING in CSysSolve::FGMRES(): " << endl;
-//      cout << "# true residual norm and calculated residual norm do not agree." << endl;
-//      cout << "# res - beta = " << res - beta << endl;
-//    }
-//  }
+  //  /*---  Recalculate final (neg.) residual (this should be optional) ---*/
+  //  mat_vec(x, w[0]);
+  //  w[0] -= b;
+  //  double res = w[0].norm();
+  //
+  //  if (fabs(res - beta) > tol*10) {
+  //    if (rank == 0) {
+  //      cout << "# WARNING in CSysSolve::FGMRES(): " << endl;
+  //      cout << "# true residual norm and calculated residual norm do not agree." << endl;
+  //      cout << "# res - beta = " << res - beta << endl;
+  //    }
+  //  }
 	
 	return i;
   
@@ -474,22 +474,22 @@ unsigned long CSysSolve::BCGSTAB(const CSysVector & b, CSysVector & x, CMatrixVe
     if (((monitoring) && (rank == 0)) && ((i+1) % 5 == 0) && (rank == 0)) writeHistory(i+1, norm_r, norm0);
     
   }
-	  
+  
   if ((monitoring) && (rank == 0)) {
     cout << "# BCGSTAB final (true) residual:" << endl;
     cout << "# Iteration = " << i << ": |res|/|res0| = "  << norm_r/norm0 << endl;
   }
 	
-//  /*--- Recalculate final residual (this should be optional) ---*/
-//	mat_vec(x, A_x);
-//  r = b; r -= A_x;
-//  double true_res = r.norm();
-//  
-//  if ((fabs(true_res - norm_r) > tol*10.0) && (rank == 0)) {
-//    cout << "# WARNING in CSysSolve::BCGSTAB(): " << endl;
-//    cout << "# true residual norm and calculated residual norm do not agree." << endl;
-//    cout << "# true_res - calc_res = " << true_res <<" "<< norm_r << endl;
-//  }
+  //  /*--- Recalculate final residual (this should be optional) ---*/
+  //	mat_vec(x, A_x);
+  //  r = b; r -= A_x;
+  //  double true_res = r.norm();
+  //
+  //  if ((fabs(true_res - norm_r) > tol*10.0) && (rank == 0)) {
+  //    cout << "# WARNING in CSysSolve::BCGSTAB(): " << endl;
+  //    cout << "# true residual norm and calculated residual norm do not agree." << endl;
+  //    cout << "# true_res - calc_res = " << true_res <<" "<< norm_r << endl;
+  //  }
 	
 	return i;
 }

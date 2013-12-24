@@ -194,29 +194,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	virtual void SetProlongated_Correction(CSolver *sol_fine, CGeometry *geo_fine, CConfig *config);
-
-	/*! 
-	 * \brief A virtual member.
-	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
-	 * \param[out] sol_fine - Pointer to the solution on the fine grid.
-	 * \param[in] sol_coarse - Pointer to the solution on the coarse grid.
-	 * \param[in] geo_fine - Geometrical definition of the fine grid.
-	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetProlongated_Solution(unsigned short RunTime_EqSystem, CSolver **sol_fine, CSolver **sol_coarse, 
-										 CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
-	
-	/*! 
-	 * \brief A virtual member.
-	 * \param[in] sol_fine - Pointer to the solution on the fine grid.
-	 * \param[out] sol_coarse - Pointer to the solution on the coarse grid.
-	 * \param[in] geo_fine - Geometrical definition of the fine grid.
-	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetRestricted_Residual(CSolver *sol_fine, CSolver *sol_coarse, CGeometry *geo_fine, 
-										CGeometry *geo_coarse, CConfig *config);
 	
 	/*! 
 	 * \brief A virtual member.
@@ -230,18 +207,6 @@ public:
 	 * \param[in] InclSharedDomain - Include the shared domain in the interpolation.
 	 */
 	virtual void SetRestricted_Solution(unsigned short RunTime_EqSystem, CSolver **sol_fine, CSolver **sol_coarse, CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
-
-	/*! 
-	 * \brief A virtual member.
-	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
-	 * \param[in] sol_fine - Pointer to the solution on the fine grid.
-	 * \param[out] sol_coarse - Pointer to the solution on the coarse grid.
-	 * \param[in] geo_fine - Geometrical definition of the fine grid.
-	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetRestricted_Gradient(unsigned short RunTime_EqSystem, CSolver **sol_fine, CSolver **sol_coarse, 
-										CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
 	
 	/*! 
 	 * \brief A virtual member.
@@ -284,18 +249,6 @@ public:
 	 */
 	virtual void SetPotential_Solver(CGeometry ***geometry, CSolver ****solver_container, CNumerics *****numerics_container,
                                    CConfig **config, unsigned short RunTime_EqSystem, unsigned short iMesh, unsigned short iZone);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
-	 * \param[in] solution - Container vector with all the solutions on the finest grid.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] val_nSmooth - Number of smoothing iterations.
-	 * \param[in] val_smooth_coeff - Relaxation factor.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void Smooth_Solution(unsigned short RunTime_EqSystem, CSolver **solver, CGeometry *geometry,
-                       unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config);
 
 };
 
@@ -360,18 +313,6 @@ public:
 	void NonDimensional_Parameters(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container, 
 																 CConfig *config, unsigned short FinestMesh, unsigned short RunTime_EqSystem, unsigned long Iteration, 
 																 double *monitor);
-
-	/*! 
-	 * \brief Compute the fine solution from a coarse solution. 
-	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
-	 * \param[out] sol_fine - Pointer to the solution on the fine grid.
-	 * \param[in] sol_coarse - Pointer to the solution on the coarse grid.
-	 * \param[in] geo_fine - Geometrical definition of the fine grid.
-	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void SetProlongated_Solution(unsigned short RunTime_EqSystem, CSolver *sol_fine, CSolver *sol_coarse, 
-								 CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
 	
 	/*! 
 	 * \brief Compute the fine grid correction from the coarse solution. 
@@ -395,18 +336,6 @@ public:
 	 */
 	void SmoothProlongated_Correction(unsigned short RunTime_EqSystem, CSolver *solver, CGeometry *geometry,
 																		 unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config);
-  
-  /*!
-	 * \brief Do an implicit smoothing of the solution.
-	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
-	 * \param[in] solution - Container vector with all the solutions on the finest grid.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] val_nSmooth - Number of smoothing iterations.
-	 * \param[in] val_smooth_coeff - Relaxation factor.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Smooth_Solution(unsigned short RunTime_EqSystem, CSolver *solver, CGeometry *geometry,
-                                    unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config);
 
 	/*!
 	 * \brief Set the value of the corrected fine grid solution.
@@ -415,17 +344,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	void SetProlongated_Correction(CSolver *sol_fine, CGeometry *geo_fine, CConfig *config);
-
-	/*! 
-	 * \brief Compute truncation error in the coarse grid using the fine grid information. 
-	 * \param[in] sol_fine - Pointer to the solution on the fine grid.
-	 * \param[out] sol_coarse - Pointer to the solution on the coarse grid.
-	 * \param[in] geo_fine - Geometrical definition of the fine grid.
-	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void SetRestricted_Residual(CSolver *sol_fine, CSolver *sol_coarse, CGeometry *geo_fine, 
-								CGeometry *geo_coarse, CConfig *config);
 
 	/*! 
 	 * \brief Restrict solution from fine grid to a coarse grid. 
@@ -439,18 +357,6 @@ public:
 	 * \param[in] InclSharedDomain - Include the shared domain in the interpolation.
 	 */
 	void SetRestricted_Solution(unsigned short RunTime_EqSystem, CSolver *sol_fine, CSolver *sol_coarse, CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
-	
-	/*! 
-	 * \brief Compute the gradient in coarse grid using the fine grid information. 
-	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
-	 * \param[in] sol_fine - Pointer to the solution on the fine grid.
-	 * \param[out] sol_coarse - Pointer to the solution on the coarse grid.
-	 * \param[in] geo_fine - Geometrical definition of the fine grid.
-	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void SetRestricted_Gradient(unsigned short RunTime_EqSystem, CSolver **sol_fine, CSolver **sol_coarse, 
-								CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
 
 	/*! 
 	 * \brief Add the truncation error to the residual. 

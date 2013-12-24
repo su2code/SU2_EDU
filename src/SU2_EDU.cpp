@@ -27,27 +27,18 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   bool StopCalc = false;
-  unsigned long StartTime, StopTime, TimeUsed = 0, ExtIter = 0;
+  unsigned long ExtIter = 0;
+  double StartTime = 0.0, StopTime = 0.0, UsedTime = 0.0;
   unsigned short iMesh, iSol, nZone, nDim;
   ofstream ConvHist_file;
   int rank = MASTER_NODE;
-  
+  int size = SINGLE_NODE;
+
 #ifndef NO_MPI
   /*--- MPI initialization, and buffer setting ---*/
-  void *buffer, *old_buffer;
-  int size, bufsize;
-  bufsize = MAX_MPI_BUFFER;
-  buffer = new char[bufsize];
   MPI::Init(argc, argv);
-  MPI::Attach_buffer(buffer, bufsize);
   rank = MPI::COMM_WORLD.Get_rank();
   size = MPI::COMM_WORLD.Get_size();
-#ifdef TIME
-  /*--- Set up a timer for parallel performance benchmarking ---*/
-  double start, finish, time;
-  MPI::COMM_WORLD.Barrier();
-  start = MPI::Wtime();
-#endif
 #endif
   
   /*--- Create pointers to all of the classes that may be used throughout
@@ -157,6 +148,16 @@ int main(int argc, char *argv[]) {
   if (rank == MASTER_NODE)
     cout << endl <<"------------------------- Solver Preprocessing --------------------------" << endl;
   
+  /*--- Computation of wall distances for turbulence modeling ---*/
+  
+  if ((config_container[ZONE_0]->GetKind_Solver() == RANS))
+  geometry_container[ZONE_0][MESH_0]->ComputeWall_Distance(config_container[ZONE_0]);
+  
+  /*--- Computation of positive surface area in the z-plane which is used for
+   the calculation of force coefficient (non-dimensionalization). ---*/
+  
+  geometry_container[ZONE_0][MESH_0]->SetPositive_ZArea(config_container[ZONE_0]);
+  
   /*--- Definition of the solver class: solver_container[#ZONES][#MG_GRIDS][#EQ_SYSTEMS].
    The solver classes are specific to a particular set of governing equations,
    and they contain the subroutines with instructions for computing each spatial
@@ -216,16 +217,6 @@ int main(int argc, char *argv[]) {
   MPI::COMM_WORLD.Barrier();
 #endif
   
-  /*--- Computation of wall distances for turbulence modeling ---*/
-  
-  if ((config_container[ZONE_0]->GetKind_Solver() == RANS))
-    geometry_container[ZONE_0][MESH_0]->ComputeWall_Distance(config_container[ZONE_0]);
-  
-  /*--- Computation of positive surface area in the z-plane which is used for
-   the calculation of force coefficient (non-dimensionalization). ---*/
-  
-  geometry_container[ZONE_0][MESH_0]->SetPositive_ZArea(config_container[ZONE_0]);
-  
   /*--- Surface grid deformation using design variables ---*/
   if (rank == MASTER_NODE) cout << endl << "------------------------- Surface grid deformation ----------------------" << endl;
   
@@ -272,13 +263,19 @@ int main(int argc, char *argv[]) {
   if (rank == MASTER_NODE)
     cout << endl <<"------------------------------ Begin Solver -----------------------------" << endl;
   
+#ifdef NO_MPI
+  StartTime = double(clock())/double(CLOCKS_PER_SEC);
+#else
+  MPI::COMM_WORLD.Barrier();
+  StartTime = MPI::Wtime();
+#endif
+  
   while (ExtIter < config_container[ZONE_0]->GetnExtIter()) {
     
     /*--- Set a timer for each iteration. Store the current iteration and
      update  the value of the CFL number (if there is CFL ramping specified)
      in the config class. ---*/
     
-    StartTime = clock();
     config_container[ZONE_0]->SetExtIter(ExtIter);
     config_container[ZONE_0]->UpdateCFL(ExtIter);
     
@@ -290,15 +287,19 @@ int main(int argc, char *argv[]) {
     /*--- Synchronization point after a single solver iteration. Compute the
      wall clock time required. ---*/
     
-#ifndef NO_MPI
+#ifdef NO_MPI
+    StopTime = double(clock())/double(CLOCKS_PER_SEC);
+#else
     MPI::COMM_WORLD.Barrier();
+    StopTime = MPI::Wtime();
 #endif
-    StopTime = clock(); TimeUsed += (StopTime - StartTime);
+    
+    UsedTime = (StopTime - StartTime);
     
     /*--- Update the convergence history file (serial and parallel computations). ---*/
     
     output->SetConvergence_History(&ConvHist_file, geometry_container, solver_container,
-                                   config_container, integration_container, false, TimeUsed, ZONE_0);
+                                   config_container, integration_container, false, UsedTime, ZONE_0);
     
     /*--- Check whether the current simulation has reached the specified
      convergence criteria, and set StopCalc to true, if so. ---*/
@@ -358,29 +359,31 @@ int main(int argc, char *argv[]) {
   /*--- Integration class deallocation ---*/
   //  cout <<"Integration container, deallocated." << endl;
   
-#ifndef NO_MPI
-  /*--- Compute/print the total time for parallel performance benchmarking. ---*/
-#ifdef TIME
+#ifdef NO_MPI
+  StopTime = double(clock())/double(CLOCKS_PER_SEC);
+#else
   MPI::COMM_WORLD.Barrier();
-  finish = MPI::Wtime();
-  time = finish-start;
+  StopTime = MPI::Wtime();
+#endif
+  
+  /*--- Compute/print the total time for performance benchmarking. ---*/
+  
+  UsedTime = StopTime-StartTime;
   if (rank == MASTER_NODE) {
-    cout << "\nCompleted in " << fixed << time << " seconds on "<< size;
-    if (size == 1) cout << " core.\n" << endl;
-    else cout << " cores.\n" << endl;
+    cout << "\nCompleted in " << fixed << UsedTime << " seconds on "<< size;
+    if (size == 1) cout << " core." << endl; else cout << " cores." << endl;
   }
-#endif
-  /*--- Finalize MPI parallelization ---*/
-  old_buffer = buffer;
-  MPI::Detach_buffer(old_buffer);
-  //	delete [] buffer;
-  MPI::Finalize();
-#endif
   
   /*--- Exit the solver cleanly ---*/
   
   if (rank == MASTER_NODE)
-    cout << endl <<"------------------------- Exit Success (SU2_EDU) ------------------------" << endl << endl;
+  cout << endl <<"------------------------- Exit Success (SU2_EDU) ------------------------" << endl << endl;
+  
+  /*--- Finalize MPI parallelization ---*/
+#ifndef NO_MPI
+  MPI::Finalize();
+#endif
   
   return EXIT_SUCCESS;
+  
 }
