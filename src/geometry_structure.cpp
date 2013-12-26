@@ -2398,6 +2398,154 @@ void CPhysicalGeometry::SetPsuP(void) {
   
 }
 
+void CPhysicalGeometry::SetRCM(CConfig *config) {
+  unsigned long iPoint, AdjPoint, AuxPoint, AddPoint, iElem;
+  vector<unsigned long> Queue, AuxQueue, Result;
+  unsigned short Degree, MinDegree, iNode, jNode, iDim, iMarker;
+  bool *AddIndex, inQueue;
+  
+  AddIndex = new bool [nPoint];
+  
+  for(iPoint = 0; iPoint < nPoint; iPoint++)
+    AddIndex[iPoint] = false;
+  
+  /*--- Select the node with the lowest degree in the grid. ---*/
+  
+  MinDegree = node[0]->GetnNeighbor(); AddPoint = 0;
+  for(iPoint = 1; iPoint < nPointDomain; iPoint++) {
+    Degree = node[iPoint]->GetnPoint();
+    if ((Degree < MinDegree) && (AddIndex[iPoint] == false)) {
+      MinDegree = Degree;
+      AddPoint = iPoint;
+    }
+  }
+  
+  /*--- Add the node in the first free position. ---*/
+  Result.push_back(AddPoint); AddIndex[AddPoint] = true;
+  
+  /*--- Loop until reorganize all the nodes ---*/
+  
+  while (Result.size() < nPointDomain) {
+    
+    /*--- Add to the queue all the nodes adjacent in the increasing
+     order of their degree, checking if the element is already
+     in the Queue. ---*/
+    
+    AuxQueue.clear();
+    for (iNode = 0; iNode < node[AddPoint]->GetnPoint(); iNode++) {
+      AdjPoint = node[AddPoint]->GetPoint(iNode);
+      
+      inQueue = false;
+      for (jNode = 0; jNode < Queue.size(); jNode++) {
+        if (Queue[jNode] == AdjPoint) { inQueue = true; break; }
+      }
+      
+      if ((AddIndex[AdjPoint] == false) && (!inQueue) && (AdjPoint < nPointDomain))
+        
+        AuxQueue.push_back(AdjPoint);
+    }
+    
+    for (iNode = 0; iNode < AuxQueue.size(); iNode++) {
+      for (jNode = 0; jNode < AuxQueue.size() - 1 - iNode; jNode++) {
+        if (node[AuxQueue[jNode]]->GetnPoint() > node[AuxQueue[jNode+1]]->GetnPoint()) {
+          AuxPoint = AuxQueue[jNode];
+          AuxQueue[jNode] = AuxQueue[jNode+1];
+          AuxQueue[jNode+1] = AuxPoint;
+        }
+      }
+    }
+    
+    Queue.insert(Queue.end(), AuxQueue.begin(), AuxQueue.end());
+    
+    /*--- Extract the first node from the queue and add it in the first free
+     position. ---*/
+    
+    AddPoint = Queue[0];
+    Result.push_back(Queue[0]); AddIndex[Queue[0]] = true;
+    Queue.erase (Queue.begin(), Queue.begin()+1);
+    
+    /*--- Add to the queue all the nodes adjacent in the increasing
+     order of their degree, checking if the element is already
+     in the Queue. ---*/
+    
+  }
+  
+  delete[] AddIndex;
+  
+  reverse(Result.begin(), Result.end());
+  
+  /*--- Add the MPI points ---*/
+  for(iPoint = nPointDomain; iPoint < nPoint; iPoint++) {
+    Result.push_back(iPoint);
+  }
+  
+  /*--- Reset old data structures ---*/
+  
+  for (iPoint = 0; iPoint < nPoint; iPoint++) {
+    node[iPoint]->ResetElem();
+    node[iPoint]->ResetPoint();
+    node[iPoint]->ResetBoundary();
+    node[iPoint]->SetPhysicalBoundary(false);
+  }
+  
+  /*--- Set the new coordinates ---*/
+  
+  double **AuxCoord;
+  
+  AuxCoord = new double* [nPoint];
+  for (iPoint = 0; iPoint < nPoint; iPoint++)
+    AuxCoord[iPoint] = new double [nDim];
+  
+  for (iPoint = 0; iPoint < nPoint; iPoint++) {
+    for (iDim = 0; iDim < nDim; iDim++) {
+      AuxCoord[iPoint][iDim] = node[iPoint]->GetCoord(iDim);
+    }
+  }
+  
+  for (iPoint = 0; iPoint < nPoint; iPoint++) {
+    for (iDim = 0; iDim < nDim; iDim++)
+      node[iPoint]->SetCoord(iDim, AuxCoord[Result[iPoint]][iDim]);
+  }
+  
+  for (iPoint = 0; iPoint < nPoint; iPoint++)
+    delete[] AuxCoord[iPoint];
+  delete[] AuxCoord;
+  
+  /*--- Set the new conectivities ---*/
+  
+  unsigned long *InvResult;
+  InvResult = new unsigned long [nPoint];
+  for (iPoint = 0; iPoint < nPoint; iPoint++)
+    InvResult[Result[iPoint]] = iPoint;
+  
+  
+  for(iElem = 0; iElem < nElem; iElem++) {
+    
+    for (iNode = 0; iNode < elem[iElem]->GetnNodes(); iNode++) {
+      iPoint = elem[iElem]->GetNode(iNode);
+      elem[iElem]->SetNode(iNode, InvResult[iPoint]);
+    }
+  }
+  
+  for (iMarker = 0; iMarker < nMarker; iMarker++) {
+    for (iElem = 0; iElem < nElem_Bound[iMarker]; iElem++) {
+      for (iNode = 0; iNode < bound[iMarker][iElem]->GetnNodes(); iNode++) {
+        iPoint = bound[iMarker][iElem]->GetNode(iNode);
+        bound[iMarker][iElem]->SetNode(iNode, InvResult[iPoint]);
+        node[InvResult[iPoint]]->SetBoundary(nMarker);
+        if (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE &&
+            config->GetMarker_All_Boundary(iMarker) != INTERFACE_BOUNDARY &&
+            config->GetMarker_All_Boundary(iMarker) != NEARFIELD_BOUNDARY &&
+            config->GetMarker_All_Boundary(iMarker) != PERIODIC_BOUNDARY)
+          node[InvResult[iPoint]]->SetPhysicalBoundary(true);
+      }
+    }
+  }
+  
+  delete[] InvResult;
+  
+}
+
 void CPhysicalGeometry::SetEsuE(void) {
   unsigned short first_elem_face, second_elem_face, iFace, iNode, jElem;
   unsigned long face_point, Test_Elem, iElem;

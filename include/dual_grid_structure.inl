@@ -23,10 +23,13 @@
 
 #pragma once
 
-inline void CPoint::SetElem(unsigned long val_elem) { 
-	Elem.push_back(val_elem); 
-	nElem = Elem.size();
-}
+inline void CPoint::SetElem(unsigned long val_elem) { Elem.push_back(val_elem); nElem = Elem.size(); }
+
+inline void CPoint::ResetBoundary(void) { if (vertex != NULL) delete [] vertex; Boundary = false; }
+
+inline void CPoint::ResetElem(void) { Elem.clear(); nElem = 0; }
+
+inline void CPoint::ResetPoint(void) { Point.clear(); Edge.clear(); nPoint = 0; }
 
 inline double CPoint::GetCoord(unsigned short val_dim) { return coord[val_dim]; }
 

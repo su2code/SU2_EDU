@@ -44,8 +44,6 @@ void CIntegration::Space_Integration(CGeometry *geometry, CSolver **solver_conta
 	unsigned short iMarker;
     
 	unsigned short MainSolver = config->GetContainerPosition(RunTime_EqSystem);
-    bool dual_time = ((config->GetUnsteady_Simulation() == DT_STEPPING_1ST) ||
-                      (config->GetUnsteady_Simulation() == DT_STEPPING_2ND));
     
 	/*--- Compute inviscid residuals ---*/
 	switch (config->GetKind_ConvNumScheme()) {
@@ -73,11 +71,7 @@ void CIntegration::Space_Integration(CGeometry *geometry, CSolver **solver_conta
             solver_container[MainSolver]->Source_Residual(geometry, solver_container, numerics[SOURCE_FIRST_TERM], numerics[SOURCE_SECOND_TERM], config, iMesh);
             break;
 	}
-    
-	/*--- Add viscous and convective residuals, and compute the Dual Time Source term ---*/
-	if (dual_time)
-		solver_container[MainSolver]->SetResidual_DualTime(geometry, solver_container, config, iRKStep, iMesh, RunTime_EqSystem);
-    
+  
 	/*--- Weak boundary conditions ---*/
 	for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
 		switch (config->GetMarker_All_Boundary(iMarker)) {

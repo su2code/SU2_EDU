@@ -4526,37 +4526,37 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   }
 
 
-  /*-- Get airfoil scaling --*/
-  while(1) {
-
-    cout << endl;
-    cout << "Enter airfoil scaling [1.0]: " ;
-    getline(cin, Input);
-
-    stringstream myStream(Input);
-
-    /*-- Handle default option --*/
-    if (Input.empty())
-      myStream << "1.0";
-
-    /*-- Check for valid input --*/
-    if (myStream >> AirfoilScale) {
-        break;
-    }
-    
-  }
+//  /*-- Get airfoil scaling --*/
+//  while(1) {
+//
+//    cout << endl;
+//    cout << "Enter airfoil scaling [1.0]: " ;
+//    getline(cin, Input);
+//
+//    stringstream myStream(Input);
+//
+//    /*-- Handle default option --*/
+//    if (Input.empty())
+//      myStream << "1.0";
+//
+//    /*-- Check for valid input --*/
+//    if (myStream >> AirfoilScale) {
+//        break;
+//    }
+//    
+//  }
 
   /*-- Decide whether or not to close the airfoil --*/
   while(1) {
 
     cout << endl;
-    cout << "Close the airfoil (Y/N)? [Y]: ";
+    cout << "Close the airfoil (Y/N)? [N]: ";
 
     getline(cin, Input);
 
     /*-- Handle default option --*/
     if (Input.empty())
-      Input = "Y";
+      Input = "N";
 
     /*-- Check for valid input --*/
     if (Input.compare("Y")==0) {

@@ -2608,63 +2608,14 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
 	iMarker_SymWall, iMarker_PerBound, iMarker_Pressure, iMarker_NearFieldBound, iMarker_InterfaceBound, iMarker_Dirichlet,
 	iMarker_Inlet, iMarker_Outlet, iMarker_Isothermal, iMarker_HeatFlux, iMarker_NacelleInflow, iMarker_NacelleExhaust, iMarker_Displacement, iMarker_Load, iMarker_FlowLoad,  iMarker_Neumann, iMarker_Monitoring, iMarker_Designing, iMarker_Plotting, iMarker_DV, iMarker_Moving, iMarker_Supersonic_Inlet;
 
-	cout << endl <<"-------------------------------------------------------------------------" << endl;
-	cout <<"|    _____   _    _   ___                                               |" << endl;
-	cout <<"|   / ____| | |  | | |__ \\    Web: su2.stanford.edu                     |" << endl;
-	cout <<"|  | (___   | |  | |    ) |   Twitter: @su2code                         |" << endl;
-	cout <<"|   \\___ \\  | |  | |   / /    Forum: www.cfd-online.com/Forums/su2/     |" << endl;
-	cout <<"|   ____) | | |__| |  / /_                                              |" << endl;
-	switch (val_software) {
-	case SU2_CFD: cout << "|  |_____/   \\____/  |____|   Suite (Computational Fluid Dynamic Code)  |" << endl; break;
-  case SU2_EDU: cout << "|  |_____/   \\____/  |____|   Suite (Educational Code)                  |" << endl; break;
-	case SU2_MDC: cout << "|  |_____/   \\____/  |____|   Suite (Mesh Deformation Code)             |" << endl; break;
-	case SU2_GPC: cout << "|  |_____/   \\____/  |____|   Suite (Gradient Projection Code)          |" << endl; break;
-	case SU2_DDC: cout << "|  |_____/   \\____/  |____|   Suite (Domain Decomposition Code)         |" << endl; break;
-	case SU2_MAC: cout << "|  |_____/   \\____/  |____|   Suite (Mesh Adaptation Code)              |" << endl; break;
-	case SU2_GDC: cout << "|  |_____/   \\____/  |____|   Suite (Geometry Design Code)              |" << endl; break;
-	case SU2_PBC: cout << "|  |_____/   \\____/  |____|   Suite (Periodic Boundary Code)            |" << endl; break;
-	case SU2_SOL: cout << "|  |_____/   \\____/  |____|   Suite (Solution Exporting Code)           |" << endl; break;
-	}
-
-	cout << "|                             Release 2.0.9                             |" << endl;
-  cout <<"-------------------------------------------------------------------------" << endl;
-  cout << "| Stanford University Unstructured (SU2).                               |" << endl; 
-  cout << "| Copyright (C) 2012-2013 Aerospace Design Laboratory (ADL).            |" << endl;
-  cout << "| SU2 is distributed in the hope that it will be useful,                |" << endl;
-  cout << "| but WITHOUT ANY WARRANTY; without even the implied warranty of        |" << endl;
-  cout << "| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |" << endl;
-  cout << "| Lesser General Public License (version 2.1) for more details.         |" << endl;
-	cout <<"-------------------------------------------------------------------------" << endl;
-
 	cout << endl <<"------------------------ Physical case definition -----------------------" << endl;
 	if ((val_software == SU2_CFD) || (val_software == SU2_EDU)) {
 		switch (Kind_Solver) {
-      case EULER:
-        if (Kind_Regime == COMPRESSIBLE) cout << "Compressible Euler equations." << endl;
-        if (Kind_Regime == INCOMPRESSIBLE) cout << "Incompressible Euler equations." << endl;
-        if (Kind_Regime == FREESURFACE) {
-          cout << "Incompressible Euler equations with FreeSurface." << endl;
-          cout << "Free surface flow equation. Density ratio: " << RatioDensity << "." << endl;
-          cout << "The free surface is located at: " << FreeSurface_Zero <<", and its thickness is: " << FreeSurface_Thickness << "." << endl;
-        }
-        break;
+      case EULER: cout << "Compressible Euler equations." << endl; break;
       case NAVIER_STOKES:
-        if (Kind_Regime == COMPRESSIBLE) cout << "Compressible Laminar Navier-Stokes' equations." << endl;
-        if (Kind_Regime == INCOMPRESSIBLE) cout << "Incompressible Laminar Navier-Stokes' equations." << endl;
-        if (Kind_Regime == FREESURFACE) {
-          cout << "Incompressible Laminar Navier-Stokes' equations with FreeSurface." << endl;
-          cout << "Free surface flow equation. Density ratio: " << RatioDensity <<". Viscosity ratio: "<< RatioViscosity << "." << endl;
-          cout << "The free surface is located at: " << FreeSurface_Zero <<", and its thickness is: " << FreeSurface_Thickness << "." << endl;
-        }
-        break;
+        cout << "Compressible Laminar Navier-Stokes' equations." << endl; break;
       case RANS:
-        if (Kind_Regime == COMPRESSIBLE) cout << "Compressible RANS equations." << endl;
-        if (Kind_Regime == INCOMPRESSIBLE) cout << "Incompressible RANS equations." << endl;
-        if (Kind_Regime == FREESURFACE) {
-          cout << "Incompressible RANS equations with FreeSurface." << endl;
-          cout << "Free surface flow equation. Density ratio: " << RatioDensity <<". Viscosity ratio: "<< RatioViscosity << "." << endl;
-          cout << "The free surface is located at: " << FreeSurface_Zero <<", and its thickness is: " << FreeSurface_Thickness << "." << endl;
-        }
+        cout << "Compressible RANS equations." << endl;
         cout << "Turbulence model: ";
         switch (Kind_Turb_Model) {
           case SA:  cout << "Spalart Allmaras" << endl; break;
@@ -2672,79 +2623,16 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
           case ML: cout << "Machine Learning" <<endl;break;
         }
         break;
-      case TNE2_EULER:
-        cout << "Compressible TNE2 Euler equations." << endl;
-        break;
-      case TNE2_NAVIER_STOKES:
-        cout << "Compressible TNE2 Laminar Navier-Stokes' equations." << endl;
-        break;
-			case POISSON_EQUATION: cout << "Poisson equation." << endl; break;
-			case WAVE_EQUATION: cout << "Wave equation." << endl; break;
-			case HEAT_EQUATION: cout << "Heat equation." << endl; break;
-			case LINEAR_ELASTICITY: cout << "Linear elasticity solver." << endl; break;
-			case FLUID_STRUCTURE_EULER: case FLUID_STRUCTURE_NAVIER_STOKES: cout << "Fluid-structure interaction." << endl; break;
-			case ADJ_EULER: cout << "Continuous Euler adjoint equations." << endl; break;
-			case ADJ_NAVIER_STOKES:
-				if (Frozen_Visc)
-					cout << "Continuous Navier-Stokes adjoint equations with frozen (laminar) viscosity." << endl;
-				else
-					cout << "Continuous Navier-Stokes adjoint equations." << endl;
-				break;
-      case ADJ_TNE2_EULER: cout << "Continuous TNE2 Euler adjoint equations." << endl; break;
-			case ADJ_TNE2_NAVIER_STOKES:
-					cout << "Continuous TNE2 Navier-Stokes adjoint equations with frozen (laminar) viscosity." << endl;
-				break;
-			case ADJ_RANS:
-        if (Frozen_Visc)
-          cout << "Continuous RANS adjoint equations with frozen (laminar and eddy) viscosity." << endl;
-        else
-          cout << "Continuous RANS adjoint equations." << endl;
-        
-				break;
-			case LIN_EULER: cout << "Linearized Euler equations." << endl; break;
-        
 		}
 
-		if ((Kind_Regime == COMPRESSIBLE) && (Kind_Solver != LINEAR_ELASTICITY) &&
-        (Kind_Solver != HEAT_EQUATION) && (Kind_Solver != WAVE_EQUATION)) {
 			cout << "Mach number: " << Mach <<"."<< endl;
 			cout << "Angle of attack (AoA): " << AoA <<" deg, and angle of sideslip (AoS): " << AoS <<" deg."<< endl;
 			if ((Kind_Solver == NAVIER_STOKES) || (Kind_Solver == ADJ_NAVIER_STOKES) ||
 					(Kind_Solver == RANS) || (Kind_Solver == ADJ_RANS))
 				cout << "Reynolds number: " << Reynolds <<"."<< endl;
-		}
-
-		if (EquivArea) {
-			cout <<"The equivalent area is going to be evaluated on the near-field."<< endl;
-			cout <<"The lower integration limit is "<<EA_IntLimit[0]<<", and the upper is "<<EA_IntLimit[1]<<"."<<endl;
-			cout <<"The near-field is situated at "<<EA_IntLimit[2]<<"."<<endl;
-		}
     
-		if (Grid_Movement) {
-			cout << "Performing a dynamic mesh simulation: ";
-      switch (Kind_GridMovement[ZONE_0]) {
-        case NO_MOVEMENT:     cout << "no movement." << endl; break;
-        case DEFORMING:       cout << "deforming mesh motion." << endl; break;
-        case RIGID_MOTION:    cout << "rigid mesh motion." << endl; break;
-        case MOVING_WALL:     cout << "moving walls." << endl; break;
-        case ROTATING_FRAME:  cout << "rotating reference frame." << endl; break;
-        case AEROELASTIC:     cout << "aeroelastic motion." << endl; break;
-        case FLUID_STRUCTURE: cout << "fluid-structure motion." << endl; break;
-        case EXTERNAL:        cout << "externally prescribed motion." << endl; break;
-      }
-		}
-
-		if (Restart) {
-			if (!Adjoint && !Linearized) cout << "Read flow solution from: " << Solution_FlowFileName << "." << endl;
-			if (Adjoint) cout << "Read adjoint solution from: " << Solution_AdjFileName << "." << endl;
-			if (Linearized) cout << "Read linearized solution from: " << Solution_LinFileName << "." << endl;
-		}
-		else {
-			cout << "No restart solution, use the values at infinity (freestream)." << endl;
-		}
-
-		if (Adjoint || Linearized)
-			cout << "Read flow solution from: " << Solution_FlowFileName << "." << endl;
+		if (Restart) { cout << "Read flow solution from: " << Solution_FlowFileName << "." << endl; }
+		else { cout << "No restart solution, use the values at infinity (freestream)." << endl; }
 
 		if (RefAreaCoeff == 0) cout << "The reference length/area will be computed using y(2D) or z(3D) projection." <<endl;
 		else cout << "The reference length/area (force coefficient) is " << RefAreaCoeff << "." <<endl;
@@ -2810,96 +2698,6 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
 
 	cout << "Input mesh file name: " << Mesh_FileName << endl;
 
-	if (Divide_Element) cout << "Divide grid elements into triangles and tetrahedra." << endl;
-
-	if (val_software == SU2_GPC) {
-		cout << "Input sensitivity file name: " << SurfAdjCoeff_FileName << "." << endl;
-	}
-
-	if (val_software == SU2_MAC) {
-		switch (Kind_Adaptation) {
-		case FULL: case WAKE: case TWOPHASE: case FULL_FLOW: case FULL_ADJOINT: case FULL_LINEAR: case SMOOTHING: case SUPERSONIC_SHOCK:
-			break;
-		case GRAD_FLOW:
-			cout << "Read flow solution from: " << Solution_FlowFileName << "." << endl;
-			break;
-		case GRAD_ADJOINT:
-			cout << "Read adjoint flow solution from: " << Solution_AdjFileName << "." << endl;
-			break;
-		case GRAD_FLOW_ADJ: case ROBUST: case COMPUTABLE_ROBUST: case COMPUTABLE: case REMAINING:
-			cout << "Read flow solution from: " << Solution_FlowFileName << "." << endl;
-			cout << "Read adjoint flow solution from: " << Solution_AdjFileName << "." << endl;
-			break;
-		}
-	}
-
-	if (val_software == SU2_MDC) {
-		cout << endl <<"---------------------- Grid deformation parameters ----------------------" << endl;
-		cout << "Grid deformation using a linear elasticity method." << endl;
-
-		if (Design_Variable[0] != NO_DEFORMATION && Design_Variable[0] != SURFACE_FILE) {
-			if (Hold_GridFixed == YES) cout << "Hold some regions of the mesh fixed (hardcode implementation)." <<endl;
-			cout << "Geo. design var. definition (markers <-> value def. <-> param):" <<endl;
-			for (unsigned short iDV = 0; iDV < nDV; iDV++) {
-				switch (Design_Variable[iDV]) {
-				case NO_DEFORMATION: cout << "There isn't any deformation." ; break;
-				case HICKS_HENNE: cout << "Hicks Henne <-> " ; break;
-				case COSINE_BUMP: cout << "Cosine bump <-> " ; break;
-				case FOURIER: cout << "Fourier <-> " ; break;
-				case SPHERICAL: cout << "Spherical design <-> " ; break;
-				case MACH_NUMBER: cout << "Mach number <-> " ; break;
-				case DISPLACEMENT: cout << "Displacement design variable."; break;
-				case NACA_4DIGITS: cout << "NACA four digits <-> "; break;
-				case PARABOLIC: cout << "Parabolic <-> "; break;
-				case OBSTACLE: cout << "Obstacle <-> "; break;
-        case AIRFOIL: cout << "Airfoil <-> "; break;
-				case STRETCH: cout << "Stretch <-> "; break;
-				case ROTATION: cout << "Rotation <-> "; break;
-				case FFD_CONTROL_POINT: cout << "FFD (control point) <-> "; break;
-				case FFD_DIHEDRAL_ANGLE: cout << "FFD (dihedral angle) <-> "; break;
-				case FFD_TWIST_ANGLE: cout << "FFD (twist angle) <-> "; break;
-				case FFD_ROTATION: cout << "FFD (rotation) <-> "; break;
-				case FFD_CAMBER: cout << "FFD (camber) <-> "; break;
-				case FFD_THICKNESS: cout << "FFD (thickness) <-> "; break;
-				case FFD_VOLUME: cout << "FFD (volume) <-> "; break;
-				}
-				for (iMarker_DV = 0; iMarker_DV < nMarker_DV; iMarker_DV++) {
-					cout << Marker_DV[iMarker_DV];
-					if (iMarker_DV < nMarker_DV-1) cout << ", ";
-					else cout << " <-> ";
-				}
-				cout << DV_Value[iDV] << " <-> ";
-
-				if (Design_Variable[iDV] == NO_DEFORMATION) nParamDV = 0;
-				if (Design_Variable[iDV] == HICKS_HENNE) nParamDV = 2;
-				if (Design_Variable[iDV] == SPHERICAL) nParamDV = 3;
-				if (Design_Variable[iDV] == COSINE_BUMP) nParamDV = 3;
-				if (Design_Variable[iDV] == FOURIER) nParamDV = 3;
-				if (Design_Variable[iDV] == DISPLACEMENT) nParamDV = 3;
-				if (Design_Variable[iDV] == ROTATION) nParamDV = 6;
-				if (Design_Variable[iDV] == NACA_4DIGITS) nParamDV = 3;
-				if (Design_Variable[iDV] == PARABOLIC) nParamDV = 2;
-				if (Design_Variable[iDV] == OBSTACLE) nParamDV = 2;
-        if (Design_Variable[iDV] == AIRFOIL) nParamDV = 2;
-				if (Design_Variable[iDV] == STRETCH) nParamDV = 2;
-				if (Design_Variable[iDV] == FFD_CONTROL_POINT) nParamDV = 7;
-				if (Design_Variable[iDV] == FFD_DIHEDRAL_ANGLE) nParamDV = 7;
-				if (Design_Variable[iDV] == FFD_TWIST_ANGLE) nParamDV = 7;
-				if (Design_Variable[iDV] == FFD_ROTATION) nParamDV = 7;
-				if (Design_Variable[iDV] == FFD_CAMBER) nParamDV = 3;
-				if (Design_Variable[iDV] == FFD_THICKNESS) nParamDV = 3;
-				if (Design_Variable[iDV] == FFD_VOLUME) nParamDV = 3;
-
-				for (unsigned short iParamDV = 0; iParamDV < nParamDV; iParamDV++) {
-					if (iParamDV == 0) cout << "( ";
-					cout << ParamDV[iDV][iParamDV];
-					if (iParamDV < nParamDV-1) cout << ", ";
-					else cout <<" )"<<endl;
-				}
-			}
-		}
-	}
-
 	if ((((val_software == SU2_CFD) || (val_software == SU2_EDU)) && ( Linearized )) || (val_software == SU2_GPC)) {
 		cout << endl <<"-------------------- Surface deformation parameters ---------------------" << endl;
 		cout << "Geo. design var. definition (markers <-> old def., new def. <-> param):" <<endl;
@@ -2962,37 +2760,6 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
 		}
 	}
 
-	if ((((val_software == SU2_CFD) || (val_software == SU2_EDU)) && ( Adjoint || OneShot )) || (val_software == SU2_GPC)) {
-
-		cout << endl <<"----------------------- Design problem definition -----------------------" << endl;
-		switch (Kind_ObjFunc) {
-		case DRAG_COEFFICIENT: cout << "Drag objective function." << endl; break;
-		case LIFT_COEFFICIENT: cout << "Lift objective function." << endl; break;
-		case SIDEFORCE_COEFFICIENT: cout << "Side force objective function." << endl; break;
-		case MOMENT_X_COEFFICIENT: cout << "Mx objective function." << endl; break;
-		case MOMENT_Y_COEFFICIENT: cout << "My objective function." << endl; break;
-		case MOMENT_Z_COEFFICIENT: cout << "Mz objective function." << endl; break;
-		case EFFICIENCY: cout << "Efficiency objective function." << endl; break;
-		case PRESSURE_COEFFICIENT: cout << "Pressure objective function." << endl; break;
-		case EQUIVALENT_AREA:
-			cout << "Equivalent area objective function." << endl;
-			cout << "Drag coefficient weight in the objective function: " << WeightCd <<"."<< endl;  break;
-		case NEARFIELD_PRESSURE:
-			cout << "Nearfield pressure objective function." << endl;
-			cout << "Drag coefficient weight in the objective function: " << WeightCd <<"."<< endl;  break;
-
-			break;
-		case FORCE_X_COEFFICIENT: cout << "X-force objective function." << endl; break;
-		case FORCE_Y_COEFFICIENT: cout << "Y-force moment objective function." << endl; break;
-		case FORCE_Z_COEFFICIENT: cout << "Z-force moment objective function." << endl; break;
-		case THRUST_COEFFICIENT: cout << "Thrust objective function." << endl; break;
-		case TORQUE_COEFFICIENT: cout << "Torque efficiency objective function." << endl; break;
-    case HEAT_LOAD: cout << "Integrated heat flux objective function." << endl; break;
-		case FIGURE_OF_MERIT: cout << "Rotor Figure of Merit objective function." << endl; break;
-		case FREE_SURFACE: cout << "Free-Surface objective function." << endl; break;
-		}
-
-	}
 
 	if ((val_software == SU2_CFD) || (val_software == SU2_EDU)) {
 		cout << endl <<"---------------------- Space numerical integration ----------------------" << endl;
@@ -3038,80 +2805,6 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
 			}
 		}
 
-    if ((Kind_Solver == TNE2_EULER) || (Kind_Solver == TNE2_NAVIER_STOKES)) {
-      if (Kind_ConvNumScheme_TNE2 == SPACE_CENTERED) {
-        if (Kind_ConvNumScheme_TNE2 == LAX) cout << "Lax-Friedrich convective scheme for the inviscid terms of the two-temperature model." << endl;
-      }
-			if (Kind_ConvNumScheme_TNE2 == SPACE_UPWIND) {
-				if (Kind_Upwind_TNE2 == ROE_1ST) cout << "1st order Roe solver for the inviscid terms of the two-temperature model."<< endl;
-				if (Kind_Upwind_TNE2 == ROE_TURKEL_1ST) cout << "1st order Roe-Turkel solver for the inviscid terms of the two-temperature model."<< endl;
-				if (Kind_Upwind_TNE2 == AUSM_1ST)	cout << "1st order AUSM solver for the inviscid terms of the two-temperature model."<< endl;
-				if (Kind_Upwind_TNE2 == HLLC_1ST)	cout << "1st order HLLC solver for the inviscid terms of the two-temperature model."<< endl;
-				if (Kind_Upwind_TNE2 == SW_1ST)	cout << "1st order Steger-Warming solver for the inviscid terms of the two-temperature model."<< endl;
-				if (Kind_Upwind_TNE2 == MSW_1ST)	cout << "1st order Modified Steger-Warming solver for the inviscid terms of the two-temperature model."<< endl;
-			}
-			if ((Kind_ConvNumScheme_TNE2 == SPACE_UPWIND) &&
-					((Kind_Upwind_TNE2 == ROE_2ND) || (Kind_Upwind_Flow == AUSM_2ND) || (Kind_Upwind_Flow == HLLC_2ND)
-           || (Kind_Upwind_TNE2 == SW_2ND) || (Kind_Upwind_Flow == MSW_2ND) || (Kind_Upwind_Flow == ROE_TURKEL_2ND))) {
-            if (Kind_Upwind_TNE2 == ROE_2ND) cout << "2nd order Roe solver for the flow inviscid terms."<< endl;
-            if (Kind_Upwind_TNE2 == ROE_TURKEL_2ND) cout << "2nd order Roe-Turkel solver for the flow inviscid terms."<< endl;
-            if (Kind_Upwind_TNE2 == AUSM_2ND) cout << "2nd order AUSM solver for the flow inviscid terms."<< endl;
-            if (Kind_Upwind_TNE2 == HLLC_2ND) cout << "2nd order HLLC solver for the flow inviscid terms."<< endl;
-            if (Kind_Upwind_TNE2 == SW_2ND) cout << "2nd order Steger-Warming solver for the flow inviscid terms."<< endl;
-            if (Kind_Upwind_TNE2 == MSW_2ND) cout << "2nd order Modified Steger-Warming solver for the flow inviscid terms."<< endl;
-            switch (Kind_SlopeLimit_TNE2) {
-              case NONE: cout << "Without slope-limiting method." << endl; break;
-              case VENKATAKRISHNAN:
-                cout << "Venkatakrishnan slope-limiting method, with constant: " << LimiterCoeff <<". "<< endl;
-                cout << "The reference element size is: " << RefElemLength <<". "<< endl;
-                break;
-              case MINMOD:
-                cout << "Minmod slope-limiting method." << endl;
-                break;
-            }
-          }
-		}
-
-		if ((Kind_Solver == ADJ_EULER) || (Kind_Solver == ADJ_NAVIER_STOKES) || (Kind_Solver == ADJ_RANS)) {
-			if ((Kind_ConvNumScheme_AdjFlow == SPACE_CENTERED) && (Kind_Centered_AdjFlow == JST)) {
-				cout << "Jameson-Schmidt-Turkel scheme for the adjoint inviscid terms."<< endl;
-				cout << "JST viscous coefficients (1st, 2nd, & 4th): " << Kappa_1st_AdjFlow
-						<< ", " << Kappa_2nd_AdjFlow << ", " << Kappa_4th_AdjFlow <<"."<< endl;
-				cout << "The method includes a grid stretching correction (p = 0.3)."<< endl;
-        cout << "The reference sharp edge distance is: " << SharpEdgesCoeff*RefElemLength*LimiterCoeff <<". "<< endl;
-			}
-			if ((Kind_ConvNumScheme_AdjFlow == SPACE_CENTERED) && (Kind_Centered_AdjFlow == LAX))
-				cout << "Lax-Friedrich scheme for the adjoint inviscid terms."<< endl;
-			if ((Kind_ConvNumScheme_AdjFlow == SPACE_UPWIND) && (Kind_Upwind_AdjFlow == ROE_1ST))
-				cout << "1st order Roe solver for the adjoint inviscid terms."<< endl;
-			if ((Kind_ConvNumScheme_AdjFlow == SPACE_UPWIND) && (Kind_Upwind_AdjFlow == ROE_2ND)) {
-				cout << "2nd order Roe solver for the adjoint inviscid terms."<< endl;
-				switch (Kind_SlopeLimit_AdjFlow) {
-				case NONE: cout << "Without slope-limiting method." << endl; break;
-				case VENKATAKRISHNAN:
-            cout << "Venkatakrishnan slope-limiting method, with constant: " << LimiterCoeff <<". "<< endl;
-            cout << "The reference element size is: " << RefElemLength <<". "<< endl;
-            break;
-        case SHARP_EDGES:
-            cout << "Sharp edges slope-limiting method, with constant: " << LimiterCoeff <<". "<< endl;
-            cout << "The reference element size is: " << RefElemLength <<". "<< endl;
-            cout << "The reference sharp edge distance is: " << SharpEdgesCoeff*RefElemLength*LimiterCoeff <<". "<< endl;
-            break;
-				}
-			}
-		}
-
-		if (Kind_Solver == LIN_EULER) {
-			if ((Kind_ConvNumScheme_LinFlow == SPACE_CENTERED) && (Kind_Centered_LinFlow == JST)) {
-				cout << "Jameson-Schmidt-Turkel scheme for the linearized inviscid terms."<< endl;
-				cout << "JST viscous coefficients (1st, & 4th): " << Kappa_1st_LinFlow
-						<< ", " << Kappa_4th_LinFlow <<"."<< endl;
-				cout << "The method includes a grid stretching correction (p = 0.3)."<< endl;
-			}
-			if ((Kind_ConvNumScheme_LinFlow == SPACE_CENTERED) && (Kind_Centered_LinFlow == LAX))
-				cout << "Lax-Friedrich scheme for the linearized inviscid terms."<< endl;
-		}
-
 		if ((Kind_Solver == NAVIER_STOKES) || (Kind_Solver == RANS)) {
 			switch (Kind_ViscNumScheme_Flow) {
 			case AVG_GRAD: cout << "Average of gradients (viscous flow terms)." << endl; break;
@@ -3119,48 +2812,8 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
 			}
 		}
     
-    if (Kind_Solver == ADJ_TNE2_EULER || Kind_Solver == ADJ_TNE2_NAVIER_STOKES) {
-      if ((Kind_ConvNumScheme_AdjTNE2 == SPACE_CENTERED) && (Kind_Centered_AdjTNE2 == JST)) {
-				cout << "Jameson-Schmidt-Turkel scheme for the adjoint inviscid terms."<< endl;
-				cout << "JST viscous coefficients (1st, 2nd, & 4th): " << Kappa_1st_AdjTNE2
-        << ", " << Kappa_2nd_AdjTNE2 << ", " << Kappa_4th_AdjTNE2 <<"."<< endl;
-				cout << "The method includes a grid stretching correction (p = 0.3)."<< endl;
-        cout << "The reference sharp edge distance is: " << SharpEdgesCoeff*RefElemLength*LimiterCoeff <<". "<< endl;
-			}
-			if ((Kind_ConvNumScheme_AdjTNE2 == SPACE_CENTERED) && (Kind_Centered_AdjTNE2 == LAX))
-				cout << "Lax-Friedrich scheme for the adjoint inviscid terms."<< endl;
-			if ((Kind_ConvNumScheme_AdjTNE2 == SPACE_UPWIND) && (Kind_Upwind_AdjTNE2 == ROE_1ST))
-				cout << "1st order Roe solver for the adjoint inviscid terms."<< endl;
-			if ((Kind_ConvNumScheme_AdjTNE2 == SPACE_UPWIND) && (Kind_Upwind_AdjTNE2 == ROE_2ND)) {
-				cout << "2nd order Roe solver for the adjoint inviscid terms."<< endl;
-				switch (Kind_SlopeLimit_AdjTNE2) {
-          case NONE: cout << "Without slope-limiting method." << endl; break;
-          case VENKATAKRISHNAN:
-            cout << "Venkatakrishnan slope-limiting method, with constant: " << LimiterCoeff <<". "<< endl;
-            cout << "The reference element size is: " << RefElemLength <<". "<< endl;
-            break;
-          case SHARP_EDGES:
-            cout << "Sharp edges slope-limiting method, with constant: " << LimiterCoeff <<". "<< endl;
-            cout << "The reference element size is: " << RefElemLength <<". "<< endl;
-            cout << "The reference sharp edge distance is: " << SharpEdgesCoeff*RefElemLength*LimiterCoeff <<". "<< endl;
-            break;
-				}
-			}
-    }
-    
-    if (Kind_Solver == TNE2_NAVIER_STOKES) {
-			switch (Kind_ViscNumScheme_TNE2) {
-        case AVG_GRAD: cout << "Average of gradients (viscous flow terms)." << endl; break;
-        case AVG_GRAD_CORRECTED: cout << "Average of gradients with correction (viscous flow terms)." << endl; break;
-			}
-		}
-    
 		if ((Kind_Solver == EULER) || (Kind_Solver == NAVIER_STOKES) || (Kind_Solver == RANS)) {
 			if (Kind_SourNumScheme_Flow == PIECEWISE_CONSTANT) cout << "Piecewise constant integration of the flow source terms." << endl;
-		}
-
-		if (Kind_Solver == ADJ_EULER) {
-			if (Kind_SourNumScheme_AdjFlow == PIECEWISE_CONSTANT) cout << "Piecewise constant integration of the adjoint source terms." << endl;
 		}
 
 		if (Kind_Solver == RANS) {
@@ -3170,47 +2823,10 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
 				cout << "Scalar upwind solver (second order) for the turbulence model."<< endl;
 		}
 
-		if ((Kind_Solver == ADJ_RANS) && (!Frozen_Visc)) {
-			if ((Kind_ConvNumScheme_AdjTurb == SPACE_UPWIND) && (Kind_Upwind_AdjTurb == SCALAR_UPWIND_1ST))
-				cout << "Adjoint turbulent eq - Scalar upwind solver (first order)"<< endl;
-			if ((Kind_ConvNumScheme_AdjTurb == SPACE_UPWIND) && (Kind_Upwind_AdjTurb == SCALAR_UPWIND_2ND))
-				cout << "Adjoint turbulent eq - Scalar upwind solver (second order)"<< endl;
-		}
-
-		if ((Kind_Solver == ADJ_NAVIER_STOKES) || (Kind_Solver == ADJ_RANS)) {
-			switch (Kind_ViscNumScheme_AdjFlow) {
-			case AVG_GRAD: cout << "Average of gradients (viscous adjoint terms)." << endl; break;
-			case AVG_GRAD_CORRECTED: cout << "Average of gradients with correction (viscous adjoint terms)." << endl; break;
-			}
-		}
-
 		if (Kind_Solver == RANS) {
 			if (Kind_ViscNumScheme_Turb == AVG_GRAD) cout << "Average of gradients (viscous turbulence terms)." << endl;
 			if (Kind_ViscNumScheme_Turb == AVG_GRAD_CORRECTED) cout << "Average of gradients with correction (viscous turbulence terms)." << endl;
 			if (Kind_SourNumScheme_Turb == PIECEWISE_CONSTANT) cout << "Piecewise constant integration of the turbulence model source terms." << endl;
-		}
-
-		if (Kind_Solver == POISSON_EQUATION) {
-			if (Kind_ViscNumScheme_Poisson == GALERKIN) cout << "Galerkin method for viscous terms computation of the poisson potential equation." << endl;
-		}
-
-		if ((Kind_Solver == ADJ_RANS) && (!Frozen_Visc)) {
-			if (Kind_ViscNumScheme_AdjTurb == AVG_GRAD) cout << "Average of gradients (1st order) for computation of adjoint viscous turbulence terms." << endl;
-			if (Kind_ViscNumScheme_AdjTurb == AVG_GRAD_CORRECTED) cout << "Average of gradients with correction (2nd order) for computation of adjoint viscous turbulence terms." << endl;
-			if (Kind_SourNumScheme_AdjTurb == PIECEWISE_CONSTANT) cout << "Piecewise constant integration of the turbulence adjoint model source terms." << endl;
-			if (Kind_TimeIntScheme_AdjTurb == EULER_IMPLICIT) cout << "Euler implicit method for the turbulent adjoint equation." << endl;
-		}
-
-		if ((Kind_Solver == ADJ_NAVIER_STOKES) || (Kind_Solver == ADJ_RANS)) {
-			if (Kind_SourNumScheme_AdjFlow == PIECEWISE_CONSTANT) cout << "Piecewise constant integration of the Navier-Stokes eq. source terms." << endl;
-		}
-
-		if (Kind_Solver == POISSON_EQUATION) {
-			if (Kind_SourNumScheme_Poisson == PIECEWISE_CONSTANT) cout << "Piecewise constant integration of the poisson potential source terms." << endl;
-		}
-    
-    if (Kind_Solver == HEAT_EQUATION) {
-			if (Kind_SourNumScheme_Heat == PIECEWISE_CONSTANT) cout << "Piecewise constant integration of the heat equation source terms." << endl;
 		}
 
 		switch (Kind_Gradient_Method) {
@@ -3218,27 +2834,7 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
 		case WEIGHTED_LEAST_SQUARES: cout << "Gradient Computation using weighted Least-Squares method." << endl; break;
 		}
 
-		if ((Kind_Regime == INCOMPRESSIBLE) || (Kind_Regime == FREESURFACE)) {
-			cout << "Artificial compressibility factor: " << ArtComp_Factor << "." <<endl;
-		}
-
 		cout << endl <<"---------------------- Time numerical integration -----------------------" << endl;
-		switch (Unsteady_Simulation) {
-		case NO:
-			cout << "Local time stepping (steady state simulation)." << endl; break;
-		case TIME_STEPPING:
-			cout << "Unsteady simulation using a time stepping strategy."<< endl;
-			if (Unst_CFL != 0.0) cout << "Time step computed by the code. Unsteady CFL number: " << Unst_CFL <<"."<<endl;
-			else cout << "Unsteady time step provided by the user (s): "<< Delta_UnstTime << "." << endl;
-			break;
-		case DT_STEPPING_1ST: case DT_STEPPING_2ND:
-			if (Unsteady_Simulation == DT_STEPPING_1ST) cout << "Unsteady simulation, dual time stepping strategy (first order in time)."<< endl;
-			if (Unsteady_Simulation == DT_STEPPING_2ND) cout << "Unsteady simulation, dual time stepping strategy (second order in time)."<< endl;
-			if (Unst_CFL != 0.0) cout << "Time step computed by the code. Unsteady CFL number: " << Unst_CFL <<"."<<endl;
-			else cout << "Unsteady time step provided by the user (s): "<< Delta_UnstTime << "." << endl;
-			cout << "Total number of internal Dual Time iterations: "<< Unst_nIntIter <<"." << endl;
-			break;
-		}
 
 		if ((Kind_Solver == EULER) || (Kind_Solver == NAVIER_STOKES) || (Kind_Solver == RANS)) {
 			switch (Kind_TimeIntScheme_Flow) {
@@ -3270,82 +2866,6 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
 				}
 				break;
 			}
-		}
-    
-    if ((Kind_Solver == TNE2_EULER) || (Kind_Solver == TNE2_NAVIER_STOKES)) {
-			switch (Kind_TimeIntScheme_TNE2) {
-        case EULER_IMPLICIT:
-          cout << "Euler implicit method for the flow equations." << endl;
-          switch (Kind_Linear_Solver) {
-            case LU_SGS:
-              cout << "A LU - symmetric Gauss-Seidel iteration is used for solving the linear system." << endl;
-              break;
-            case BCGSTAB:
-              cout << "BCGSTAB is used for solving the linear system." << endl;
-              cout << "Convergence criteria of the linear solver: "<< Linear_Solver_Error <<"."<<endl;
-              cout << "Max number of iterations: "<< Linear_Solver_Iter <<"."<<endl;
-              cout << "Relaxation coefficient: "<< Linear_Solver_Relax <<"."<<endl;
-              break;
-            case FGMRES:
-              cout << "FGMRES is used for solving the linear system." << endl;
-              cout << "Convergence criteria of the linear solver: "<< Linear_Solver_Error <<"."<<endl;
-              cout << "Max number of iterations: "<< Linear_Solver_Iter <<"."<<endl;
-              cout << "Relaxation coefficient: "<< Linear_Solver_Relax <<"."<<endl;
-              break;
-          }
-          break;
-			}
-		}
-
-		if ((Kind_Solver == ADJ_EULER) || (Kind_Solver == ADJ_NAVIER_STOKES) || (Kind_Solver == ADJ_RANS)) {
-			switch (Kind_TimeIntScheme_AdjFlow) {
-			case RUNGE_KUTTA_EXPLICIT:
-				cout << "Runge-Kutta explicit method for the adjoint equations." << endl;
-				cout << "Number of steps: " << nRKStep << endl;
-				cout << "Alpha coefficients: ";
-				for (unsigned short iRKStep = 0; iRKStep < nRKStep; iRKStep++) {
-					cout << "\t" << RK_Alpha_Step[iRKStep];
-				}
-				cout << endl;
-				break;
-			case EULER_EXPLICIT: cout << "Euler explicit method for the adjoint equations." << endl; break;
-			case EULER_IMPLICIT: cout << "Euler implicit method for the adjoint equations." << endl; break;
-			}
-		}
-
-		if (Kind_Solver == LIN_EULER) {
-			switch (Kind_TimeIntScheme_LinFlow) {
-			case RUNGE_KUTTA_EXPLICIT:
-				cout << "Runge-Kutta explicit explicit method for the linearized equations." << endl;
-				cout << "Number of steps: " << nRKStep << endl;
-				cout << "Alpha coefficients: ";
-				for (unsigned short iRKStep = 0; iRKStep < nRKStep; iRKStep++) {
-					cout << "\t" << RK_Alpha_Step[iRKStep];
-				}
-				cout << endl;
-				break;
-			case EULER_EXPLICIT: cout << "Euler explicit method for the linearized equations." << endl; break;
-			}
-		}
-    
-    if ((Kind_Solver == ADJ_TNE2_EULER) || (Kind_Solver == ADJ_TNE2_NAVIER_STOKES)) {
-			switch (Kind_TimeIntScheme_AdjTNE2) {
-        case RUNGE_KUTTA_EXPLICIT:
-          cout << "Runge-Kutta explicit method for the adjoint equations." << endl;
-          cout << "Number of steps: " << nRKStep << endl;
-          cout << "Alpha coefficients: ";
-          for (unsigned short iRKStep = 0; iRKStep < nRKStep; iRKStep++) {
-            cout << "\t" << RK_Alpha_Step[iRKStep];
-          }
-          cout << endl;
-          break;
-        case EULER_EXPLICIT: cout << "Euler explicit method for the adjoint equations." << endl; break;
-        case EULER_IMPLICIT: cout << "Euler implicit method for the adjoint equations." << endl; break;
-			}
-		}
-
-		if (FullMG) {
-			cout << "Full Multigrid." << endl;
 		}
 
 		if (nMultiLevel !=0) {
@@ -3469,40 +2989,6 @@ void CConfig::SetOutput(unsigned short val_software, unsigned short val_izone) {
 			}
 
 		}
-
-	}
-
-	if (val_software == SU2_MAC) {
-		cout << endl <<"----------------------- Grid adaptation strategy ------------------------" << endl;
-
-		switch (Kind_Adaptation) {
-		case NONE: break;
-		case FULL: cout << "Grid adaptation using a complete refinement." << endl; break;
-		case WAKE: cout << "Grid adaptation of the wake." << endl; break;
-		case TWOPHASE: cout << "Grid adaptation of the interphase of a free surface flow." << endl; break;
-		case FULL_FLOW: cout << "Flow grid adaptation using a complete refinement." << endl; break;
-		case FULL_ADJOINT: cout << "Adjoint grid adaptation using a complete refinement." << endl; break;
-		case FULL_LINEAR: cout << "Linear grid adaptation using a complete refinement." << endl; break;
-		case GRAD_FLOW: cout << "Grid adaptation using gradient based strategy (density)." << endl; break;
-		case GRAD_ADJOINT: cout << "Grid adaptation using gradient based strategy (adjoint density)." << endl; break;
-		case GRAD_FLOW_ADJ: cout << "Grid adaptation using gradient based strategy (density and adjoint density)." << endl; break;
-		case ROBUST: cout << "Grid adaptation using robust adaptation."<< endl; break;
-		case COMPUTABLE: cout << "Grid adaptation using computable correction."<< endl; break;
-		case COMPUTABLE_ROBUST: cout << "Grid adaptation using computable correction."<< endl; break;
-		case REMAINING: cout << "Grid adaptation using remaining error."<< endl; break;
-		case SMOOTHING: cout << "Grid smoothing using an implicit method."<< endl; break;
-		case SUPERSONIC_SHOCK: cout << "Grid adaptation for a supersonic shock at Mach: " << Mach <<"."<< endl; break;
-		}
-
-		switch (Kind_Adaptation) {
-		case GRAD_FLOW: case GRAD_ADJOINT: case GRAD_FLOW_ADJ: case ROBUST: case COMPUTABLE: case COMPUTABLE_ROBUST: case REMAINING:
-			cout << "Power of the dual volume in the adaptation sensor: " << DualVol_Power <<endl;
-			cout << "Percentage of new elements in the adaptation process: " << New_Elem_Adapt << "."<<endl;
-			break;
-		}
-
-		if (Analytical_Surface != NONE)
-			cout << "Use analytical definition for including points in the surfaces." <<endl;
 
 	}
 

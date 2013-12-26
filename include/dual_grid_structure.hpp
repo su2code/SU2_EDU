@@ -289,13 +289,23 @@ public:
 	 * \param[in] val_elem - Element to be added.		 
 	 */
 	void SetElem(unsigned long val_elem);
-	
+  
+  /*!
+	 * \brief Reset the elements of a control volume.
+	 */
+	void ResetElem(void);
+  
 	/*! 
 	 * \brief Set the points that compose the control volume.
 	 * \param[in] val_point - Point to be added.		 
 	 */
 	void SetPoint(unsigned long val_point);
 	
+  /*!
+	 * \brief Reset the points that compose the control volume.
+	 */
+	void ResetPoint(void);
+  
 	/*! 
 	 * \brief Set the edges that compose the control volume.
 	 * \param[in] val_edge - Edge to be added.
@@ -363,6 +373,11 @@ public:
 	 */		
 	void SetBoundary(unsigned short val_nmarker);
 	
+  /*!
+	 * \brief Reset the boundary of a control volume.
+	 */
+	void ResetBoundary(void);
+  
 	/*! 
 	 * \overload
 	 * \param[in] val_boundary - <code>TRUE</code> if the point belong to the boundary; otherwise <code>FALSE</code>.

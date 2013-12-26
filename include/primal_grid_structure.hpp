@@ -206,6 +206,13 @@ public:
 	 */
 	virtual unsigned long GetNode(unsigned short val_node) = 0;
 	
+  /*!
+	 * \brief A pure virtual member.
+	 * \param[in] val_node - Local index of a node.
+   * \param[in] val_point - Point associated to the node.
+	 */
+  virtual void SetNode(unsigned short val_node, unsigned long val_point);
+  
 	/*!
 	 * \brief A pure virtual member.
 	 * \param[in] val_face - Local index of the face.
@@ -261,7 +268,14 @@ public:
 	 * \return Global index of the line node.
 	 */
 	unsigned long GetNode(unsigned short val_node);
-	
+  
+  /*!
+	 * \brief Set the point associated at a node.
+	 * \param[in] val_node - Local index of a node.
+   * \param[in] val_point - Point associated to the node.
+	 */
+  void SetNode(unsigned short val_node, unsigned long val_point);
+  
 	/*!
 	 * \brief Get the number of nodes of an element.
 	 * \return Number of nodes that composes an element.
@@ -374,6 +388,13 @@ public:
 	 * \return Global index of the line node.
 	 */
 	unsigned long GetNode(unsigned short val_node);
+  
+  /*!
+	 * \brief Set the point associated at a node.
+	 * \param[in] val_node - Local index of a node.
+   * \param[in] val_point - Point associated to the node.
+	 */
+  void SetNode(unsigned short val_node, unsigned long val_point);
   
 	/*!
 	 * \brief Get the face index of and element.
@@ -495,7 +516,14 @@ public:
 	 * \return Global index of the triangle node.
 	 */
 	unsigned long GetNode(unsigned short val_node);
-	
+  
+  /*!
+	 * \brief Set the point associated at a node.
+	 * \param[in] val_node - Local index of a node.
+   * \param[in] val_point - Point associated to the node.
+	 */
+  void SetNode(unsigned short val_node, unsigned long val_point);
+  
 	/*!
 	 * \brief Get the face index of and element.
 	 * \param[in] val_face - Local index of the face.
@@ -618,6 +646,13 @@ public:
 	 */
 	unsigned long GetNode(unsigned short val_node);
   
+  /*!
+	 * \brief Set the point associated at a node.
+	 * \param[in] val_node - Local index of a node.
+   * \param[in] val_point - Point associated to the node.
+	 */
+  void SetNode(unsigned short val_node, unsigned long val_point);
+  
 	/*!
 	 * \brief Get the face index of and element.
 	 * \param[in] val_face - Local index of the face.
@@ -737,7 +772,14 @@ public:
 	 * \return Global index of the tetrahedron node.
 	 */
 	unsigned long GetNode(unsigned short val_node);
-	
+  
+  /*!
+	 * \brief Set the point associated at a node.
+	 * \param[in] val_node - Local index of a node.
+   * \param[in] val_point - Point associated to the node.
+	 */
+  void SetNode(unsigned short val_node, unsigned long val_point);
+  
 	/*!
 	 * \brief Get the face index of and element.
 	 * \param[in] val_face - Local index of the face.
@@ -851,7 +893,14 @@ public:
 	 * \return Global index of the triangle node.
 	 */
 	unsigned long GetNode(unsigned short val_node);
-	
+  
+  /*!
+	 * \brief Set the point associated at a node.
+	 * \param[in] val_node - Local index of a node.
+   * \param[in] val_point - Point associated to the node.
+	 */
+  void SetNode(unsigned short val_node, unsigned long val_point);
+  
 	/*!
 	 * \brief Get the face index of and element.
 	 * \param[in] val_face - Local index of the face.
@@ -963,7 +1012,14 @@ public:
 	 * \return Global index of the wedge node.
 	 */
 	unsigned long GetNode(unsigned short val_node);
-	
+  
+  /*!
+	 * \brief Set the point associated at a node.
+	 * \param[in] val_node - Local index of a node.
+   * \param[in] val_point - Point associated to the node.
+	 */
+  void SetNode(unsigned short val_node, unsigned long val_point);
+  
 	/*!
 	 * \brief Get the face index of and element.
 	 * \param[in] val_face - Local index of the face.
@@ -1073,7 +1129,14 @@ public:
 	 * \return Global index of the pyramid node.
 	 */
 	unsigned long GetNode(unsigned short val_node);
-	
+  
+  /*!
+	 * \brief Set the point associated at a node.
+	 * \param[in] val_node - Local index of a node.
+   * \param[in] val_point - Point associated to the node.
+	 */
+  void SetNode(unsigned short val_node, unsigned long val_point);
+  
 	/*!
 	 * \brief Get the face index of and element.
 	 * \param[in] val_face - Local index of the face.

@@ -58,6 +58,25 @@ int main(int argc, char *argv[]) {
   /*--- Load in the number of zones and spatial dimensions in the mesh file (If no config
    file is specified, default.cfg is used) ---*/
   
+  
+	cout << endl <<"-------------------------------------------------------------------------" << endl;
+	cout <<"|    _____   _    _   ___                                               |" << endl;
+	cout <<"|   / ____| | |  | | |__ \\    Web: su2.stanford.edu                     |" << endl;
+	cout <<"|  | (___   | |  | |    ) |   Twitter: @su2code                         |" << endl;
+	cout <<"|   \\___ \\  | |  | |   / /    Forum: www.cfd-online.com/Forums/su2/     |" << endl;
+	cout <<"|   ____) | | |__| |  / /_                                              |" << endl;
+  cout <<"|  |_____/   \\____/  |____|   Suite (Educational Code)                  |" << endl;
+  
+	cout << "|                             Release 1.0.0                             |" << endl;
+  cout <<"-------------------------------------------------------------------------" << endl;
+  cout << "| Stanford University Unstructured (SU2).                               |" << endl;
+  cout << "| Copyright (C) 2012-2013 Aerospace Design Laboratory (ADL).            |" << endl;
+  cout << "| SU2 is distributed in the hope that it will be useful,                |" << endl;
+  cout << "| but WITHOUT ANY WARRANTY; without even the implied warranty of        |" << endl;
+  cout << "| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |" << endl;
+  cout << "| Lesser General Public License (version 2.1) for more details.         |" << endl;
+	cout <<"-------------------------------------------------------------------------" << endl;
+    
   /*-- Get user input for viscous/inviscid --*/
   char config_file_name[200];
   int SimType = 0;
@@ -128,7 +147,7 @@ int main(int argc, char *argv[]) {
    & boundary markers. MESH_0 is the index of the finest mesh. ---*/
   
   geometry_container[ZONE_0] = new CGeometry *[config_container[ZONE_0]->GetMGLevels()+1];
-  geometry_container[ZONE_0][MESH_0] = new CPhysicalGeometry(config_container[ZONE_0],ZONE_1, nZone);
+  geometry_container[ZONE_0][MESH_0] = new CPhysicalGeometry(config_container[ZONE_0], ZONE_1, nZone);
   
   if (rank == MASTER_NODE)
     cout << endl <<"------------------------- Geometry Preprocessing ------------------------" << endl;
@@ -182,9 +201,6 @@ int main(int argc, char *argv[]) {
   /*--- Synchronization point after the solution preprocessing subroutine ---*/
   MPI::COMM_WORLD.Barrier();
 #endif
-  
-  if (rank == MASTER_NODE)
-    cout << endl <<"----------------- Integration and Numerics Preprocessing ----------------" << endl;
   
   /*--- Definition of the integration class: integration_container[#ZONES][#EQ_SYSTEMS].
    The integration class orchestrates the execution of the spatial integration

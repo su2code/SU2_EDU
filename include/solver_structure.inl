@@ -43,9 +43,6 @@ inline unsigned short CSolver::GetIterLinSolver(void) { return IterLinSolver; }
 
 inline double CSolver::GetCSensitivity(unsigned short val_marker, unsigned short val_vertex) { return 0; }
 
-inline void CSolver::SetResidual_DualTime(CGeometry *geometry, CSolver **solver_container, CConfig *config, unsigned short iRKStep,
-                                          unsigned short iMesh, unsigned short RunTime_EqSystem) { }
-
 inline void CSolver::SetFreeSurface_Distance(CGeometry *geometry, CConfig *config) { }
 
 inline void CSolver::SetFEA_Load(CSolver ***flow_solution, CGeometry **fea_geometry, CGeometry **flow_geometry, CConfig *fea_config, CConfig *flow_config) { }
