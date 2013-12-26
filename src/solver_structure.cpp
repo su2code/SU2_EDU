@@ -1338,46 +1338,6 @@ void CSolver::Gauss_Elimination(double** A, double* rhs, unsigned long nVar) {
 	}
 }
 
-void CSolver::Aeroelastic(CSurfaceMovement *surface_movement, CGeometry *geometry, CConfig *config, unsigned long IntIter) {
-  
-  /*--- Variables used for Aeroelastic case ---*/
-  
-  double Cl, Cm;
-  double structural_solution[4]; //contains solution of typical section wing model.
-  
-  unsigned short iMarker, iMarker_Monitoring, Monitoring;
-  string Marker_Tag, Monitoring_Tag;
-  
-  /*--- Loop over markers and find the ones being monitored. ---*/
-  
-  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-    Monitoring = config->GetMarker_All_Monitoring(iMarker);
-    if (Monitoring == YES) {
-      
-      /*--- Find the particular marker being monitored and get the forces acting on it. ---*/
-      
-      for (iMarker_Monitoring = 0; iMarker_Monitoring < config->GetnMarker_Monitoring(); iMarker_Monitoring++) {
-        Monitoring_Tag = config->GetMarker_Monitoring(iMarker_Monitoring);
-        Marker_Tag = config->GetMarker_All_Tag(iMarker);
-        if (Marker_Tag == Monitoring_Tag) {
-          
-          Cl = GetSurface_CLift(iMarker_Monitoring);
-          Cm = -1.0*GetSurface_CMz(iMarker_Monitoring);
-          
-          /*--- Solve the aeroelastic equations for the particular marker(surface) ---*/
-          SolveTypicalSectionWingModel(geometry, Cl, Cm, config, IntIter, iMarker_Monitoring, structural_solution);
-        }
-      }
-      
-      /*--- Compute the new surface node locations ---*/
-      surface_movement->AeroelasticDeform(geometry, config, iMarker, structural_solution);
-      
-    }
-    
-  }
-  
-}
-
 void CSolver::SetUpTypicalSectionWingModel(double (&PHI)[2][2],double (&lambda)[2], CConfig *config) {
   
   /*--- Retrieve values from the config file ---*/

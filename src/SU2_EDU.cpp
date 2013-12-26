@@ -26,6 +26,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
+  
   bool StopCalc = false;
   unsigned long ExtIter = 0;
   double StartTime = 0.0, StopTime = 0.0, UsedTime = 0.0;

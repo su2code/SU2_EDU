@@ -732,8 +732,6 @@ inline unsigned short CConfig::GetOutput_FileFormat(void) { return Output_FileFo
 
 inline string CConfig::GetConv_FileName(void) { return Conv_FileName; }
 
-inline string CConfig::GetFarfield_FileName(void) { return Farfield_FileName; }
-
 inline string CConfig::GetSolution_FlowFileName(void) { return Solution_FlowFileName; }
 
 inline string CConfig::GetSolution_LinFileName(void) { return Solution_LinFileName; }
@@ -842,8 +840,6 @@ inline bool CConfig::GetPoissonSolver(void) { return PoissonSolver; }
 
 inline bool CConfig::Low_Mach_Preconditioning(void) { return Low_Mach_Precon; }
 
-inline bool CConfig::GetUnsteady_Farfield(void) { return Unsteady_Farfield; }
-
 inline bool CConfig::GetInletConditionsDefined(void) { return Inlet_Outlet_Defined; }
 
 inline bool CConfig::GetGravityForce(void) { return GravityForce; }
@@ -951,14 +947,3 @@ inline double CConfig::GetGust_Ampl(void) {return Gust_Ampl;}
 inline double CConfig::GetGust_Begin_Time(void) {return Gust_Begin_Time;}
 
 inline double CConfig::GetGust_Begin_Loc(void) {return Gust_Begin_Loc;}
-
-inline	double  CConfig::GetDensity_FreeStreamND_Time(unsigned long val_Ext_Iter) {return Density_FreeStreamND_Time[val_Ext_Iter];}
-
-inline	double  CConfig::GetPressure_FreeStreamND_Time(unsigned long val_Ext_Iter) {return Pressure_FreeStreamND_Time[val_Ext_Iter];}
-
-inline	double  CConfig::GetEnergy_FreeStreamND_Time(unsigned long val_Ext_Iter) {return Energy_FreeStreamND_Time[val_Ext_Iter];}
-
-inline	double  CConfig::GetMach_FreeStreamND_Time(unsigned long val_Ext_Iter) {return Mach_Inf_Time[val_Ext_Iter];}
-
-inline	double*  CConfig::GetVelocity_FreeStreamND_Time(unsigned long val_Ext_Iter) {return Velocity_FreeStreamND_Time[val_Ext_Iter];}
-

@@ -481,8 +481,10 @@ void CSingleGridIntegration::SingleGrid_Iteration(CGeometry ***geometry, CSolver
   
   /*--- Copy the solution to the coarse levels ---*/
   
-  for (iMesh = 0; iMesh < config[iZone]->GetMGLevels(); iMesh++)
+  for (iMesh = 0; iMesh < config[iZone]->GetMGLevels(); iMesh++) {
     SetRestricted_Solution(RunTime_EqSystem, solver_container[iZone][iMesh], solver_container[iZone][iMesh+1], geometry[iZone][iMesh], geometry[iZone][iMesh+1], config[iZone]);
+    solver_container[iZone][iMesh+1][SolContainer_Position]->Postprocessing(geometry[iZone][iMesh+1], solver_container[iZone][iMesh+1], config[iZone], iMesh+1);
+  }
   
 }
 
@@ -522,12 +524,18 @@ void CSingleGridIntegration::SetRestricted_Solution(unsigned short RunTime_EqSys
   
   /*--- Update solution at the no slip wall boundary ---*/
   
-  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-    if ((config->GetMarker_All_Boundary(iMarker) == HEAT_FLUX) ||
-        (config->GetMarker_All_Boundary(iMarker) == ISOTHERMAL)) {
-      for (iVertex = 0; iVertex < geo_coarse->nVertex[iMarker]; iVertex++) {
-        Point_Coarse = geo_coarse->vertex[iMarker][iVertex]->GetNode();
-        sol_coarse[SolContainer_Position]->node[Point_Coarse]->SetSolutionZero();
+  /*--- Update solution at the no slip wall boundary, only the first
+   variable (nu_tilde -in SA- and k -in SST-), to guarantee that the eddy viscoisty
+   is zero on the surface ---*/
+  
+  if (RunTime_EqSystem == RUNTIME_TURB_SYS) {
+    for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
+      if ((config->GetMarker_All_Boundary(iMarker) == HEAT_FLUX) ||
+          (config->GetMarker_All_Boundary(iMarker) == ISOTHERMAL)) {
+        for (iVertex = 0; iVertex < geo_coarse->nVertex[iMarker]; iVertex++) {
+          Point_Coarse = geo_coarse->vertex[iMarker][iVertex]->GetNode();
+          sol_coarse[SolContainer_Position]->node[Point_Coarse]->SetSolutionZero(0);
+        }
       }
     }
   }

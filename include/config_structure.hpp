@@ -69,7 +69,6 @@ private:
 	Rotating_Frame,			/*!< \brief Flag to know if there is a rotating frame. */
 	PoissonSolver,			/*!< \brief Flag to know if we are solving  poisson forces  in plasma solver. */
 	Low_Mach_Precon,		/*!< \brief Flag to know if we are using a low Mach number preconditioner. */
-	Unsteady_Farfield, 		/*!< \brief Flag to know if we are using time dependent farfield boundaries. */
 	GravityForce,			/*!< \brief Flag to know if the gravity force is incuded in the formulation. */
 	SmoothNumGrid,			/*!< \brief Smooth the numerical grid. */
 	AdaptBoundary,			/*!< \brief Adapt the elements on the boundary. */
@@ -425,7 +424,6 @@ private:
 	Solution_LinFileName,			/*!< \brief Linearized flow solution input file. */
 	Solution_AdjFileName,			/*!< \brief Adjoint solution input file for drag functional. */
 	Flow_FileName,					/*!< \brief Flow variables output file. */
-	Farfield_FileName, 				/*!< \brief Data at farfield boundaries. */
 	Structure_FileName,					/*!< \brief Structure variables output file. */
 	SurfStructure_FileName,					/*!< \brief Surface structure variables output file. */
   SurfWave_FileName,					/*!< \brief Surface structure variables output file. */
@@ -598,11 +596,6 @@ private:
   Gust_Ampl,                  /*!< \brief Gust amplitude. */
   Gust_Begin_Time,            /*!< \brief Time at which to begin the gust. */
   Gust_Begin_Loc;             /*!< \brief Location at which the gust begins. */
-	double *Density_FreeStreamND_Time,
-	*Pressure_FreeStreamND_Time,
-	**Velocity_FreeStreamND_Time,
-	*Energy_FreeStreamND_Time,
-	*Mach_Inf_Time;
 
   bool ExtraOutput;
 
@@ -1265,42 +1258,6 @@ public:
 	 * \return Reference force for non-dimensionalization.
 	 */
 	double GetForce_Ref(void);
-
-	/*!
-	 * \brief Get the value of the non-dimensionalized freestream density at iteration val_Ext_Iter.
-	 * \param[in] val_Ext_Iter - current iteration number
-	 * \return Non-dimensionalized freestream density.
-	 */
-	double GetDensity_FreeStreamND_Time(unsigned long val_Ext_Iter);
-
-	/*!
-	 * \brief Get the value of the non-dimensionalized freestream pressure at iteration val_Ext_Iter.
-	 * \param[in] val_Ext_Iter - current iteration number
-	 * \return Non-dimensionalized freestream density.
-	 */
-	double GetPressure_FreeStreamND_Time(unsigned long val_Ext_Iter);
-
-	/*!
-	 * \brief Get the value of the non-dimensionalized freestream energy at iteration val_Ext_Iter.
-	 * \param[in] val_Ext_Iter - current iteration number
-	 * \return Non-dimensionalized freestream density.
-	 */
-	double GetEnergy_FreeStreamND_Time(unsigned long val_Ext_Iter);
-
-
-	/*!
-	 * \brief Get the value of the non-dimensionalized freestream velocity at iteration val_Ext_Iter.
-	 * \param[in] val_Ext_Iter - current iteration number
-	 * \return Non-dimensionalized freestream density.
-	 */
-	double* GetVelocity_FreeStreamND_Time(unsigned long val_Ext_Iter);
-
-	/*!
-	 * \brief Get the value of the freestream Mach at iteration val_Ext_Iter.
-	 * \param[in] val_Ext_Iter - current iteration number
-	 * \return Non-dimensionalized freestream density.
-	 */
-	double GetMach_FreeStreamND_Time(unsigned long val_Ext_Iter);
 
 	/*!
 	 * \brief Get the value of the non-dimensionalized freestream pressure.
@@ -3227,12 +3184,6 @@ public:
 	 */
 	string GetSolution_FlowFileName(void);
 
-	/*! 
-	 * \brief Get the name of the file with the data for farfield boundaries.
-	 * \return Name of the file with the farfield boundary conditions.
-	 */
-	string GetFarfield_FileName(void);
-
 	/*!
 	 * \brief Get the name of the file with the solution of the linearized flow problem.
 	 * \return Name of the file with the solution of the linearized flow problem.
@@ -3771,12 +3722,6 @@ public:
 	 * \return <code>TRUE</code> if it is a poisson solver condition; otherwise <code>FALSE</code>.
 	 */
 	bool GetPoissonSolver(void);
-
-	/*!
-	 * \brief Get information about using time dependent farfield boundaries
-	 * \return <code>TRUE</code> if we are using time dependent farfield boundaries; otherwise <code>FALSE</code>.
-	 */
-	bool GetUnsteady_Farfield(void);
 
 	/*! 
 	 * \brief Get information about the gravity force.
