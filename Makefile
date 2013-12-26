@@ -123,7 +123,7 @@ CXX = g++
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS =  -DNO_MPI
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"SU2_EDU\" -DPACKAGE_TARNAME=\"SU2_EDU\" -DPACKAGE_VERSION=\"2.0.9\" -DPACKAGE_STRING=\"SU2_EDU\ 2.0.9\" -DPACKAGE_BUGREPORT=\"susquared-dev@lists.stanford.edu\" -DPACKAGE_URL=\"http://su2.stanford.edu\" -DPACKAGE=\"SU2_EDU\" -DVERSION=\"2.0.9\"
+DEFS = -DPACKAGE_NAME=\"SU2_EDU\" -DPACKAGE_TARNAME=\"SU2_EDU\" -DPACKAGE_VERSION=\"1.0.0\" -DPACKAGE_STRING=\"SU2_EDU\ 1.0.0\" -DPACKAGE_BUGREPORT=\"susquared-dev@lists.stanford.edu\" -DPACKAGE_URL=\"http://su2.stanford.edu\" -DPACKAGE=\"SU2_EDU\" -DVERSION=\"1.0.0\"
 DEPDIR = .deps
 ECHO_C = \c
 ECHO_N = 
@@ -144,16 +144,16 @@ OBJEXT = o
 PACKAGE = SU2_EDU
 PACKAGE_BUGREPORT = susquared-dev@lists.stanford.edu
 PACKAGE_NAME = SU2_EDU
-PACKAGE_STRING = SU2_EDU 2.0.9
+PACKAGE_STRING = SU2_EDU 1.0.0
 PACKAGE_TARNAME = SU2_EDU
 PACKAGE_URL = http://su2.stanford.edu
-PACKAGE_VERSION = 2.0.9
+PACKAGE_VERSION = 1.0.0
 PATH_SEPARATOR = :
 RANLIB = ranlib
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
-VERSION = 2.0.9
+VERSION = 1.0.0
 abs_builddir = /Users/fpalacios/SU2_EDU
 abs_srcdir = /Users/fpalacios/SU2_EDU
 abs_top_builddir = /Users/fpalacios/SU2_EDU

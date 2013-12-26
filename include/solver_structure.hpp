@@ -5,7 +5,7 @@
  *        <i>solution_direct.cpp</i>, <i>solution_adjoint.cpp</i>, and
  *        <i>solution_linearized.cpp</i> files.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 2.0.10
+ * \version 1.0.0
  *
  * Stanford University Unstructured (SU2).
  * Copyright (C) 2012-2013 Aerospace Design Laboratory (ADL).
@@ -56,7 +56,7 @@ using namespace std;
  * \brief Main class for defining the PDE solution, it requires
  * a child class for each particular solver (Euler, Navier-Stokes, etc.)
  * \author F. Palacios.
- * \version 2.0.10
+ * \version 1.0.0
  */
 class CSolver {
 protected:
@@ -1623,7 +1623,7 @@ public:
  * \class CBaselineSolver
  * \brief Main class for defining a baseline solution from a restart file (for output).
  * \author F. Palacios, T. Economon.
- * \version 2.0.10
+ * \version 1.0.0
  */
 class CBaselineSolver : public CSolver {
 public:
@@ -1668,7 +1668,7 @@ public:
  * \brief Main class for defining the Euler's flow solver.
  * \ingroup Euler_Equations
  * \author F. Palacios.
- * \version 2.0.10
+ * \version 1.0.0
  */
 class CEulerSolver : public CSolver {
 protected:
@@ -2391,7 +2391,7 @@ public:
  * \brief Main class for defining the Navier-Stokes flow solver.
  * \ingroup Navier_Stokes_Equations
  * \author F. Palacios.
- * \version 2.0.10
+ * \version 1.0.0
  */
 class CNSSolver : public CEulerSolver {
 private:
@@ -2600,7 +2600,7 @@ public:
  * \brief Main class for defining the turbulence model solver.
  * \ingroup Turbulence_Model
  * \author A. Bueno.
- * \version 2.0.10
+ * \version 1.0.0
  */
 class CTurbSolver : public CSolver {
 protected:
@@ -2716,7 +2716,7 @@ public:
  * \brief Main class for defining the turbulence model solver.
  * \ingroup Turbulence_Model
  * \author A. Bueno.
- * \version 2.0.10
+ * \version 1.0.0
  */
 
 class CTurbSASolver: public CTurbSolver {
@@ -2856,7 +2856,7 @@ public:
  * \brief Main class for defining the turbulence model solver.
  * \ingroup Turbulence_Model
  * \author A. Campos, F. Palacios, T. Economon
- * \version 2.0.10
+ * \version 1.0.0
  */
 
 class CTurbSSTSolver: public CTurbSolver {
