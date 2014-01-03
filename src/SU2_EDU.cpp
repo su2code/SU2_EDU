@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
   ofstream ConvHist_file;
   int rank = MASTER_NODE;
   int size = SINGLE_NODE;
-
+  
 #ifndef NO_MPI
   /*--- MPI initialization, and buffer setting ---*/
   MPI::Init(argc, argv);
@@ -55,20 +55,20 @@ int main(int argc, char *argv[]) {
   CConfig **config_container            = NULL;
   CSurfaceMovement **surface_movement   = NULL;
   CVolumetricMovement **grid_movement   = NULL;
-
+  
   /*--- Load in the number of zones and spatial dimensions in the mesh file (If no config
    file is specified, default.cfg is used) ---*/
   
   
-	cout << endl <<"-------------------------------------------------------------------------" << endl;
-	cout <<"|    _____   _    _   ___                                               |" << endl;
-	cout <<"|   / ____| | |  | | |__ \\    Web: su2.stanford.edu                     |" << endl;
-	cout <<"|  | (___   | |  | |    ) |   Twitter: @su2code                         |" << endl;
-	cout <<"|   \\___ \\  | |  | |   / /    Forum: www.cfd-online.com/Forums/su2/     |" << endl;
-	cout <<"|   ____) | | |__| |  / /_                                              |" << endl;
+  cout << endl <<"-------------------------------------------------------------------------" << endl;
+  cout <<"|    _____   _    _   ___                                               |" << endl;
+  cout <<"|   / ____| | |  | | |__ \\    Web: su2.stanford.edu                     |" << endl;
+  cout <<"|  | (___   | |  | |    ) |   Twitter: @su2code                         |" << endl;
+  cout <<"|   \\___ \\  | |  | |   / /    Forum: www.cfd-online.com/Forums/su2/     |" << endl;
+  cout <<"|   ____) | | |__| |  / /_                                              |" << endl;
   cout <<"|  |_____/   \\____/  |____|   Suite (Educational Code)                  |" << endl;
   
-	cout << "|                             Release 1.0.0                             |" << endl;
+  cout << "|                             Release 1.0.0                             |" << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
   cout << "| Stanford University Unstructured (SU2).                               |" << endl;
   cout << "| Copyright (C) 2012-2013 Aerospace Design Laboratory (ADL).            |" << endl;
@@ -76,41 +76,40 @@ int main(int argc, char *argv[]) {
   cout << "| but WITHOUT ANY WARRANTY; without even the implied warranty of        |" << endl;
   cout << "| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |" << endl;
   cout << "| Lesser General Public License (version 2.1) for more details.         |" << endl;
-	cout <<"-------------------------------------------------------------------------" << endl;
-    
-  /*-- Get user input for viscous/inviscid --*/
+  cout <<"-------------------------------------------------------------------------" << endl;
+  
+  /*--- Get user input for the simulation type (viscous/inviscid) ---*/
   char config_file_name[200];
   int SimType = 0;
   string Input = "";
   while(1) {
-
+    
     cout << endl;
     cout << "   [0] Inviscid (Euler)" << endl;
     cout << "   [1] Viscous (RANS)"  << endl;
     cout << "Select simulation type [0]: " ;
     getline(cin, Input);
-
     stringstream myStream(Input);
-
+    
     /*-- Handle default option --*/
     if (Input.empty())
       myStream << "0";
-
+    
     /*-- Check for valid input --*/
     if (myStream >> SimType) {
       if (SimType == 0) {
-          strcpy(config_file_name, "Inviscid_ConfigFile.cfg");
-          break;
+        strcpy(config_file_name, "Inviscid_ConfigFile.cfg");
+        break;
       } else if(SimType == 1) {
-          strcpy(config_file_name, "Viscous_ConfigFile.cfg");
-          break;
+        strcpy(config_file_name, "Viscous_ConfigFile.cfg");
+        break;
       }
     }
   }
   
-  /*--- Definition and of the containers for a zone. ---*/
+  /*--- Definition of the containers for a zone. ---*/
   nZone = 1; nDim  = 2;
-
+  
   solver_container      = new CSolver***[nZone];
   integration_container = new CIntegration**[nZone];
   numerics_container    = new CNumerics****[nZone];
@@ -171,7 +170,7 @@ int main(int argc, char *argv[]) {
   /*--- Computation of wall distances for turbulence modeling ---*/
   
   if ((config_container[ZONE_0]->GetKind_Solver() == RANS))
-  geometry_container[ZONE_0][MESH_0]->ComputeWall_Distance(config_container[ZONE_0]);
+    geometry_container[ZONE_0][MESH_0]->ComputeWall_Distance(config_container[ZONE_0]);
   
   /*--- Computation of positive surface area in the z-plane which is used for
    the calculation of force coefficient (non-dimensionalization). ---*/
@@ -322,7 +321,7 @@ int main(int argc, char *argv[]) {
      convergence criteria, and set StopCalc to true, if so. ---*/
     
     StopCalc = integration_container[ZONE_0][FLOW_SOL]->GetConvergence();
-
+    
     /*--- Solution output. Determine whether a solution needs to be written
      after the current iteration, and if so, execute the output file writing
      routines. ---*/
@@ -330,13 +329,13 @@ int main(int argc, char *argv[]) {
     if ((ExtIter+1 == config_container[ZONE_0]->GetnExtIter()) ||
         ((ExtIter % config_container[ZONE_0]->GetWrt_Sol_Freq() == 0) && (ExtIter != 0)) ||
         (StopCalc)) {
-          
-          /*--- Execute the routine for writing restart, volume solution,
-           surface solution, and surface comma-separated value files. ---*/
-          
-          output->SetResult_Files(solver_container, geometry_container, config_container, ExtIter, nZone);
-          
-        }
+      
+      /*--- Execute the routine for writing restart, volume solution,
+       surface solution, and surface comma-separated value files. ---*/
+      
+      output->SetResult_Files(solver_container, geometry_container, config_container, ExtIter, nZone);
+      
+    }
     
     /*--- If the convergence criteria has been met, terminate the simulation. ---*/
     
@@ -394,7 +393,7 @@ int main(int argc, char *argv[]) {
   /*--- Exit the solver cleanly ---*/
   
   if (rank == MASTER_NODE)
-  cout << endl <<"------------------------- Exit Success (SU2_EDU) ------------------------" << endl << endl;
+    cout << endl <<"------------------------- Exit Success (SU2_EDU) ------------------------" << endl << endl;
   
   /*--- Finalize MPI parallelization ---*/
 #ifndef NO_MPI

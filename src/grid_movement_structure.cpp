@@ -1469,7 +1469,7 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   char AirfoilFormat[15];
   char MeshOrientation[15];
   char AirfoilClose[15];
-  double AirfoilScale;
+  double AirfoilScale = 1.0;
   double TrailingEdge = 0.95;
   unsigned short nUpper, nLower, iUpper, iLower;
   ifstream airfoil_file;
