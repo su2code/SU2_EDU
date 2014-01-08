@@ -25,7 +25,7 @@
 
 string AssembleVariableNames(CGeometry *geometry, CConfig *config, unsigned short nVar_Consv, unsigned short *NVar);
 
-void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, unsigned short val_iZone, unsigned short val_nZone, bool surf_sol) {
+void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_sol) {
   
   /*--- Local variables and initialization ---*/
   unsigned short iDim, iVar, nDim = geometry->GetnDim();
@@ -83,19 +83,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, unsigned sh
   strcpy (cstr, filename.c_str());
   if (Kind_Solver == POISSON_EQUATION) strcpy (cstr, config->GetStructure_FileName().c_str());
   
-  /*--- Special cases where a number needs to be appended to the file name. ---*/
-  if ((Kind_Solver == EULER || Kind_Solver == NAVIER_STOKES || Kind_Solver == RANS) &&
-      (val_nZone > 1) && (config->GetUnsteady_Simulation() != TIME_SPECTRAL)) {
-    sprintf (buffer, "_%d", int(val_iZone));
-    strcat(cstr,buffer);
-  }
-  
-  /*--- Special cases where a number needs to be appended to the file name. ---*/
-  if (((Kind_Solver == ADJ_EULER) || (Kind_Solver == ADJ_NAVIER_STOKES) || (Kind_Solver == ADJ_RANS)) &&
-      (val_nZone > 1) && (config->GetUnsteady_Simulation() != TIME_SPECTRAL)) {
-    sprintf (buffer, "_%d", int(val_iZone));
-    strcat(cstr,buffer);
-  }
   
   /*--- Special cases where a number needs to be appended to the file name. ---*/
   if ((Kind_Solver == POISSON_EQUATION) && config->GetUnsteady_Simulation()) {
@@ -103,19 +90,7 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, unsigned sh
     strcat(cstr,buffer);
   }
   
-  if (config->GetUnsteady_Simulation() == TIME_SPECTRAL) {
-    
-    /*--- SU2_SOL requires different names. It is only called for parallel cases. ---*/
-    if (config->GetKind_SU2() == SU2_SOL) {
-      val_iZone = iExtIter;
-    }
-    if (int(val_iZone) < 10) sprintf (buffer, "_0000%d.dat", int(val_iZone));
-    if ((int(val_iZone) >= 10) && (int(val_iZone) < 100)) sprintf (buffer, "_000%d.dat", int(val_iZone));
-    if ((int(val_iZone) >= 100) && (int(val_iZone) < 1000)) sprintf (buffer, "_00%d.dat", int(val_iZone));
-    if ((int(val_iZone) >= 1000) && (int(val_iZone) < 10000)) sprintf (buffer, "_0%d.dat", int(val_iZone));
-    if (int(val_iZone) >= 10000) sprintf (buffer, "_%d.dat", int(val_iZone));
-    
-  } else if (config->GetUnsteady_Simulation() && config->GetWrt_Unsteady()) {
+ if (config->GetUnsteady_Simulation() && config->GetWrt_Unsteady()) {
     if (int(iExtIter) < 10) sprintf (buffer, "_0000%d.dat", int(iExtIter));
     if ((int(iExtIter) >= 10) && (int(iExtIter) < 100)) sprintf (buffer, "_000%d.dat", int(iExtIter));
     if ((int(iExtIter) >= 100) && (int(iExtIter) < 1000)) sprintf (buffer, "_00%d.dat", int(iExtIter));

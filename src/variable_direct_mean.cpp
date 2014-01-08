@@ -46,7 +46,6 @@ CEulerVariable::CEulerVariable(double val_density, double *val_velocity, double 
   bool low_fidelity = config->GetLowFidelitySim();
   bool dual_time = ((config->GetUnsteady_Simulation() == DT_STEPPING_1ST) ||
                     (config->GetUnsteady_Simulation() == DT_STEPPING_2ND));
-  bool windgust = config->GetWind_Gust();
   
   /*--- Array initialization ---*/
 	TS_Source = NULL;
@@ -54,8 +53,6 @@ CEulerVariable::CEulerVariable(double val_density, double *val_velocity, double 
 	Primitive = NULL;
 	Gradient_Primitive = NULL;
 	Limiter_Primitive = NULL;
-  WindGust = NULL;
-  WindGustDer = NULL;
   
   /*--- Allocate and initialize the primitive variables and gradients ---*/
   if (incompressible) { nPrimVar = nDim+5; nPrimVarGrad = nDim+3; }
@@ -142,18 +139,6 @@ CEulerVariable::CEulerVariable(double val_density, double *val_velocity, double 
 		}
 	}
   
-	/*--- Allocate space for the time spectral source terms ---*/
-	if (config->GetUnsteady_Simulation() == TIME_SPECTRAL) {
-		TS_Source = new double[nVar];
-		for (iVar = 0; iVar < nVar; iVar++) TS_Source[iVar] = 0.0;
-	}
-  
-  /*--- Allocate vector for wind gust and wind gust derivative field ---*/
-	if (windgust) {
-    WindGust = new double [nDim];
-    WindGustDer = new double [nDim+1];
-  }
-  
 	/*--- Allocate auxiliar vector for free surface source term ---*/
 	if (freesurface) Grad_AuxVar = new double [nDim];
   
@@ -185,7 +170,6 @@ CEulerVariable::CEulerVariable(double *val_solution, unsigned short val_ndim, un
   bool low_fidelity = config->GetLowFidelitySim();
   bool dual_time = ((config->GetUnsteady_Simulation() == DT_STEPPING_1ST) ||
                     (config->GetUnsteady_Simulation() == DT_STEPPING_2ND));
-  bool windgust = config->GetWind_Gust();
   
   /*--- Array initialization ---*/
 	TS_Source = NULL;
@@ -254,18 +238,6 @@ CEulerVariable::CEulerVariable(double *val_solution, unsigned short val_ndim, un
 			Solution_time_n1[iVar] = val_solution[iVar];
 		}
 	}
-  
-	/*--- Allocate space for the time spectral source terms ---*/
-	if (config->GetUnsteady_Simulation() == TIME_SPECTRAL) {
-		TS_Source = new double[nVar];
-		for (iVar = 0; iVar < nVar; iVar++) TS_Source[iVar] = 0.0;
-	}
-  
-  /*--- Allocate vector for wind gust and wind gust derivative field ---*/
-	if (windgust) {
-    WindGust = new double [nDim];
-    WindGustDer = new double [nDim+1];
-  }
   
 	/*--- Allocate auxiliar vector for free surface source term ---*/
 	if (freesurface) Grad_AuxVar = new double [nDim];

@@ -607,12 +607,7 @@ public:
 	/*! 
 	 * \brief Constructor of the class which reads the input file.
 	 */
-	CConfig(char case_filename[200], unsigned short val_software, unsigned short val_iZone, unsigned short val_nZone, unsigned short verb_level);
-
-	/*! 
-	 * \brief Constructor of the class which reads the input file.
-	 */
-	CConfig(char case_filename[200]);
+	CConfig(char case_filename[200], unsigned short val_software, unsigned short verb_level);
 
 	/*! 
 	 * \brief Destructor of the class. 
@@ -4239,12 +4234,12 @@ public:
 	 * \param[in] val_rank - Processor rank.
 	 * \param[in] val_iZone - Current grid domain number.
 	 */	
-	void SetNondimensionalization(unsigned short val_nDim, unsigned short val_iZone);
+	void SetNondimensionalization(unsigned short val_nDim);
 
   /*!
 	 * \brief Set the config options.
 	 */
-	void SetConfig_Options(unsigned short val_iZone, unsigned short val_nZone);
+	void SetConfig_Options(void);
 
   /*!
 	 * \brief Set the config file parsing.
@@ -4254,135 +4249,17 @@ public:
 	/*! 
 	 * \brief Config file postprocessing.
 	 */	
-	void SetPostprocessing(unsigned short val_software, unsigned short val_izone);	
+	void SetPostprocessing(unsigned short val_software);
 
 	/*! 
 	 * \brief Config file markers processing.
 	 */	
-	void SetMarkers(unsigned short val_software, unsigned short val_izone);	
+	void SetMarkers(unsigned short val_software);
 
 	/*! 
 	 * \brief Config file output.
 	 */	
-	void SetOutput(unsigned short val_software, unsigned short val_izone);
-
-	/*!
-	 * \brief Value of Aeroelastic solution coordinate at time n+1.
-	 */
-	double *GetAeroelastic_np1(void);
-
-	/*!
-	 * \brief Value of Aeroelastic solution coordinate at time n.
-	 */
-	double *GetAeroelastic_n(void);
-
-	/*!
-	 * \brief Value of Aeroelastic solution coordinate at time n-1.
-	 */
-	double *GetAeroelastic_n1(void);
-
-	/*!
-	 * \brief Value of Aeroelastic solution coordinate at time n+1.
-	 */
-	void SetAeroelastic_np1(unsigned short val_index, double val);
-
-	/*!
-	 * \brief Value of Aeroelastic solution coordinate at time n from time n+1.
-	 */
-	void SetAeroelastic_n(void);
-
-	/*!
-	 * \brief Value of Aeroelastic solution coordinate at time n-1 from time n.
-	 */
-	void SetAeroelastic_n1(void);
-
-	/*!
-	 * \brief Uncoupled Aeroelastic Frequency Plunge.
-	 */
-	double GetAeroelastic_Frequency_Plunge(void);
-
-	/*!
-	 * \brief Uncoupled Aeroelastic Frequency Pitch.
-	 */
-	double GetAeroelastic_Frequency_Pitch(void);
-
-	/*!
-	 * \brief Value of plunging coordinate.
-     * \param[in] val_marker - the marker we are monitoring.
-	 * \return Value of plunging coordinate.
-	 */
-	double GetAeroelastic_plunge(unsigned short val_marker);
-
-    /*!
-	 * \brief Value of pitching coordinate.
-     * \param[in] val_marker - the marker we are monitoring.
-	 * \return Value of pitching coordinate.
-	 */
-	double GetAeroelastic_pitch(unsigned short val_marker);
-
-	/*!
-	 * \brief Value of plunging coordinate.
-     * \param[in] val_marker - the marker we are monitoring.
-     * \param[in] val - value of plunging coordinate.
-	 */
-	void SetAeroelastic_plunge(unsigned short val_marker, double val);
-
-	/*!
-	 * \brief Value of pitching coordinate.
-     * \param[in] val_marker - the marker we are monitoring.
-     * \param[in] val - value of pitching coordinate.
-	 */
-	void SetAeroelastic_pitch(unsigned short val_marker, double val);
-    
-    /*!
-	 * \brief Get information about the aeroelastic simulation.
-	 * \return <code>TRUE</code> if it is an aeroelastic case; otherwise <code>FALSE</code>.
-	 */
-	bool GetAeroelastic_Simulation(void);
-    
-    /*!
-	 * \brief Get information about the wind gust.
-	 * \return <code>TRUE</code> if there is a wind gust; otherwise <code>FALSE</code>.
-	 */
-	bool GetWind_Gust(void);
-    
-    /*!
-	 * \brief Get the type of gust to simulate.
-	 * \return type of gust to use for the simulation.
-	 */
-	unsigned short GetGust_Type(void);
-    
-    /*!
-	 * \brief Get the gust direction.
-	 * \return the gust direction.
-	 */
-    unsigned short GetGust_Dir(void);
-
-    /*!
-	 * \brief Value of the gust wavelength.
-	 */
-	double GetGust_WaveLength(void);
-    
-    /*!
-	 * \brief Value of the number of gust periods.
-	 */
-	double GetGust_Periods(void);
-    
-    /*!
-	 * \brief Value of the gust amplitude.
-	 */
-	double GetGust_Ampl(void);
-    
-    /*!
-	 * \brief Value of the time at which to begin the gust.
-	 */
-	double GetGust_Begin_Time(void);
-    
-    /*!
-	 * \brief Value of the location ath which the gust begins.
-	 */
-	double GetGust_Begin_Loc(void);
-
+	void SetOutput(unsigned short val_software);
 
 	/*!
 	 * \brief Given arrays x[1..n] and y[1..n] containing a tabulated function, i.e., yi = f(xi), with

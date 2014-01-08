@@ -156,8 +156,8 @@ public:
 	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
 	 * \param[in] Iteration - Current iteration.
 	 */
-	virtual void MultiGrid_Iteration(CGeometry ***geometry, CSolver ****solver_container, CNumerics *****numerics_container,
-								  CConfig **config, unsigned short RunTime_EqSystem, unsigned long Iteration, unsigned short iZone);
+	virtual void MultiGrid_Iteration(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container,
+								  CConfig *config, unsigned short RunTime_EqSystem, unsigned long Iteration);
 	
 	/*! 
 	 * \brief A virtual member.
@@ -170,9 +170,9 @@ public:
 	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
 	 * \param[in] Iteration - Current iteration.
 	 */
-	virtual void MultiGrid_Cycle(CGeometry ***geometry, CSolver ****solver_container, CNumerics *****numerics_container,
-							   CConfig **config, unsigned short iMesh, unsigned short mu, unsigned short RunTime_EqSystem,
-							   unsigned long Iteration, unsigned short iZone);
+	virtual void MultiGrid_Cycle(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container,
+							   CConfig *config, unsigned short iMesh, unsigned short mu, unsigned short RunTime_EqSystem,
+							   unsigned long Iteration);
 	
 	/*! 
 	 * \brief A virtual member.
@@ -235,20 +235,8 @@ public:
 	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
 	 * \param[in] Iteration - Current iteration.
 	 */
-	virtual void SingleGrid_Iteration(CGeometry ***geometry, CSolver ****solver_container, CNumerics *****numerics_container,
-								  CConfig **config, unsigned short RunTime_EqSystem, unsigned long Iteration, unsigned short iZone);
-	
-	/*! 
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] numerics_container - Description of the numerical method (the way in which the equations are solved).
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
-	 * \param[in] iMesh - Index of the mesh in multigrid computations.
-	 */
-	virtual void SetPotential_Solver(CGeometry ***geometry, CSolver ****solver_container, CNumerics *****numerics_container,
-                                   CConfig **config, unsigned short RunTime_EqSystem, unsigned short iMesh, unsigned short iZone);
+	virtual void SingleGrid_Iteration(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container,
+								  CConfig *config, unsigned short RunTime_EqSystem, unsigned long Iteration);
 
 };
 
@@ -283,8 +271,8 @@ public:
 	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
 	 * \param[in] Iteration - Current iteration.
 	 */
-	void MultiGrid_Iteration(CGeometry ***geometry, CSolver ****solver_container, CNumerics *****numerics_container,
-							 CConfig **config, unsigned short RunTime_EqSystem, unsigned long Iteration, unsigned short iZone);
+	void MultiGrid_Iteration(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container,
+							 CConfig *config, unsigned short RunTime_EqSystem, unsigned long Iteration);
 	
 	/*! 
 	 * \brief Perform a Full-Approximation Storage (FAS) Multigrid. 
@@ -297,9 +285,9 @@ public:
 	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
 	 * \param[in] Iteration - Current iteration.
 	 */
-	void MultiGrid_Cycle(CGeometry ***geometry, CSolver ****solver_container, CNumerics *****numerics_container,
-                     CConfig **config, unsigned short iMesh, unsigned short mu, unsigned short RunTime_EqSystem,
-                     unsigned long Iteration, unsigned short iZone);
+	void MultiGrid_Cycle(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container,
+                     CConfig *config, unsigned short iMesh, unsigned short mu, unsigned short RunTime_EqSystem,
+                     unsigned long Iteration);
 	
 	/*! 
 	 * \brief Compute the non-dimensional parameters.
@@ -406,8 +394,8 @@ public:
 	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
 	 * \param[in] Iteration - Current iteration.
 	 */
-	void SingleGrid_Iteration(CGeometry ***geometry, CSolver ****solver_container, CNumerics *****numerics_container,
-							 CConfig **config, unsigned short RunTime_EqSystem, unsigned long Iteration, unsigned short iZone);
+	void SingleGrid_Iteration(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container,
+							 CConfig *config, unsigned short RunTime_EqSystem, unsigned long Iteration);
   
   /*!
 	 * \brief Restrict solution from fine grid to a coarse grid.

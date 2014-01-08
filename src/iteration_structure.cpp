@@ -23,12 +23,11 @@
 
 #include "../include/iteration_structure.hpp"
 
-void MeanFlowIteration(COutput *output, CIntegration ***integration_container, CGeometry ***geometry_container,
-                       CSolver ****solver_container, CNumerics *****numerics_container, CConfig **config_container,
-                       CSurfaceMovement **surface_movement, CVolumetricMovement **grid_movement) {
+void MeanFlowIteration(COutput *output, CIntegration **integration_container, CGeometry **geometry_container,
+                       CSolver ***solver_container, CNumerics ****numerics_container, CConfig *config_container) {
   
-  unsigned long IntIter = 0; config_container[ZONE_0]->SetIntIter(IntIter);
-  unsigned long ExtIter = config_container[ZONE_0]->GetExtIter();
+  unsigned long IntIter = 0; config_container->SetIntIter(IntIter);
+  unsigned long ExtIter = config_container->GetExtIter();
   
 #ifndef NO_MPI
 	int rank = MPI::COMM_WORLD.Get_rank();
@@ -40,26 +39,26 @@ void MeanFlowIteration(COutput *output, CIntegration ***integration_container, C
   
   /*--- Set the initial condition ---*/
   
-  solver_container[ZONE_0][MESH_0][FLOW_SOL]->SetInitialCondition(geometry_container[ZONE_0], solver_container[ZONE_0], config_container[ZONE_0], ExtIter);
+  solver_container[MESH_0][FLOW_SOL]->SetInitialCondition(geometry_container, solver_container, config_container, ExtIter);
   
   /*--- Update global parameters ---*/
   
-  if (config_container[ZONE_0]->GetKind_Solver() == EULER) { config_container[ZONE_0]->SetGlobalParam(EULER, RUNTIME_FLOW_SYS, ExtIter); }
-  if (config_container[ZONE_0]->GetKind_Solver() == NAVIER_STOKES) { config_container[ZONE_0]->SetGlobalParam(NAVIER_STOKES, RUNTIME_FLOW_SYS, ExtIter); }
-  if (config_container[ZONE_0]->GetKind_Solver() == RANS) { config_container[ZONE_0]->SetGlobalParam(RANS, RUNTIME_FLOW_SYS, ExtIter); }
+  if (config_container->GetKind_Solver() == EULER) { config_container->SetGlobalParam(EULER, RUNTIME_FLOW_SYS, ExtIter); }
+  if (config_container->GetKind_Solver() == NAVIER_STOKES) { config_container->SetGlobalParam(NAVIER_STOKES, RUNTIME_FLOW_SYS, ExtIter); }
+  if (config_container->GetKind_Solver() == RANS) { config_container->SetGlobalParam(RANS, RUNTIME_FLOW_SYS, ExtIter); }
   
   /*--- Solve the Euler, Navier-Stokes or Reynolds-averaged Navier-Stokes (RANS) equations (one iteration) ---*/
   
-  integration_container[ZONE_0][FLOW_SOL]->MultiGrid_Iteration(geometry_container, solver_container, numerics_container,
-                                                               config_container, RUNTIME_FLOW_SYS, IntIter, ZONE_0);
+  integration_container[FLOW_SOL]->MultiGrid_Iteration(geometry_container, solver_container, numerics_container,
+                                                               config_container, RUNTIME_FLOW_SYS, IntIter);
   
   /*--- Solve the turbulence model ---*/
   
-  if (config_container[ZONE_0]->GetKind_Solver() == RANS) {
+  if (config_container->GetKind_Solver() == RANS) {
     
-    config_container[ZONE_0]->SetGlobalParam(RANS, RUNTIME_TURB_SYS, ExtIter);
-    integration_container[ZONE_0][TURB_SOL]->SingleGrid_Iteration(geometry_container, solver_container, numerics_container,
-                                                                  config_container, RUNTIME_TURB_SYS, IntIter, ZONE_0);
+    config_container->SetGlobalParam(RANS, RUNTIME_TURB_SYS, ExtIter);
+    integration_container[TURB_SOL]->SingleGrid_Iteration(geometry_container, solver_container, numerics_container,
+                                                                  config_container, RUNTIME_TURB_SYS, IntIter);
     
   }
   

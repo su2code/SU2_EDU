@@ -150,8 +150,6 @@ inline void CNumerics::SetVelocity2_Inf(double velocity2) {
 
 inline void CNumerics::SetTimeStep(double val_timestep) {TimeStep = val_timestep;}
 
-inline void CNumerics::SetElec_Cond() {}
-
 inline void CNumerics::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
 	Laminar_Viscosity_i = val_lam_viscosity_i;
 	Laminar_Viscosity_j = val_lam_viscosity_j;
@@ -298,16 +296,6 @@ inline void CNumerics::SetGridVel(double *val_gridvel_i, double *val_gridvel_j) 
 	GridVel_j = val_gridvel_j;
 }
 
-inline void CNumerics::SetWindGust(double *val_windgust_i, double *val_windgust_j) {
-	WindGust_i = val_windgust_i;
-	WindGust_j = val_windgust_j;
-}
-
-inline void CNumerics::SetWindGustDer(double *val_windgustder_i, double *val_windgustder_j) {
-	WindGustDer_i = val_windgustder_i;
-	WindGustDer_j = val_windgustder_j;
-}
-
 inline void CNumerics::SetPressure(double val_pressure_i, double val_pressure_j) {
 	Pressure_i = val_pressure_i;
 	Pressure_j = val_pressure_j;
@@ -400,16 +388,6 @@ inline double CSourcePieceWise_TurbSA::GetDestruction(void) { return Destruction
 inline double CSourcePieceWise_TurbSA::GetCrossProduction(void) { return CrossProduction; }
 
 inline double CUpwRoeTurkel_Flow::GetPrecond_Beta() { return Beta; }
-
-inline double* CSource_Magnet::GetMagneticField() { return Current_Density; }
-
-inline double CNumerics::GetElec_CondIntegral() {return 0;}
-
-inline double CSource_JouleHeating::GetElec_CondIntegral() {return Elec_Conduct*Coord_i[1]*(Coord_i[1]-Coord_j[1]);}
-
-inline void CNumerics::SetElec_CondIntegralsqr(double val_var) {}
-
-inline void CSource_JouleHeating::SetElec_CondIntegralsqr(double val_var) {Integralsqr = val_var; }
 
 inline void CNumerics::ComputeResidual(double **val_Jacobian_i, double *val_Jacobian_mui, double ***val_Jacobian_gradi, CConfig *config) { }
 

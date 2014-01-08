@@ -39,19 +39,10 @@
 using namespace std;
 
 /*! 
- * \brief Gets the number of zones in the mesh file.
- * \param[in] val_mesh_filename - Name of the file with the grid information.
- * \param[in] val_format - Format of the file with the grid information.
- * \param[in] config - Definition of the particular problem.
- * \return Total number of zones in the grid file.
- */
-unsigned short GetnZone(string val_mesh_filename, unsigned short val_format, CConfig *config);
-
-/*! 
  * \brief Gets the number of dimensions in the mesh file
  * \param[in] val_mesh_filename - Name of the file with the grid information.
  * \param[in] val_format - Format of the file with the grid information.
- * \return Total number of domains in the grid file.
+ * \return Total number of dimesions in the grid file.
  */
 unsigned short GetnDim(string val_mesh_filename, unsigned short val_format);
 
@@ -61,18 +52,16 @@ unsigned short GetnDim(string val_mesh_filename, unsigned short val_format);
  * \param[in] solver_container - Container vector with all the solutions.
  * \param[in] geometry - Geometrical definition of the problem.
  * \param[in] config - Definition of the particular problem.
- * \param[in] iZone - Index of the zone.
  */
-void Solver_Preprocessing(CSolver ***solver_container, CGeometry **geometry, CConfig *config, unsigned short iZone);
+void Solver_Preprocessing(CSolver ***solver_container, CGeometry **geometry, CConfig *config);
 
 /*! 
  * \brief Definition and allocation of all integration classes.
  * \param[in] integration_container - Container vector with all the integration methods.
  * \param[in] geometry - Geometrical definition of the problem.
  * \param[in] config - Definition of the particular problem.
- * \param[in] iZone - Index of the zone.
  */
-void Integration_Preprocessing(CIntegration **integration_container, CGeometry **geometry, CConfig *config, unsigned short iZone);
+void Integration_Preprocessing(CIntegration **integration_container, CGeometry **geometry, CConfig *config);
 
 /*! 
  * \brief Definition and allocation of all solver classes.
@@ -80,14 +69,12 @@ void Integration_Preprocessing(CIntegration **integration_container, CGeometry *
  * \param[in] solver_container - Container vector with all the solutions.
  * \param[in] geometry - Geometrical definition of the problem.
  * \param[in] config - Definition of the particular problem.
- * \param[in] iZone - Index of the zone.
  */
-void Numerics_Preprocessing(CNumerics ****numerics_container, CSolver ***solver_container, CGeometry **geometry, CConfig *config, unsigned short iZone);
+void Numerics_Preprocessing(CNumerics ****numerics_container, CSolver ***solver_container, CGeometry **geometry, CConfig *config);
 
 /*! 
  * \brief Do the geometrical preprocessing.
  * \param[in] geometry - Geometrical definition of the problem.
  * \param[in] config - Definition of the particular problem.
- * \param[in] val_nZone - Total number of zones.
  */
-void Geometrical_Preprocessing(CGeometry ***geometry, CConfig **config, unsigned short val_nZone);
+void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config);

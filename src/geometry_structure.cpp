@@ -394,7 +394,7 @@ unsigned short CGeometry::ComputeSegmentPlane_Intersection(double *Segment_P0, d
 
 CPhysicalGeometry::CPhysicalGeometry() : CGeometry() {}
 
-CPhysicalGeometry::CPhysicalGeometry(CConfig *config, unsigned short val_iZone, unsigned short val_nZone) : CGeometry() {
+CPhysicalGeometry::CPhysicalGeometry(CConfig *config) : CGeometry() {
   
   /*--- Local variables and initialization ---*/
   string text_line, Marker_Tag;
@@ -403,7 +403,7 @@ CPhysicalGeometry::CPhysicalGeometry(CConfig *config, unsigned short val_iZone, 
   unsigned long Point_Surface, iElem_Surface;
   double Conversion_Factor = 1.0;
   int rank = MASTER_NODE;
-  nZone = val_nZone;
+  nZone = 1;
   
   string val_mesh_filename = config->GetMesh_FileName();
   unsigned short val_format = config->GetMesh_FileFormat();
@@ -422,10 +422,10 @@ CPhysicalGeometry::CPhysicalGeometry(CConfig *config, unsigned short val_iZone, 
   
   switch (val_format) {
     case SU2:
-      Read_SU2_Format(config, val_mesh_filename, val_iZone, val_nZone);
+      Read_SU2_Format(config, val_mesh_filename);
       break;
     case NETCDF_ASCII:
-      Read_NETCDF_Format(config, val_mesh_filename, val_iZone, val_nZone);
+      Read_NETCDF_Format(config, val_mesh_filename);
       break;
     default:
       cout << "geometry_structure.cpp" << endl;
@@ -486,7 +486,7 @@ CPhysicalGeometry::~CPhysicalGeometry(void) {
   
 }
 
-void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filename, unsigned short val_iZone, unsigned short val_nZone) {
+void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filename) {
   
   /*--- Local variables and initialization ---*/
   string text_line, Marker_Tag;
@@ -496,11 +496,9 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
   char cstr[200];
   double Coord_2D[2], Coord_3D[3], Conversion_Factor = 1.0, dummyDouble;
   string::size_type position;
-  bool time_spectral = (config->GetUnsteady_Simulation() == TIME_SPECTRAL);
   int rank = MASTER_NODE, size = SINGLE_NODE;
   bool domain_flag = false;
   bool found_transform = false;
-  nZone = val_nZone;
   
   /*--- Initialize counters for local/global points & elements ---*/
 #ifndef NO_MPI
@@ -596,26 +594,6 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
     strcpy (cstr, val_mesh_filename.c_str());
     mesh_file.open(cstr, ios::in);
     
-  }
-  
-  /*--- If more than one, find the zone in the mesh file ---*/
-  if (val_nZone > 1 || time_spectral) {
-    if (time_spectral) {
-      if (rank == MASTER_NODE) cout << "Reading time spectral instance " << val_iZone << ":" << endl;
-    } else {
-      while (getline (mesh_file,text_line)) {
-        /*--- Search for the current domain ---*/
-        position = text_line.find ("IZONE=",0);
-        if (position != string::npos) {
-          text_line.erase (0,6);
-          unsigned short jDomain = atoi(text_line.c_str());
-          if (jDomain == val_iZone) {
-            if (rank == MASTER_NODE) cout << "Reading zone " << val_iZone << ":" << endl;
-            break;
-          }
-        }
-      }
-    }
   }
   
   /*--- Read grid file with format SU2 ---*/
@@ -1416,7 +1394,7 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
   
 }
 
-void CPhysicalGeometry::Read_NETCDF_Format(CConfig *config, string val_mesh_filename, unsigned short val_iZone, unsigned short val_nZone) {
+void CPhysicalGeometry::Read_NETCDF_Format(CConfig *config, string val_mesh_filename) {
   
   /*--- Local variables and initialization ---*/
   string text_line, Marker_Tag;
@@ -1426,7 +1404,7 @@ void CPhysicalGeometry::Read_NETCDF_Format(CConfig *config, string val_mesh_file
   vnodes_triangle[3], vnodes_quad[4], vnodes_tetra[4], vnodes_hexa[8], vnodes_wedge[6];
   char cstr[200];
   string::size_type position;
-  nZone = val_nZone;
+  nZone = 1;
   
   /*--- Initialize counters for local/global points & elements ---*/
   
@@ -2284,7 +2262,7 @@ void CPhysicalGeometry::ComputeWall_Distance(CConfig *config) {
   
 }
 
-void CPhysicalGeometry::SetPositive_ZArea(CConfig *config) {
+void CPhysicalGeometry::ComputeReference_Area(CConfig *config) {
   unsigned short iMarker, Boundary, Monitoring;
   unsigned long iVertex, iPoint;
   double *Normal, PositiveZArea;
@@ -3206,177 +3184,6 @@ void CPhysicalGeometry::MatchInterface(CConfig *config) {
 #endif
     
   }
-}
-
-void CPhysicalGeometry::MatchZone(CConfig *config, CGeometry *geometry_donor, CConfig *config_donor,
-                                  unsigned short val_iZone, unsigned short val_nZone) {
-  
-#ifdef NO_MPI
-  
-  unsigned short iMarker, jMarker;
-  unsigned long iVertex, iPoint, jVertex, jPoint = 0, pPoint = 0;
-  double *Coord_i, *Coord_j, dist = 0.0, mindist, maxdist;
-  
-  if (val_iZone == ZONE_0) cout << "Set zone boundary conditions (if any)." << endl;
-  
-  maxdist = 0.0;
-  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-    for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
-      iPoint = vertex[iMarker][iVertex]->GetNode();
-      Coord_i = node[iPoint]->GetCoord();
-      
-      mindist = 1E6;
-      for (jMarker = 0; jMarker < config_donor->GetnMarker_All(); jMarker++)
-      for (jVertex = 0; jVertex < geometry_donor->GetnVertex(jMarker); jVertex++) {
-        jPoint = geometry_donor->vertex[jMarker][jVertex]->GetNode();
-        Coord_j = geometry_donor->node[jPoint]->GetCoord();
-        if (nDim == 2) dist = sqrt(pow(Coord_j[0]-Coord_i[0],2.0) + pow(Coord_j[1]-Coord_i[1],2.0));
-        if (nDim == 3) dist = sqrt(pow(Coord_j[0]-Coord_i[0],2.0) + pow(Coord_j[1]-Coord_i[1],2.0) + pow(Coord_j[2]-Coord_i[2],2.0));
-        if (dist < mindist) { mindist = dist; pPoint = jPoint; }
-      }
-      
-      maxdist = max(maxdist, mindist);
-      vertex[iMarker][iVertex]->SetDonorPoint(pPoint);
-      
-    }
-  }
-  
-#else
-#ifdef WINDOWS
-  MPI_Barrier(MPI_COMM_WORLD);
-#else
-  MPI::COMM_WORLD.Barrier();
-#endif
-  
-  unsigned short iMarker, iDim;
-  unsigned long iVertex, iPoint, pPoint = 0, jVertex, jPoint;
-  double *Coord_i, Coord_j[3], dist = 0.0, mindist, maxdist;
-  int iProcessor, pProcessor = 0;
-  unsigned long nLocalVertex_Zone = 0, nGlobalVertex_Zone = 0, MaxLocalVertex_Zone = 0;
-  int rank, nProcessor;
-  
-#ifdef WINDOWS
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &nProcessor);
-#else
-  rank = MPI::COMM_WORLD.Get_rank();
-  nProcessor = MPI::COMM_WORLD.Get_size();
-#endif
-  
-  unsigned long *Buffer_Send_nVertex = new unsigned long [1];
-  unsigned long *Buffer_Receive_nVertex = new unsigned long [nProcessor];
-  
-  if (val_iZone == ZONE_0) cout << "Set zone boundary conditions (if any)." <<endl;
-  
-  nLocalVertex_Zone = 0;
-  for (iMarker = 0; iMarker < config_donor->GetnMarker_All(); iMarker++)
-  for (iVertex = 0; iVertex < geometry_donor->GetnVertex(iMarker); iVertex++) {
-    iPoint = geometry_donor->vertex[iMarker][iVertex]->GetNode();
-    if (geometry_donor->node[iPoint]->GetDomain()) nLocalVertex_Zone ++;
-  }
-  
-  Buffer_Send_nVertex[0] = nLocalVertex_Zone;
-  
-  /*--- Send Interface vertex information --*/
-#ifdef WINDOWS
-  MPI_Allreduce(&nLocalVertex_Zone, &nGlobalVertex_Zone, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
-  MPI_Allreduce(&nLocalVertex_Zone, &MaxLocalVertex_Zone, 1, MPI_UNSIGNED_LONG, MPI_MAX, MPI_COMM_WORLD);
-  MPI_Allgather(Buffer_Send_nVertex, 1, MPI_UNSIGNED_LONG, Buffer_Receive_nVertex, 1, MPI_UNSIGNED_LONG, MPI_COMM_WORLD);
-#else
-  MPI::COMM_WORLD.Allreduce(&nLocalVertex_Zone, &nGlobalVertex_Zone, 1, MPI::UNSIGNED_LONG, MPI::SUM);
-  MPI::COMM_WORLD.Allreduce(&nLocalVertex_Zone, &MaxLocalVertex_Zone, 1, MPI::UNSIGNED_LONG, MPI::MAX);
-  MPI::COMM_WORLD.Allgather(Buffer_Send_nVertex, 1, MPI::UNSIGNED_LONG, Buffer_Receive_nVertex, 1, MPI::UNSIGNED_LONG);
-#endif
-  
-  double *Buffer_Send_Coord = new double [MaxLocalVertex_Zone*nDim];
-  unsigned long *Buffer_Send_Point = new unsigned long [MaxLocalVertex_Zone];
-  
-  double *Buffer_Receive_Coord = new double [nProcessor*MaxLocalVertex_Zone*nDim];
-  unsigned long *Buffer_Receive_Point = new unsigned long [nProcessor*MaxLocalVertex_Zone];
-  
-  unsigned long nBuffer_Coord = MaxLocalVertex_Zone*nDim;
-  unsigned long nBuffer_Point = MaxLocalVertex_Zone;
-  
-  for (iVertex = 0; iVertex < MaxLocalVertex_Zone; iVertex++) {
-    Buffer_Send_Point[iVertex] = 0;
-    for (iDim = 0; iDim < nDim; iDim++)
-    Buffer_Send_Coord[iVertex*nDim+iDim] = 0.0;
-  }
-  
-  /*--- Copy coordinates and point to the auxiliar vector --*/
-  nLocalVertex_Zone = 0;
-  for (iMarker = 0; iMarker < config_donor->GetnMarker_All(); iMarker++)
-  for (iVertex = 0; iVertex < geometry_donor->GetnVertex(iMarker); iVertex++) {
-    iPoint = geometry_donor->vertex[iMarker][iVertex]->GetNode();
-    if (geometry_donor->node[iPoint]->GetDomain()) {
-      Buffer_Send_Point[nLocalVertex_Zone] = iPoint;
-      for (iDim = 0; iDim < nDim; iDim++)
-      Buffer_Send_Coord[nLocalVertex_Zone*nDim+iDim] = geometry_donor->node[iPoint]->GetCoord(iDim);
-      nLocalVertex_Zone++;
-    }
-  }
-  
-#ifdef WINDOWS
-  MPI_Allgather(Buffer_Send_Coord, nBuffer_Coord, MPI_DOUBLE, Buffer_Receive_Coord, nBuffer_Coord, MPI_DOUBLE, MPI_COMM_WORLD);
-  MPI_Allgather(Buffer_Send_Point, nBuffer_Point, MPI_UNSIGNED_LONG, Buffer_Receive_Point, nBuffer_Point, MPI_UNSIGNED_LONG, MPI_COMM_WORLD);
-#else
-  MPI::COMM_WORLD.Allgather(Buffer_Send_Coord, nBuffer_Coord, MPI::DOUBLE, Buffer_Receive_Coord, nBuffer_Coord, MPI::DOUBLE);
-  MPI::COMM_WORLD.Allgather(Buffer_Send_Point, nBuffer_Point, MPI::UNSIGNED_LONG, Buffer_Receive_Point, nBuffer_Point, MPI::UNSIGNED_LONG);
-#endif
-  
-  /*--- Compute the closest point to a Near-Field boundary point ---*/
-  maxdist = 0.0;
-  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-    for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
-      iPoint = vertex[iMarker][iVertex]->GetNode();
-      
-      if (node[iPoint]->GetDomain()) {
-        
-        /*--- Coordinates of the boundary point ---*/
-        Coord_i = node[iPoint]->GetCoord(); mindist = 1E6; pProcessor = 0; pPoint = 0;
-        
-        /*--- Loop over all the boundaries to find the pair ---*/
-        for (iProcessor = 0; iProcessor < nProcessor; iProcessor++)
-        for (jVertex = 0; jVertex < Buffer_Receive_nVertex[iProcessor]; jVertex++) {
-          jPoint = Buffer_Receive_Point[iProcessor*MaxLocalVertex_Zone+jVertex];
-          
-          /*--- Compute the distance ---*/
-          dist = 0.0; for (iDim = 0; iDim < nDim; iDim++) {
-            Coord_j[iDim] = Buffer_Receive_Coord[(iProcessor*MaxLocalVertex_Zone+jVertex)*nDim+iDim];
-            dist += pow(Coord_j[iDim]-Coord_i[iDim],2.0);
-          } dist = sqrt(dist);
-          
-          if (((dist < mindist) && (iProcessor != rank)) ||
-              ((dist < mindist) && (iProcessor == rank) && (jPoint != iPoint))) {
-            mindist = dist; pProcessor = iProcessor; pPoint = jPoint;
-          }
-        }
-        
-        /*--- Store the value of the pair ---*/
-        maxdist = max(maxdist, mindist);
-        vertex[iMarker][iVertex]->SetDonorPoint(pPoint, pProcessor);
-        
-        
-      }
-    }
-  }
-  
-  delete[] Buffer_Send_Coord;
-  delete[] Buffer_Send_Point;
-  
-  delete[] Buffer_Receive_Coord;
-  delete[] Buffer_Receive_Point;
-  
-  delete[] Buffer_Send_nVertex;
-  delete[] Buffer_Receive_nVertex;
-  
-#ifdef WINDOWS
-  MPI_Barrier(MPI_COMM_WORLD);
-#else
-  MPI::COMM_WORLD.Barrier();
-#endif
-#endif
-  
 }
 
 
@@ -5564,13 +5371,13 @@ void CPhysicalGeometry::SetGeometryPlanes(CConfig *config) {
   delete[] FaceArea;
 }
 
-CMultiGridGeometry::CMultiGridGeometry(CGeometry ***geometry, CConfig **config_container, unsigned short iMesh, unsigned short iZone) : CGeometry() {
+CMultiGridGeometry::CMultiGridGeometry(CGeometry **geometry, CConfig *config_container, unsigned short iMesh) : CGeometry() {
   
   /*--- CGeometry & CConfig pointers to the fine grid level for clarity. We may
    need access to the other zones in the mesh for zone boundaries. ---*/
   
-  CGeometry *fine_grid = geometry[iZone][iMesh-1];
-  CConfig *config = config_container[iZone];
+  CGeometry *fine_grid = geometry[iMesh-1];
+  CConfig *config = config_container;
   
   /*--- Local variables ---*/
   

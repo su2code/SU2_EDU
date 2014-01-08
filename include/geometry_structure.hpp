@@ -312,7 +312,7 @@ public:
 	 * \brief A virtual member.
 	 * \param[in] config - Definition of the particular problem.		 
 	 */
-	virtual void SetPositive_ZArea(CConfig *config);
+	virtual void ComputeReference_Area(CConfig *config);
 
 	/*! 
 	 * \brief A virtual member.
@@ -797,10 +797,8 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] val_mesh_filename - Name of the file with the grid information.
 	 * \param[in] val_format - Format of the file with the grid information.
-	 * \param[in] val_iZone - Domain to be read from the grid file.
-	 * \param[in] val_nZone - Total number of domains in the grid file.
 	 */
-	CPhysicalGeometry(CConfig *config, unsigned short val_iZone, unsigned short val_nZone);
+	CPhysicalGeometry(CConfig *config);
 
 	/*! 
 	 * \brief Destructor of the class.
@@ -813,10 +811,8 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] val_mesh_filename - Name of the file with the grid information.
 	 * \param[in] val_format - Format of the file with the grid information.
-	 * \param[in] val_iZone - Domain to be read from the grid file.
-	 * \param[in] val_nZone - Total number of domains in the grid file.
 	 */
-	void Read_SU2_Format(CConfig *config, string val_mesh_filename, unsigned short val_iZone, unsigned short val_nZone);
+	void Read_SU2_Format(CConfig *config, string val_mesh_filename);
   
   /*!
 	 * \brief Reads the geometry of the grid and adjust the boundary
@@ -824,10 +820,8 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] val_mesh_filename - Name of the file with the grid information.
 	 * \param[in] val_format - Format of the file with the grid information.
-	 * \param[in] val_iZone - Domain to be read from the grid file.
-	 * \param[in] val_nZone - Total number of domains in the grid file.
 	 */
-	void Read_NETCDF_Format(CConfig *config, string val_mesh_filename, unsigned short val_iZone, unsigned short val_nZone);
+	void Read_NETCDF_Format(CConfig *config, string val_mesh_filename);
 
 	/*! 
 	 * \brief Find repeated nodes between two elements to identify the common face.
@@ -850,7 +844,7 @@ public:
 	 * \brief Compute surface area (positive z-direction) for force coefficient non-dimensionalization.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-	void SetPositive_ZArea(CConfig *config);
+	void ComputeReference_Area(CConfig *config);
 
 	/*! 
 	 * \brief Set elements which surround a point.
@@ -913,15 +907,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	void MatchInterface(CConfig *config);
-
-	/*! 
-	 * \brief Mach the interface boundary condition.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] geometry_donor - Geometry of the donor zone.
-	 * \param[in] config_donor - Definition of the donor problem.
-	 */
-	void MatchZone(CConfig *config, CGeometry *geometry_donor, CConfig *config_donor, 
-			unsigned short val_iZone, unsigned short val_nZone);
 
 	/*! 
 	 * \brief Set boundary vertex structure of the control volume.
@@ -1179,9 +1164,8 @@ public:
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] iMesh - Level of the multigrid.
-	 * \param[in] iZone - Current zone in the mesh.
 	 */	
-	CMultiGridGeometry(CGeometry ***geometry, CConfig **config_container, unsigned short iMesh, unsigned short iZone);
+	CMultiGridGeometry(CGeometry **geometry, CConfig *config_container, unsigned short iMesh);
 
 	/*! 
 	 * \brief Destructor of the class.

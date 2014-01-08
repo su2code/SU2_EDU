@@ -23,96 +23,6 @@
 
 #include "../include/definition_structure.hpp"
 
-
-unsigned short GetnZone(string val_mesh_filename, unsigned short val_format, CConfig *config) {
-  string text_line, Marker_Tag;
-  ifstream mesh_file;
-  short nZone = 1;
-  bool isFound = false;
-  char cstr[200];
-  string::size_type position;
-  int rank = MASTER_NODE;
-  
-#ifndef NO_MPI
-  rank = MPI::COMM_WORLD.Get_rank();
-  if (MPI::COMM_WORLD.Get_size() != 1) {
-    unsigned short lastindex = val_mesh_filename.find_last_of(".");
-    val_mesh_filename = val_mesh_filename.substr(0, lastindex);
-    val_mesh_filename = val_mesh_filename + "_1.su2";
-  }
-#endif
-  
-  /*--- Search the mesh file for the 'NZONE' keyword. ---*/
-  switch (val_format) {
-    case SU2:
-      
-      /*--- Open grid file ---*/
-      strcpy (cstr, val_mesh_filename.c_str());
-      mesh_file.open(cstr, ios::in);
-      if (mesh_file.fail()) {
-        cout << "cstr=" << cstr << endl;
-        cout << "There is no geometry file (GetnZone))!" << endl;
-#ifdef NO_MPI
-        exit(1);
-#else
-        MPI::COMM_WORLD.Abort(1);
-        MPI::Finalize();
-#endif
-      }
-      
-      /*--- Open the SU2 mesh file ---*/
-      while (getline (mesh_file,text_line)) {
-        
-        /*--- Search for the "NZONE" keyword to see if there are multiple Zones ---*/
-        position = text_line.find ("NZONE=",0);
-        if (position != string::npos) {
-          text_line.erase (0,6); nZone = atoi(text_line.c_str()); isFound = true;
-          if (rank == MASTER_NODE) {
-            //					if (nZone == 1) cout << "SU2 mesh file format with a single zone." << endl;
-            //					else if (nZone >  1) cout << "SU2 mesh file format with " << nZone << " zones." << endl;
-            //					else
-            if (nZone <= 0) {
-              cout << "Error: Number of mesh zones is less than 1 !!!" << endl;
-#ifdef NO_MPI
-              exit(1);
-#else
-              MPI::COMM_WORLD.Abort(1);
-              MPI::Finalize();
-#endif
-            }
-          }
-        }
-      }
-      /*--- If the "NZONE" keyword was not found, assume this is an ordinary
-       simulation on a single Zone ---*/
-      if (!isFound) {
-        nZone = 1;
-        //			if (rank == MASTER_NODE) cout << "SU2 mesh file format with a single zone." << endl;
-      }
-      break;
-      
-    case CGNS:
-      
-      nZone = 1;
-      //		if (rank == MASTER_NODE) cout << "CGNS mesh file format with a single zone." << endl;
-      break;
-      
-    case NETCDF_ASCII:
-      
-      nZone = 1;
-      //		if (rank == MASTER_NODE) cout << "NETCDF mesh file format with a single zone." << endl;
-      break;
-      
-  }
-  
-  /*--- For time spectral integration, nZones = nTimeInstances. ---*/
-  if (config->GetUnsteady_Simulation() == TIME_SPECTRAL) {
-    nZone = config->GetnTimeInstances();
-  }
-  
-  return (unsigned short) nZone;
-}
-
 unsigned short GetnDim(string val_mesh_filename, unsigned short val_format) {
   
   string text_line, Marker_Tag;
@@ -160,9 +70,9 @@ unsigned short GetnDim(string val_mesh_filename, unsigned short val_format) {
 
 
 
-void Geometrical_Preprocessing(CGeometry ***geometry, CConfig **config, unsigned short val_nZone) {
+void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   
-  unsigned short iMGlevel, iZone;
+  unsigned short iMGlevel;
   unsigned long iPoint;
   
   int rank = MASTER_NODE;
@@ -170,63 +80,72 @@ void Geometrical_Preprocessing(CGeometry ***geometry, CConfig **config, unsigned
   rank = MPI::COMM_WORLD.Get_rank();
 #endif
   
-  for (iZone = 0; iZone < val_nZone; iZone++) {
-    
+  
     /*--- Compute elements surrounding points, points surrounding points,
      and elements surrounding elements ---*/
     
     if (rank == MASTER_NODE) cout << "Setting point connectivity." << endl;
-    geometry[iZone][MESH_0]->SetEsuP();
-    geometry[iZone][MESH_0]->SetPsuP();
+    geometry[MESH_0]->SetEsuP();
+    geometry[MESH_0]->SetPsuP();
     
     if (rank == MASTER_NODE) cout << "Renumbering using a Reverse Cuthill-McKee Algorithm." << endl;
-    geometry[iZone][MESH_0]->SetRCM(config[iZone]);
+    geometry[MESH_0]->SetRCM(config);
     
     if (rank == MASTER_NODE) cout << "Recomputing point connectivity." << endl;
-    geometry[iZone][MESH_0]->SetEsuP();
-    geometry[iZone][MESH_0]->SetPsuP();
+    geometry[MESH_0]->SetEsuP();
+    geometry[MESH_0]->SetPsuP();
     
     if (rank == MASTER_NODE) cout << "Setting element connectivity." << endl;
     
-    geometry[iZone][MESH_0]->SetEsuE();
+    geometry[MESH_0]->SetEsuE();
     
     /*--- Check the orientation before computing geometrical quantities ---*/
     
     if (rank == MASTER_NODE) cout << "Checking the numerical grid orientation." << endl;
-    geometry[iZone][MESH_0]->SetBoundVolume();
-    geometry[iZone][MESH_0]->Check_Orientation(config[iZone]);
+    geometry[MESH_0]->SetBoundVolume();
+    geometry[MESH_0]->Check_Orientation(config);
     
     /*--- Create the edge structure ---*/
     
     if (rank == MASTER_NODE) cout << "Identifying edges and vertices." << endl;
-    geometry[iZone][MESH_0]->SetEdges();
-    geometry[iZone][MESH_0]->SetVertex(config[iZone]);
+    geometry[MESH_0]->SetEdges();
+    geometry[MESH_0]->SetVertex(config);
     
     /*--- Compute cell center of gravity ---*/
     
     if (rank == MASTER_NODE) cout << "Computing centers of gravity." << endl;
-    geometry[iZone][MESH_0]->SetCG();
+    geometry[MESH_0]->SetCG();
     
     /*--- Create the control volume structures ---*/
     
     if (rank == MASTER_NODE) cout << "Setting the control volume structure." << endl;
-    geometry[iZone][MESH_0]->SetControlVolume(config[iZone], ALLOCATE);
-    geometry[iZone][MESH_0]->SetBoundControlVolume(config[iZone], ALLOCATE);
+    geometry[MESH_0]->SetControlVolume(config, ALLOCATE);
+    geometry[MESH_0]->SetBoundControlVolume(config, ALLOCATE);
     
     /*--- Identify closest normal neighbor ---*/
     
     if (rank == MASTER_NODE) cout << "Searching for the closest normal neighbors to the surfaces." << endl;
-    geometry[iZone][MESH_0]->FindNormal_Neighbor(config[iZone]);
+    geometry[MESH_0]->FindNormal_Neighbor(config);
     
     /*--- Compute the surface curvature ---*/
     
     if (rank == MASTER_NODE) cout << "Compute the surface curvature." << endl;
-    geometry[iZone][MESH_0]->ComputeSurf_Curvature(config[iZone]);
-    
-    if ((config[iZone]->GetMGLevels() != 0) && (rank == MASTER_NODE))
+    geometry[MESH_0]->ComputeSurf_Curvature(config);
+  
+  /*--- Computation of wall distances for turbulence modeling ---*/
+  
+  if (config->GetKind_Solver() == RANS)
+    geometry[MESH_0]->ComputeWall_Distance(config);
+  
+  /*--- Computation of positive surface area in the y-direction (2-D) or the
+   z-direction (3-D) which is used to calculate force coefficients (non-dim).
+   This value is used if the reference area is set to zero in the config. ---*/
+  
+  geometry[MESH_0]->ComputeReference_Area(config);
+  
+  
+    if ((config->GetMGLevels() != 0) && (rank == MASTER_NODE))
       cout << "Setting the multigrid structure." <<endl;
-    
-  }
   
 #ifndef NO_MPI
   /*--- Synchronization point before the multigrid algorithm ---*/
@@ -235,65 +154,55 @@ void Geometrical_Preprocessing(CGeometry ***geometry, CConfig **config, unsigned
   
   /*--- Loop over all the new grid ---*/
   
-  for (iMGlevel = 1; iMGlevel <= config[ZONE_0]->GetMGLevels(); iMGlevel++) {
-    
-    /*--- Loop over all zones at each grid level. ---*/
-    
-    for (iZone = 0; iZone < val_nZone; iZone++) {
+  for (iMGlevel = 1; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
       
       /*--- Create main agglomeration structure ---*/
       
-      geometry[iZone][iMGlevel] = new CMultiGridGeometry(geometry, config, iMGlevel, iZone);
+      geometry[iMGlevel] = new CMultiGridGeometry(geometry, config, iMGlevel);
       
       /*--- Compute points surrounding points. ---*/
       
-      geometry[iZone][iMGlevel]->SetPsuP(geometry[iZone][iMGlevel-1]);
+      geometry[iMGlevel]->SetPsuP(geometry[iMGlevel-1]);
       
       /*--- Create the edge structure ---*/
       
-      geometry[iZone][iMGlevel]->SetEdges();
-      geometry[iZone][iMGlevel]->SetVertex(geometry[iZone][iMGlevel-1], config[iZone]);
+      geometry[iMGlevel]->SetEdges();
+      geometry[iMGlevel]->SetVertex(geometry[iMGlevel-1], config);
       
       /*--- Create the control volume structures ---*/
       
-      geometry[iZone][iMGlevel]->SetControlVolume(config[iZone],geometry[iZone][iMGlevel-1], ALLOCATE);
-      geometry[iZone][iMGlevel]->SetBoundControlVolume(config[iZone],geometry[iZone][iMGlevel-1], ALLOCATE);
-      geometry[iZone][iMGlevel]->SetCoord(geometry[iZone][iMGlevel-1]);
+      geometry[iMGlevel]->SetControlVolume(config,geometry[iMGlevel-1], ALLOCATE);
+      geometry[iMGlevel]->SetBoundControlVolume(config,geometry[iMGlevel-1], ALLOCATE);
+      geometry[iMGlevel]->SetCoord(geometry[iMGlevel-1]);
       
       /*--- Find closest neighbor to a surface point ---*/
       
-      geometry[iZone][iMGlevel]->FindNormal_Neighbor(config[iZone]);
+      geometry[iMGlevel]->FindNormal_Neighbor(config);
       
     }
-    
-  }
   
   /*--- For unsteady simulations, initialize the grid volumes
    and coordinates for previous solutions. Loop over all zones/grids ---*/
   
-  for (iZone = 0; iZone < val_nZone; iZone++) {
-    if (config[iZone]->GetUnsteady_Simulation() && config[iZone]->GetGrid_Movement()) {
-      for (iMGlevel = 0; iMGlevel <= config[iZone]->GetMGLevels(); iMGlevel++) {
-        for (iPoint = 0; iPoint < geometry[iZone][iMGlevel]->GetnPoint(); iPoint++) {
+    if (config->GetUnsteady_Simulation() && config->GetGrid_Movement())
+      for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
+        for (iPoint = 0; iPoint < geometry[iMGlevel]->GetnPoint(); iPoint++) {
           
           /*--- Update cell volume ---*/
           
-          geometry[iZone][iMGlevel]->node[iPoint]->SetVolume_n();
-          geometry[iZone][iMGlevel]->node[iPoint]->SetVolume_nM1();
+          geometry[iMGlevel]->node[iPoint]->SetVolume_n();
+          geometry[iMGlevel]->node[iPoint]->SetVolume_nM1();
           
           /*--- Update point coordinates ---*/
-          geometry[iZone][iMGlevel]->node[iPoint]->SetCoord_n();
-          geometry[iZone][iMGlevel]->node[iPoint]->SetCoord_n1();
+          geometry[iMGlevel]->node[iPoint]->SetCoord_n();
+          geometry[iMGlevel]->node[iPoint]->SetCoord_n1();
           
         }
       }
-    }
-  }
   
 }
 
-void Solver_Preprocessing(CSolver ***solver_container, CGeometry **geometry,
-                          CConfig *config, unsigned short iZone) {
+void Solver_Preprocessing(CSolver ***solver_container, CGeometry **geometry, CConfig *config) {
   
   unsigned short iMGlevel;
   bool euler, ns, turbulent, spalart_allmaras, menter_sst;
@@ -347,8 +256,7 @@ void Solver_Preprocessing(CSolver ***solver_container, CGeometry **geometry,
 }
 
 void Integration_Preprocessing(CIntegration **integration_container,
-                               CGeometry **geometry, CConfig *config,
-                               unsigned short iZone) {
+                               CGeometry **geometry, CConfig *config) {
   
   bool
   euler, ns, turbulent, spalart_allmaras, menter_sst;
@@ -382,7 +290,7 @@ void Integration_Preprocessing(CIntegration **integration_container,
 
 void Numerics_Preprocessing(CNumerics ****numerics_container,
                             CSolver ***solver_container, CGeometry **geometry,
-                            CConfig *config, unsigned short iZone) {
+                            CConfig *config) {
   
   unsigned short iMGlevel, iSol, nDim,
   

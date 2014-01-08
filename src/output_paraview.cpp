@@ -23,7 +23,7 @@
 
 #include "../include/output_structure.hpp"
 
-void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, unsigned short val_iZone, unsigned short val_nZone, bool surf_sol) {
+void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, bool surf_sol) {
     
 	/*--- Local variables and initialization ---*/
 	unsigned short iDim, iVar, nDim = geometry->GetnDim();
@@ -77,29 +77,8 @@ void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, unsigned s
     
 	strcpy (cstr, filename.c_str());
 	if (Kind_Solver == POISSON_EQUATION) strcpy (cstr, config->GetStructure_FileName().c_str());
-    
-	/*--- Special cases where a number needs to be appended to the file name. ---*/
-	if ((Kind_Solver == EULER || Kind_Solver == NAVIER_STOKES || Kind_Solver == RANS) &&
-        (val_nZone > 1) && (config->GetUnsteady_Simulation() != TIME_SPECTRAL)) {
-		sprintf (buffer, "_%d", int(val_iZone));
-		strcat(cstr,buffer);
-	}
-    
-	/*--- Special cases where a number needs to be appended to the file name. ---*/
-	if (((Kind_Solver == ADJ_EULER) || (Kind_Solver == ADJ_NAVIER_STOKES) || (Kind_Solver == ADJ_RANS)) &&
-        (val_nZone > 1) && (config->GetUnsteady_Simulation() != TIME_SPECTRAL)) {
-		sprintf (buffer, "_%d", int(val_iZone));
-		strcat(cstr,buffer);
-	}
-    
-	if (config->GetUnsteady_Simulation() == TIME_SPECTRAL) {
-		if (int(val_iZone) < 10) sprintf (buffer, "_0000%d.vtk", int(val_iZone));
-		if ((int(val_iZone) >= 10) && (int(val_iZone) < 100)) sprintf (buffer, "_000%d.vtk", int(val_iZone));
-		if ((int(val_iZone) >= 100) && (int(val_iZone) < 1000)) sprintf (buffer, "_00%d.vtk", int(val_iZone));
-		if ((int(val_iZone) >= 1000) && (int(val_iZone) < 10000)) sprintf (buffer, "_0%d.vtk", int(val_iZone));
-		if (int(val_iZone) >= 10000) sprintf (buffer, "_%d.vtk", int(val_iZone));
-        
-	} else if (config->GetUnsteady_Simulation() && config->GetWrt_Unsteady()) {
+  
+ if (config->GetUnsteady_Simulation() && config->GetWrt_Unsteady()) {
 		if (int(iExtIter) < 10) sprintf (buffer, "_0000%d.vtk", int(iExtIter));
 		if ((int(iExtIter) >= 10) && (int(iExtIter) < 100)) sprintf (buffer, "_000%d.vtk", int(iExtIter));
 		if ((int(iExtIter) >= 100) && (int(iExtIter) < 1000)) sprintf (buffer, "_00%d.vtk", int(iExtIter));
