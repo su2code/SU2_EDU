@@ -29,7 +29,6 @@ CUpwSca_TurbSA::CUpwSca_TurbSA(unsigned short val_nDim, unsigned short val_nVar,
   
   implicit        = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
   incompressible  = (config->GetKind_Regime() == INCOMPRESSIBLE);
-  grid_movement   = config->GetGrid_Movement();
   
   Velocity_i = new double [nDim];
   Velocity_j = new double [nDim];
@@ -47,19 +46,11 @@ void CUpwSca_TurbSA::ComputeResidual(double *val_residual, double **val_Jacobian
   
   q_ij = 0.0;
   
-  if (grid_movement) {
-    for (iDim = 0; iDim < nDim; iDim++) {
-      Velocity_i[iDim] = V_i[iDim+1] - GridVel_i[iDim];
-      Velocity_j[iDim] = V_j[iDim+1] - GridVel_j[iDim];
-      q_ij += 0.5*(Velocity_i[iDim]+Velocity_j[iDim])*Normal[iDim];
-    }
-  } else {
     for (iDim = 0; iDim < nDim; iDim++) {
       Velocity_i[iDim] = V_i[iDim+1];
       Velocity_j[iDim] = V_j[iDim+1];
       q_ij += 0.5*(Velocity_i[iDim]+Velocity_j[iDim])*Normal[iDim];
     }
-  }
   
   a0 = 0.5*(q_ij+fabs(q_ij));
   a1 = 0.5*(q_ij-fabs(q_ij));
@@ -246,9 +237,7 @@ CSourcePieceWise_TurbSA::CSourcePieceWise_TurbSA(unsigned short val_nDim, unsign
                                                  CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
   incompressible = (config->GetKind_Regime() == INCOMPRESSIBLE);
-  //transition     = (config->GetKind_Trans_Model() == LM);
   transition = false; // Debugging, -AA
-  rotating_frame = config->GetRotating_Frame();
   
   /*--- Spalart-Allmaras closure constants ---*/
   cv1_3 = pow(7.1,3.0);
@@ -288,25 +277,6 @@ void CSourcePieceWise_TurbSA::ComputeResidual(double *val_residual, double **val
   Vorticity = (PrimVar_Grad_i[2][0]-PrimVar_Grad_i[1][1])*(PrimVar_Grad_i[2][0]-PrimVar_Grad_i[1][1]);
   if (nDim == 3) Vorticity += ( (PrimVar_Grad_i[3][1]-PrimVar_Grad_i[2][2])*(PrimVar_Grad_i[3][1]-PrimVar_Grad_i[2][2]) + (PrimVar_Grad_i[1][2]-PrimVar_Grad_i[3][0])*(PrimVar_Grad_i[1][2]-PrimVar_Grad_i[3][0]) );
   Omega = sqrt(Vorticity);
-  
-  /*--- Rotational correction term ---*/
-  if (rotating_frame) {
-    div = PrimVar_Grad_i[1][0] + PrimVar_Grad_i[2][1];
-    if (nDim == 3) div += PrimVar_Grad_i[3][2];
-    StrainMag = 0.0;
-    // add diagonals
-    StrainMag += pow(PrimVar_Grad_i[1][0] - 1.0/3.0*div,2.0);
-    StrainMag += pow(PrimVar_Grad_i[2][1] - 1.0/3.0*div,2.0);
-    if (nDim == 3) StrainMag += pow(PrimVar_Grad_i[3][2] - 1.0/3.0*div,2.0);
-    // add off diagonals
-    StrainMag += 2.0*pow(0.5*(PrimVar_Grad_i[1][1]+PrimVar_Grad_i[2][0]),2.0);
-    if (nDim == 3) {
-      StrainMag += 2.0*pow(0.5*(PrimVar_Grad_i[1][2]+PrimVar_Grad_i[3][0]),2.0);
-      StrainMag += 2.0*pow(0.5*(PrimVar_Grad_i[2][2]+PrimVar_Grad_i[3][1]),2.0);
-    }
-    StrainMag = sqrt(2.0*StrainMag);
-    Omega += 2.0*min(0.0,StrainMag-Omega);
-  }
   
   if (dist_i > 1e-10) {
     
@@ -373,7 +343,6 @@ CUpwSca_TurbSST::CUpwSca_TurbSST(unsigned short val_nDim, unsigned short val_nVa
   
   implicit        = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
   incompressible  = (config->GetKind_Regime() == INCOMPRESSIBLE);
-  grid_movement   = config->GetGrid_Movement();
   
   Velocity_i = new double [nDim];
   Velocity_j = new double [nDim];
@@ -399,20 +368,11 @@ void CUpwSca_TurbSST::ComputeResidual(double *val_residual, double **val_Jacobia
   }
   
   q_ij = 0.0;
-  if (grid_movement) {
-    for (iDim = 0; iDim < nDim; iDim++) {
-      Velocity_i[iDim] = V_i[iDim+1] - GridVel_i[iDim];
-      Velocity_j[iDim] = V_j[iDim+1] - GridVel_j[iDim];
-      q_ij += 0.5*(Velocity_i[iDim]+Velocity_j[iDim])*Normal[iDim];
-    }
-  }
-  else {
     for (iDim = 0; iDim < nDim; iDim++) {
       Velocity_i[iDim] = V_i[iDim+1];
       Velocity_j[iDim] = V_j[iDim+1];
       q_ij += 0.5*(Velocity_i[iDim]+Velocity_j[iDim])*Normal[iDim];
     }
-  }
   
   a0 = 0.5*(q_ij+fabs(q_ij));
   a1 = 0.5*(q_ij-fabs(q_ij));

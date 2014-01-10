@@ -428,12 +428,6 @@ public:
 
 	/*! 
 	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.		 
-	 */
-	virtual void SetPeriodicBoundary(CConfig *config);
-
-	/*! 
-	 * \brief A virtual member.
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] val_domain - Number of domains for parallelization purposes.		 
@@ -503,51 +497,6 @@ public:
 	 * \param[in] val_mesh_out_filename - Name of the output file.
 	 */
 	virtual void SetMeshFile(CConfig *config, string val_mesh_out_filename, string val_mesh_in_filename);
-
-	/*! 
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetBoundSensitivity(CConfig *config);
-
-	/*! 
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetPeriodicBoundary(CGeometry *geometry, CConfig *config);
-
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetRotationalVelocity(CConfig *config);
-
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] iter - Current physical time step.
-	 */
-	virtual void SetGridVelocity(CConfig *config, unsigned long iter);
-
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  virtual void Set_MPI_Coord(CConfig *config);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  virtual void Set_MPI_GridVel(CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
-   * \param[in] geometry - Geometry of the fine mesh.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetRestricted_GridVelocity(CGeometry *fine_mesh, CConfig *config);
 
 	/*!
 	 * \brief A virtual member.
@@ -944,36 +893,6 @@ public:
 	 */
 	void Check_Orientation(CConfig *config);
   
-	/*!
-	 * \brief Set the rotational velocity at each node.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void SetRotationalVelocity(CConfig *config);
-
-	/*! 
-	 * \brief Set the grid velocity via finite differencing at each node.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void SetGridVelocity(CConfig *config, unsigned long iter);
-  
-  /*!
-	 * \brief Perform the MPI communication for the grid coordinates (dynamic meshes).
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  void Set_MPI_Coord(CConfig *config);
-  
-  /*!
-	 * \brief Perform the MPI communication for the grid velocities.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  void Set_MPI_GridVel(CConfig *config);
-  
-	/*! 
-	 * \brief Set the periodic boundary conditions.
-	 * \param[in] config - Definition of the particular problem.		 
-	 */
-	void SetPeriodicBoundary(CConfig *config);
-  
 	/*! 
 	 * \brief Do an implicit smoothing of the grid coordinates.
 	 * \param[in] val_nSmooth - Number of smoothing iterations.
@@ -1347,12 +1266,6 @@ public:
 	 * \param[in] action - Allocate or not the new elements.
 	 */
 	void SetBoundControlVolume(CConfig *config, unsigned short action);
-
-	/*! 
-	 * \brief Read the sensitivity from an input file.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void SetBoundSensitivity(CConfig *config);
   
   /*!
 	 * \brief Compute the sections of a wing.
@@ -1461,52 +1374,6 @@ public:
 	 */
 	unsigned short GetGlobal_to_Local_Marker(unsigned short val_imarker);
 
-};
-
-/*! 
- * \class CPeriodicGeometry
- * \brief Class for defining a periodic boundary condition.
- * \author T. Economon, F. Palacios.
- * \version 1.0.0
- */
-class CPeriodicGeometry : public CGeometry {
-	CPrimalGrid*** newBoundPer;            /*!< \brief Boundary vector for new periodic elements (primal grid information). */
-	unsigned long *nNewElem_BoundPer;			/*!< \brief Number of new periodic elements of the boundary. */
-
-public:
-
-	/*! 
-	 * \brief Constructor of the class.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CPeriodicGeometry(CGeometry *geometry, CConfig *config);
-
-	/*! 
-	 * \brief Destructor of the class.
-	 */
-	~CPeriodicGeometry(void);
-
-	/*! 
-	 * \brief Set the periodic boundaries of the grid.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void SetPeriodicBoundary(CGeometry *geometry, CConfig *config);
-
-	/*! 
-	 * \brief Set the Tecplot file.
-	 * \param[in] config_filename - Name of the file where the Tecplot 
-	 *            information is going to be stored.
-	 */
-	void SetTecPlot(char config_filename[200]);
-
-	/*! 
-	 * \brief Write the .su2 file.
-	 * \param[in] config - Definition of the particular problem.		 
-	 * \param[in] val_mesh_out_filename - Name of the output file.
-	 */
-	void SetMeshFile(CGeometry *geometry, CConfig *config, string val_mesh_out_filename);
 };
 
 /*! 

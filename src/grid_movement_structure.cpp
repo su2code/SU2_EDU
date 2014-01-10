@@ -83,8 +83,6 @@ void CVolumetricMovement::UpdateMultiGrid(CGeometry **geometry, CConfig *config)
     geometry[iMGlevel]->SetControlVolume(config,geometry[iMGfine], UPDATE);
     geometry[iMGlevel]->SetBoundControlVolume(config,geometry[iMGfine],UPDATE);
     geometry[iMGlevel]->SetCoord(geometry[iMGfine]);
-    if (config->GetGrid_Movement())
-      geometry[iMGlevel]->SetRestricted_GridVelocity(geometry[iMGfine],config);
   }
  
 }

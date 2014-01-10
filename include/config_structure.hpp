@@ -374,7 +374,6 @@ private:
 	Wrt_Con_Freq,				/*!< \brief Writing convergence history frequency. */
 	Wrt_Con_Freq_DualTime;				/*!< \brief Writing convergence history frequency. */
 	bool Wrt_Unsteady;  /*!< \brief Write unsteady data adding header and prefix. */
-	bool LowFidelitySim;  /*!< \brief Compute a low fidelity simulation. */
 	bool Restart,	/*!< \brief Restart solution (for direct, adjoint, and linearized problems). */
 	Restart_Flow;	/*!< \brief Restart flow solution for adjoint and linearized problems. */
 	unsigned short nMarker_Monitoring,	/*!< \brief Number of markers to monitor. */
@@ -951,26 +950,6 @@ public:
 	unsigned short GetMaxChildren(void);
 
 	/*! 
-	 * \brief Get index of the upper and lower horizontal plane.
-	 * \param[in] index - 0 means upper surface, and 1 means lower surface.
-	 * \return Index of the upper and lower surface.
-	 */
-	string GetPlaneTag(unsigned short index);
-
-	/*! 
-	 * \brief Get the integration limits for the equivalent area computation.
-	 * \param[in] index - 0 means x_min, and 1 means x_max.
-	 * \return Integration limits for the equivalent area computation.
-	 */
-	double GetEA_IntLimit(unsigned short index);
-  
-  /*!
-	 * \brief Get the limit value for the adjoint variables.
-	 * \return Limit value for the adjoint variables.
-	 */
-	double GetAdjointLimit(void);
-
-	/*! 
 	 * \brief Get the the coordinates where of the box where the grid is going to be deformed.
 	 * \return Coordinates where of the box where the grid is going to be deformed.
 	 */
@@ -1009,30 +988,6 @@ public:
 	double GetRatioViscosity(void);
 
 	/*! 
-	 * \brief Get the thickness of the interfase for a free surface problem.
-	 * \return Thickness of the interfase for a free surface problem.
-	 */
-	double GetFreeSurface_Thickness(void);
-
-	/*! 
-	 * \brief Get the damping of the free surface for a free surface problem.
-	 * \return Damping of the interfase for a free surface problem.
-	 */
-	double GetFreeSurface_Damping_Coeff(void);
-
-	/*! 
-	 * \brief Get the damping of the free surface for a free surface problem.
-	 * \return Damping of the interfase for a free surface problem.
-	 */
-	double GetFreeSurface_Damping_Length(void);
-
-	/*!
-	 * \brief Get the outlet position of the free surface for a free surface problem.
-	 * \return Outlet position of the interfase for a free surface problem.
-	 */
-	double GetFreeSurface_Outlet(void);
-
-	/*! 
 	 * \brief Creates a tecplot file to visualize the partition made by the DDC software.
 	 * \return <code>TRUE</code> if the partition is going to be plotted; otherwise <code>FALSE</code>.
 	 */
@@ -1061,20 +1016,6 @@ public:
 	 * \return Value of the constant: Gamma
 	 */
 	double GetGamma(void);
-
-	/*! 
-	 * \brief Get the value of the Gamma of fluid (ratio of specific heats) for a particular species.
-	 * \param[in] - val_Species: Index of desired species specific heat ratio.
-	 * \return Value of the constant: Species_Gamma[iSpecies]
-	 */
-	double GetSpecies_Gamma(unsigned short val_Species);
-
-	/*! 
-	 * \brief Get the value of the charge number for a particular species (1 for ions, -1 for electrons, 0 for neutral).
-	 * \param[in] - val_Species: Index of desired species charge number.
-	 * \return Value of the constant: Charge_Number[val_Species]
-	 */
-	int GetCharge_Number(unsigned short val_Species);
   
   /*!
 	 * \brief Get the value of the limits for the sections.
@@ -1083,40 +1024,10 @@ public:
 	double GetSection_Limit(unsigned short val_var);
 
 	/*! 
-	 * \brief Get the array that maps chemical consituents to each chemical reaction.
-	 * \return Memory location of the triple pointer to the 3-D reaction map array.
-	 */
-	int ***GetReaction_Map(void);
-
-	/*!
-	 * \brief Get the array containing the curve fit coefficients for the Omega(0,0) collision integrals.
-	 * \return Memory location of the triple pointer to the 3-D collision integral array.
-	 */
-	double ***GetCollisionIntegral00(void);
-
-	/*!
-	 * \brief Get the array containing the curve fit coefficients for the Omega(1,1) collision integrals.
-	 * \return Memory location of the triple pointer to the 3-D collision integral array.
-	 */
-	double ***GetCollisionIntegral11(void);
-
-	/*! 
 	 * \brief Get the value of the bulk modulus.
 	 * \return Value of the bulk modulus.
 	 */
 	double GetBulk_Modulus(void);
-
-	/*! 
-	 * \brief Get the value of the Gamma of fluid (ratio of specific heats) for monatomic species.
-	 * \return Value of the constant: GammaMonatomic
-	 */
-	double GetGammaMonatomic(void);	
-
-	/*! 
-	 * \brief Get the value of the Gamma of fluid (ratio of specific heats) for diatomic species.
-	 * \return Value of the constant: Gamma
-	 */
-	double GetGammaDiatomic(void);
 
 	/*! 
 	 * \brief Get the artificial compresibility factor.
@@ -1148,21 +1059,6 @@ public:
 	 */
 	double GetGas_ConstantND(void);
 
-	/*! 
-	 * \brief Get the value of specific gas constant for a particular species.
-	 * \param[in] val_Species - Index of desired species gas constant.
-	 * \return Value of the constant: R
-	 */
-	double GetSpecies_Gas_Constant(unsigned short val_Species);
-
-	/*!
-	 * \brief Get the coefficients of the Blottner viscosity model
-	 * \param[in] val_Species - Index of the species
-	 * \param[in] val_Coeff - Index of the coefficient (As, Bs, Cs)
-	 * \return Value of the Blottner coefficient
-	 */
-	double GetBlottnerCoeff(unsigned short val_Species, unsigned short val_Coeff);
-
 	/*!
 	 * \brief Get the value of wall temperature.
 	 * \return Value of the constant: Temperature
@@ -1180,12 +1076,6 @@ public:
 	 * \return Freestream temperature.
 	 */
 	double GetTemperature_FreeStream(void);
-  
-  /*!
-	 * \brief Get the value of the frestream vibrational-electronic temperature.
-	 * \return Freestream temperature.
-	 */
-	double GetTemperature_ve_FreeStream(void);
 
 	/*!
 	 * \brief Get the value of the laminar Prandtl number.
@@ -1326,12 +1216,6 @@ public:
 	 */
 	double GetTurb2LamViscRatio_FreeStream(void);
   
-  /*!
-	 * \brief Get the vector of free stream mass fraction values.
-	 * \return Ratio of species mass to mixture mass.
-	 */
-	double* GetMassFrac_FreeStream(void);
-  
 	/*!
 	 * \brief Get the value of the Reynolds length.
 	 * \return Reynolds length.
@@ -1357,36 +1241,6 @@ public:
 	 * \return Value of the reference area for coefficient computation.
 	 */
 	double GetRefAreaCoeff(void);
-
-	/*!
-	 * \brief Get the wave speed.
-	 * \return Value of the wave speed.
-	 */
-	double GetWaveSpeed(void);
-
-	/*!
-	 * \brief Get the wave speed.
-	 * \return Value of the wave speed.
-	 */
-	double GetThermalDiffusivity(void);
-
-	/*! 
-	 * \brief Get the Young's modulus of elasticity.
-	 * \return Value of the Young's modulus of elasticity.
-	 */
-	double GetElasticyMod(void);
-
-	/*! 
-	 * \brief Get the Poisson's ratio.
-	 * \return Value of the Poisson's ratio.
-	 */
-	double GetPoissonRatio(void);
-
-	/*! 
-	 * \brief Get the Material Density.
-	 * \return Value of the Material Density.
-	 */
-	double GetMaterialDensity(void);
 
 	/*! 
 	 * \brief Get the reference length for computing moment (the default value is 1).
@@ -1657,36 +1511,6 @@ public:
 	unsigned long GetnExtIter(void);
 
 	/*! 
-	 * \brief Get the number of internal iterations.
-	 * \return Number of internal iterations.
-	 */
-	unsigned long GetUnst_nIntIter(void);
-
-  /*!
-	 * \brief Get the restart iteration number for unsteady simulations.
-	 * \return Restart iteration number for unsteady simulations.
-	 */
-  long GetUnst_RestartIter(void);
-  
-  /*!
-	 * \brief Get the starting direct iteration number for the unsteady adjoint (reverse time integration).
-	 * \return Starting direct iteration number for the unsteady adjoint.
-	 */
-  long GetUnst_AdjointIter(void);
-  
-	/*!
-	 * \brief Retrieves the number of periodic time instances for Time Spectral.
-	 * \return: Number of periodic time instances for Time Spectral.
-	 */
-	unsigned short GetnTimeInstances(void);
-
-	/*!
-	 * \brief Retrieves the period of oscillations to be used with Time Spectral.
-	 * \return: Period for Time Spectral.
-	 */
-	double GetTimeSpectral_Period(void);
-
-	/*! 
 	 * \brief Set the number of external iterations.
 	 * \note This is important in no time depending methods, where only 
 	 *       one external iteration is needed.
@@ -1725,34 +1549,10 @@ public:
 	unsigned long GetWrt_Sol_Freq(void);
 
 	/*!
-	 * \brief Get the frequency for writing the solution file in Dual Time.
-	 * \return It writes the solution file with this frequency.
-	 */
-	unsigned long GetWrt_Sol_Freq_DualTime(void);
-
-	/*!
 	 * \brief Get the frequency for writing the convergence file.
 	 * \return It writes the convergence file with this frequency.
 	 */		
 	unsigned long GetWrt_Con_Freq(void);
-
-	/*!
-	 * \brief Get the frequency for writing the convergence file in Dual Time.
-	 * \return It writes the convergence file with this frequency.
-	 */
-	unsigned long GetWrt_Con_Freq_DualTime(void);
-
-	/*!
-	 * \brief Get information about writing unsteady headers and file extensions.
-	 * \return 	<code>TRUE</code> means that unsteady solution files will be written.
-	 */
-	bool GetWrt_Unsteady(void);
-
-	/*!
-	 * \brief Get information about performing a low fidelity simulation.
-	 * \return 	<code>TRUE</code> means that a low fidelity simulation will be performed.
-	 */
-	bool GetLowFidelitySim(void);
 
 	/*!
 	 * \brief Get information about writing a volume solution file.
@@ -1810,22 +1610,6 @@ public:
 	 *         has the marker <i>val_marker</i>.
 	 */		
 	string GetMarker_All_Tag(unsigned short val_marker);
-
-	/*!
-	 * \brief Get the index of the surface defined in the geometry file.
-	 * \param[in] val_marker - Value of the marker in which we are interested.
-	 * \return Value of the index that is in the geometry file for the surface that
-	 *         has the marker <i>val_marker</i>.
-	 */
-	string GetMarker_NacelleInflow(unsigned short val_marker);
-    
-	/*!
-	 * \brief Get the index of the surface defined in the geometry file.
-	 * \param[in] val_marker - Value of the marker in which we are interested.
-	 * \return Value of the index that is in the geometry file for the surface that
-	 *         has the marker <i>val_marker</i>.
-	 */
-	string GetMarker_NacelleExhaust(unsigned short val_marker);
     
     /*!
 	 * \brief Get the name of the surface defined in the geometry file.
@@ -2008,12 +1792,6 @@ public:
 	 * \return Governing equation that we are solving.
 	 */
 	unsigned short GetKind_Regime(void);
-  
-	/*! 
-	 * \brief Gas model that we are using.
-	 * \return Gas model that we are using.
-	 */		
-	unsigned short GetKind_GasModel(void);
 
 	/*! 
 	 * \brief Get the kind of method for computation of spatial gradients.
@@ -2056,42 +1834,6 @@ public:
 	 * \return relaxation coefficient of the linear solver for the implicit formulation.
 	 */
 	double GetLinear_Solver_Relax(void);
-
-	/*!
-	 * \brief Get the kind of solver for the implicit solver.
-	 * \return Numerical solver for implicit formulation (solving the linear system).
-	 */
-	unsigned short GetKind_AdjTurb_Linear_Solver(void);
-
-	/*!
-	 * \brief Get the kind of preconditioner for the implicit solver.
-	 * \return Numerical preconditioner for implicit formulation (solving the linear system).
-	 */
-	unsigned short GetKind_AdjTurb_Linear_Prec(void);
-
-	/*!
-	 * \brief Set the kind of preconditioner for the implicit solver.
-	 * \return Numerical preconditioner for implicit formulation (solving the linear system).
-	 */
-	void SetKind_AdjTurb_Linear_Prec(unsigned short val_kind_prec);
-
-	/*!
-	 * \brief Get min error of the linear solver for the implicit formulation.
-	 * \return Min error of the linear solver for the implicit formulation.
-	 */
-	double GetAdjTurb_Linear_Error(void);
-
-	/*!
-	 * \brief Get max number of iterations of the linear solver for the implicit formulation.
-	 * \return Max number of iterations of the linear solver for the implicit formulation.
-	 */
-	unsigned short GetAdjTurb_Linear_Iter(void);
-
-	/*!
-	 * \brief Get CFL reduction factor for adjoint turbulence model.
-	 * \return CFL reduction factor.
-	 */
-	double GetAdjTurb_CFLRedCoeff(void);
   
   /*!
 	 * \brief Get the number of increments for mesh deformation.
@@ -2110,34 +1852,6 @@ public:
 	 * \return Kind of the turbulence model.
 	 */
 	unsigned short GetKind_Turb_Model(void);
-
-  /*!
-	 * \brief Get the file containing the ML model
-	 */
-	string GetML_Turb_Model_File(void);
-  /*!
-	 * \brief File containing a check for the proper creation of the turb model
-	 * \return Temporary ml->SU2 file name.
-	 */
-	string GetML_Turb_Model_Check_File(void);
-  
-	/*! 
-	 * \brief Get the kind of the transition model.
-	 * \return Kind of the transion model.
-	 */
-	unsigned short GetKind_Trans_Model(void);
-
-	/*! 
-	 * \brief Get the kind of adaptation technique.
-	 * \return Kind of adaptation technique.
-	 */
-	unsigned short GetKind_Adaptation(void);
-
-	/*! 
-	 * \brief Get the number of new elements added in the adaptation process.
-	 * \return percentage of new elements that are going to be added in the adaptation.
-	 */		
-	double GetNew_Elem_Adapt(void);
 
 	/*! 
 	 * \brief Get the kind of time integration method.
@@ -2201,51 +1915,6 @@ public:
 	 * \return Kind of integration scheme for the flow equations.
 	 */
 	unsigned short GetKind_TimeIntScheme_Flow(void);
-  
-  /*!
-	 * \brief Get the kind of integration scheme (explicit or implicit)
-	 *        for the flow equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of integration scheme for the flow equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_TNE2(void);
-
-	/*! 
-	 * \brief Get the kind of integration scheme (explicit or implicit) 
-	 *        for the flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of integration scheme for the plasma equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_Wave(void);
-  
-  /*!
-	 * \brief Get the kind of integration scheme (explicit or implicit)
-	 *        for the flow equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of integration scheme for the plasma equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_Heat(void);
-  
-  /*!
-	 * \brief Get the kind of integration scheme (explicit or implicit)
-	 *        for the flow equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of integration scheme for the plasma equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_Poisson(void);
-  
-	/*! 
-	 * \brief Get the kind of integration scheme (explicit or implicit) 
-	 *        for the flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of integration scheme for the plasma equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_FEA(void);
 
 	/*! 
 	 * \brief Get the kind of integration scheme (explicit or implicit) 
@@ -2264,24 +1933,6 @@ public:
 	 * \return Kind of convective numerical scheme for the flow equations.
 	 */		
 	unsigned short GetKind_ConvNumScheme_Flow(void);
-  
-  /*!
-	 * \brief Get the kind of convective numerical scheme for the flow
-	 *        equations (centered or upwind).
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of convective numerical scheme for the flow equations.
-	 */
-	unsigned short GetKind_ConvNumScheme_TNE2(void);
-  
-  /*!
-	 * \brief Get the kind of convective numerical scheme for the flow
-	 *        equations (centered or upwind).
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of convective numerical scheme for the flow equations.
-	 */
-	unsigned short GetKind_ConvNumScheme_AdjTNE2(void);
 
 	/*! 
 	 * \brief Get the kind of convective numerical scheme for the template 
@@ -2292,15 +1943,6 @@ public:
 	 */		
 	unsigned short GetKind_ConvNumScheme_Template(void);
 
-	/*!
-	 * \brief Get the kind of convective numerical scheme for the adjoint level set
-	 *        equations (centered or upwind).
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of convective numerical scheme for the level set equation.
-	 */
-	unsigned short GetKind_ConvNumScheme_AdjLevelSet(void);
-
 	/*! 
 	 * \brief Get the kind of viscous numerical scheme for the flow
 	 *        equations (Galerkin, Average of gradients, Average of gradients
@@ -2310,62 +1952,6 @@ public:
 	 * \return Kind of viscous numerical scheme for the flow equations.
 	 */		
 	unsigned short GetKind_ViscNumScheme_Flow(void);
-  
-  /*!
-	 * \brief Get the kind of viscous numerical scheme for the flow
-	 *        equations (Galerkin, Average of gradients, Average of gradients
-	 *        with correction).
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the flow equations.
-	 */
-	unsigned short GetKind_ViscNumScheme_TNE2(void);
-  
-  /*!
-	 * \brief Get the kind of viscous numerical scheme for the flow
-	 *        equations (Galerkin, Average of gradients, Average of gradients
-	 *        with correction).
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the flow equations.
-	 */
-	unsigned short GetKind_ViscNumScheme_AdjTNE2(void);
-
-	/*!
-	 * \brief Get the kind of viscous numerical scheme for the wave
-	 (        equation.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the levelset equations.
-	 */		
-	unsigned short GetKind_SourNumScheme_Wave(void);
-
-  /*!
-	 * \brief Get the kind of viscous numerical scheme for the wave
-	 (        equation.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the levelset equations.
-	 */
-	unsigned short GetKind_SourNumScheme_Heat(void);
-  
-	/*!
-	 * \brief Get the kind of viscous numerical scheme for the FEA
-	 (        equation.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the levelset equations.
-	 */		
-	unsigned short GetKind_SourNumScheme_FEA(void);
-
-	/*! 
-	 * \brief Get the kind of viscous numerical scheme for the adjoint level set
-	 (        equation.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the levelset equations.
-	 */
-	unsigned short GetKind_ViscNumScheme_AdjLevelSet(void);
 
 	/*! 
 	 * \brief Get the kind of viscous numerical scheme for the plasma
@@ -2383,22 +1969,6 @@ public:
 	 * \return Kind of source term for the flow equations.
 	 */			
 	unsigned short GetKind_SourNumScheme_Flow(void);
-  
-  /*!
-	 * \brief Get the kind of source term for the flow equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of source term for the flow equations.
-	 */
-	unsigned short GetKind_SourNumScheme_TNE2(void);
-  
-  /*!
-	 * \brief Get the kind of source term for the flow equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of source term for the flow equations.
-	 */
-	unsigned short GetKind_SourNumScheme_AdjTNE2(void);
 
 	/*! 
 	 * \brief Get the kind of source term for the plasma equations.
@@ -2415,30 +1985,6 @@ public:
 	 * \return Kind of center convective numerical scheme for the flow equations.
 	 */
 	unsigned short GetKind_Centered_Flow(void);
-  
-  /*!
-	 * \brief Get the kind of center convective numerical scheme for the two-temperature model.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of center convective numerical scheme for the flow equations.
-	 */
-	unsigned short GetKind_Centered_TNE2(void);
-  
-  /*!
-	 * \brief Get the kind of center convective numerical scheme for the two-temperature model.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of center convective numerical scheme for the flow equations.
-	 */
-	unsigned short GetKind_Centered_AdjTNE2(void);
-
-	/*!
-	 * \brief Get the kind of center convective numerical scheme for the adjoint level set equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of center convective numerical scheme for the level set equations.
-	 */
-	unsigned short GetKind_Centered_AdjLevelSet(void);
 
 	/*! 
 	 * \brief Get the kind of center convective numerical scheme for the plasma equations.
@@ -2455,30 +2001,6 @@ public:
 	 * \return Kind of upwind convective numerical scheme for the flow equations.
 	 */
 	unsigned short GetKind_Upwind_Flow(void);
-  
-  /*!
-	 * \brief Get the kind of upwind convective numerical scheme for the flow equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of upwind convective numerical scheme for the flow equations.
-	 */
-	unsigned short GetKind_Upwind_TNE2(void);
-  
-  /*!
-	 * \brief Get the kind of upwind convective numerical scheme for the flow equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of upwind convective numerical scheme for the flow equations.
-	 */
-	unsigned short GetKind_Upwind_AdjTNE2(void);
-
-	/*!
-	 * \brief Get the kind of upwind convective numerical scheme for the adjoint level set equation.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of upwind convective numerical scheme for the flow equations.
-	 */
-	unsigned short GetKind_Upwind_AdjLevelSet(void);
 
 	/*! 
 	 * \brief Get the method for limiting the spatial gradients.
@@ -2491,42 +2013,12 @@ public:
 	 * \return Method for limiting the spatial gradients solving the flow equations.
 	 */		
 	unsigned short GetKind_SlopeLimit_Flow(void);
-  
-  /*!
-	 * \brief Get the method for limiting the spatial gradients.
-	 * \return Method for limiting the spatial gradients solving the flow equations.
-	 */
-	unsigned short GetKind_SlopeLimit_TNE2(void);
-  
-  /*!
-	 * \brief Get the method for limiting the spatial gradients.
-	 * \return Method for limiting the spatial gradients solving the flow equations.
-	 */
-	unsigned short GetKind_SlopeLimit_AdjTNE2(void);
 
 	/*! 
 	 * \brief Get the method for limiting the spatial gradients.
 	 * \return Method for limiting the spatial gradients solving the turbulent equation.
 	 */		
 	unsigned short GetKind_SlopeLimit_Turb(void);
-
-	/*!
-	 * \brief Get the method for limiting the spatial gradients.
-	 * \return Method for limiting the spatial gradients solving the level set equation.
-	 */
-	unsigned short GetKind_SlopeLimit_AdjLevelSet(void);
-
-	/*! 
-	 * \brief Get the method for limiting the spatial gradients.
-	 * \return Method for limiting the spatial gradients solving the adjoint turbulent equation.
-	 */		
-	unsigned short GetKind_SlopeLimit_AdjTurb(void);
-
-	/*! 
-	 * \brief Get the method for limiting the spatial gradients.
-	 * \return Method for limiting the spatial gradients solving the adjoint flow equation.
-	 */		
-	unsigned short GetKind_SlopeLimit_AdjFlow(void);
 
 	/*!
 	 * \brief Value of the calibrated constant for the Lax method (center scheme).
@@ -2546,215 +2038,6 @@ public:
 	 * \return Calibrated constant for the JST method for the flow equations.
 	 */		
 	double GetKappa_4th_Flow(void);
-  
-  /*!
-	 * \brief Value of the calibrated constant for the Lax method (center scheme).
-	 * \note This constant is used in coarse levels and with first order methods.
-	 * \return Calibrated constant for the Lax method.
-	 */
-	double GetKappa_1st_TNE2(void);
-  
-	/*!
-	 * \brief Value of the calibrated constant for the JST method (center scheme).
-	 * \return Calibrated constant for the JST method for the flow equations.
-	 */
-	double GetKappa_2nd_TNE2(void);
-  
-	/*!
-	 * \brief Value of the calibrated constant for the JST method (center scheme).
-	 * \return Calibrated constant for the JST method for the flow equations.
-	 */
-	double GetKappa_4th_TNE2(void);
-
-	/*!
-	 * \brief Get the kind of integration scheme (explicit or implicit) 
-	 *        for the adjoint flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of integration scheme for the adjoint flow equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_AdjFlow(void);
-  
-  /*!
-	 * \brief Get the kind of integration scheme (explicit or implicit)
-	 *        for the adjoint flow equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of integration scheme for the adjoint flow equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_AdjTNE2(void);
-
-	/*! 
-	 * \brief Get the kind of convective numerical scheme for the adjoint flow 
-	 *        equations (centered or upwind).
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of convective numerical scheme for the adjoint flow equations.
-	 */
-	unsigned short GetKind_ConvNumScheme_AdjFlow(void);
-
-	/*! 
-	 * \brief Get the kind of viscous numerical scheme for the adjoint flow
-	 *        equations (Galerkin, Average of gradients, Average of gradients
-	 *        with correction).
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the adjoint flow equations.
-	 */
-	unsigned short GetKind_ViscNumScheme_AdjFlow(void);
-
-	/*! 
-	 * \brief Get the kind of viscous numerical scheme for the wave
-	 *        equations (Galerkin, Average of gradients, Average of gradients
-	 *        with correction).
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the adjoint flow equations.
-	 */
-	unsigned short GetKind_ViscNumScheme_Wave(void);
-  
-  /*!
-	 * \brief Get the kind of viscous numerical scheme for the wave
-	 *        equations (Galerkin, Average of gradients, Average of gradients
-	 *        with correction).
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the adjoint flow equations.
-	 */
-	unsigned short GetKind_ViscNumScheme_Heat(void);
-
-	/*! 
-	 * \brief Get the kind of viscous numerical scheme for the FEA
-	 *        equations (Galerkin, Average of gradients, Average of gradients
-	 *        with correction).
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the adjoint flow equations.
-	 */
-	unsigned short GetKind_ViscNumScheme_FEA(void);
-
-	/*! 
-	 * \brief Get the kind of source term for the adjoint flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of source term for the adjoint flow equations.
-	 */
-	unsigned short GetKind_SourNumScheme_AdjFlow(void);
-
-	/*! 
-	 * \brief Get the kind of center convective numerical scheme for the adjoint flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of center convective numerical scheme for the adjoint flow equations.
-	 */
-	unsigned short GetKind_Centered_AdjFlow(void);
-
-	/*! 
-	 * \brief Get the kind of upwind convective numerical scheme for the adjoint flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of upwind convective numerical scheme for the adjoint flow equations.
-	 */
-	unsigned short GetKind_Upwind_AdjFlow(void);
-
-	/*!
-	 * \brief Value of the calibrated constant for the high order method (center scheme).
-	 * \return Calibrated constant for the high order center method for the adjoint flow equations.
-	 */
-	double GetKappa_2nd_AdjFlow(void);
-
-	/*! 
-	 * \brief Value of the calibrated constant for the high order method (center scheme).
-	 * \return Calibrated constant for the high order center method for the adjoint flow equations.
-	 */
-	double GetKappa_4th_AdjFlow(void);
-
-	/*! 
-	 * \brief Value of the calibrated constant for the low order method (center scheme).
-	 * \return Calibrated constant for the low order center method for the adjoint flow equations.
-	 */
-	double GetKappa_1st_AdjFlow(void);
-  
-  /*!
-	 * \brief Value of the calibrated constant for the high order method (center scheme).
-	 * \return Calibrated constant for the high order center method for the adjoint flow equations.
-	 */
-	double GetKappa_2nd_AdjTNE2(void);
-  
-	/*!
-	 * \brief Value of the calibrated constant for the high order method (center scheme).
-	 * \return Calibrated constant for the high order center method for the adjoint flow equations.
-	 */
-	double GetKappa_4th_AdjTNE2(void);
-  
-	/*!
-	 * \brief Value of the calibrated constant for the low order method (center scheme).
-	 * \return Calibrated constant for the low order center method for the adjoint flow equations.
-	 */
-	double GetKappa_1st_AdjTNE2(void);
-
-	/*! 
-	 * \brief Get the kind of integration scheme (explicit or implicit) 
-	 *        for the linearized flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of integration scheme for the linearized flow equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_LinFlow(void);
-
-	/*! 
-	 * \brief Get the kind of convective numerical scheme for the linearized flow 
-	 *        equations (centered or upwind).
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of convective numerical scheme for the linearized flow equations.
-	 */
-	unsigned short GetKind_ConvNumScheme_LinFlow(void);
-
-	/*! 
-	 * \brief Get the kind of viscous numerical scheme for the linearized flow
-	 *        equations (Galerkin, Divergence theorem or Weiss correction).
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the linearized flow equations.
-	 */
-	unsigned short GetKind_ViscNumScheme_LinFlow(void);
-
-	/*! 
-	 * \brief Get the kind of source term for the linearized flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of source term for the linearized flow equations.
-	 */
-	unsigned short GetKind_SourNumScheme_LinFlow(void);
-
-	/*! 
-	 * \brief Get the kind of center convective numerical scheme for the linearized flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of center convective numerical scheme for the linearized flow equations.
-	 */
-	unsigned short GetKind_Centered_LinFlow(void);
-
-	/*! 
-	 * \brief Get the kind of upwind convective numerical scheme for the linearized flow equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of upwind convective numerical scheme for the linearized flow equations.
-	 */
-	unsigned short GetKind_Upwind_LinFlow(void);
-
-	/*! 
-	 * \brief Value of the calibrated constant for the high order method (center scheme).
-	 * \return Calibrated constant for the high order center method for the linearized flow equations.
-	 */	
-	double GetKappa_4th_LinFlow(void);
-
-	/*! 
-	 * \brief Value of the calibrated constant for the low order method (center scheme).
-	 * \return Calibrated constant for the low order center method for the linearized flow equations.
-	 */	
-	double GetKappa_1st_LinFlow(void);
 
 	/*! 
 	 * \brief Get the kind of integration scheme (implicit) 
@@ -2764,15 +2047,6 @@ public:
 	 * \return Kind of integration scheme for the turbulence equations.
 	 */
 	unsigned short GetKind_TimeIntScheme_Turb(void);
-
-	/*!
-	 * \brief Get the kind of integration scheme (implicit)
-	 *        for the level set equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of integration scheme for the level set equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_AdjLevelSet(void);
 
 	/*! 
 	 * \brief Get the kind of convective numerical scheme for the turbulence 
@@ -2817,96 +2091,6 @@ public:
 	 */	
 	unsigned short GetKind_Upwind_Turb(void);
 
-	/*! 
-	 * \brief Get the kind of viscous numerical scheme for the poisson potential
-	 *        equation (Galerkin).
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the poisson potential equation.
-	 */
-	unsigned short GetKind_ViscNumScheme_Poisson(void);
-
-	/*! 
-	 * \brief Get the kind of source term for the poisson potential equation.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of source term for the poisson potential equation.
-	 */	
-	unsigned short GetKind_SourNumScheme_Poisson(void);
-
-	/*! 
-	 * \brief Get the kind of integration scheme (explicit or implicit) 
-	 *        for the adjoint turbulence equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of integration scheme for the adjoint turbulence equations.
-	 */
-	unsigned short GetKind_TimeIntScheme_AdjTurb(void);
-
-	/*! 
-	 * \brief Get the kind of convective numerical scheme for the adjoint turbulence 
-	 *        equations (centered or upwind).
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of convective numerical scheme for the adjoint turbulence equations.
-	 */
-	unsigned short GetKind_ConvNumScheme_AdjTurb(void);
-
-	/*! 
-	 * \brief Get the kind of viscous numerical scheme for the adjoint turbulence
-	 *        equations (Galerkin, Average of gradients, Average of gradients
-	 *        with correction).
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of viscous numerical scheme for the adjoint turbulence equations.
-	 */
-	unsigned short GetKind_ViscNumScheme_AdjTurb(void);
-
-	/*! 
-	 * \brief Get the kind of source term for the adjoint turbulence equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of source term for the adjoint turbulence equations.
-	 */
-	unsigned short GetKind_SourNumScheme_AdjTurb(void);
-
-	/*!
-	 * \brief Get the kind of source term for the adjoint levelset equations.
-	 * \note This value is obtained from the config file, and it is constant
-	 *       during the computation.
-	 * \return Kind of source term for the adjoint levelset equations.
-	 */
-	unsigned short GetKind_SourNumScheme_AdjLevelSet(void);
-
-	/*! 
-	 * \brief Get the kind of center convective numerical scheme for the adjoint turbulence equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of center convective numerical scheme for the adjoint turbulence equations.
-	 */
-	unsigned short GetKind_Centered_AdjTurb(void);
-
-	/*! 
-	 * \brief Get the kind of upwind convective numerical scheme for the adjoint turbulence equations.
-	 * \note This value is obtained from the config file, and it is constant 
-	 *       during the computation.
-	 * \return Kind of upwind convective numerical scheme for the adjoint turbulence equations.
-	 */
-	unsigned short GetKind_Upwind_AdjTurb(void);
-
-	/*! 
-	 * \brief Provides information about the way in which the turbulence will be treated by the 
-	 *        adjoint method.
-	 * \return <code>FALSE</code> means that the adjoint turbulence equations will be used.
-	 */
-	bool GetFrozen_Visc(void);
-  
-  /*!
-	 * \brief Provides information about if the sharp edges are going to be removed from the sensitivity.
-	 * \return <code>FALSE</code> means that the sharp edges will be removed from the sensitivity.
-	 */
-	bool GetSens_Remove_Sharp(void);
-
 	/*!
 	 * \brief Get the kind of inlet boundary condition treatment (total conditions or mass flow).
 	 * \return Kind of inlet boundary condition.
@@ -2920,32 +2104,6 @@ public:
 	 */
 	bool GetHold_GridFixed(void);
 
-	/*!
-	 * \brief Get the kind of objective function. There are several options: Drag coefficient, 
-	 *        Lift coefficient, efficiency, etc.
-	 * \note The objective function will determine the boundary condition of the adjoint problem.
-	 * \return Kind of objective function.
-	 */
-	unsigned short GetKind_ObjFunc(void);
-
-	/*!
-	 * \brief Get the kind of sensitivity smoothing technique.
-	 * \return Kind of sensitivity smoothing technique.
-	 */
-	unsigned short GetKind_SensSmooth(void);
-
-	/*!
-	 * \brief Get equations to be treated continuously. There are several options: Euler, Navier Stokes
-	 * \return Continuous equations.
-	 */
-	unsigned short GetContinuous_Eqns(void);
-
-	/*!
-	 * \brief Get equations to be treated discretely. There are several options: None, SA, SST
-	 * \return Discrete equations.
-	 */
-	unsigned short GetDiscrete_Eqns(void);
-
 	/*! 
 	 * \brief Provides information about the time integration, and change the write in the output 
 	 *        files information about the iteration.
@@ -2953,163 +2111,6 @@ public:
 	 *         dual time stepping method (unsteady).
 	 */
 	unsigned short GetUnsteady_Simulation(void);
-
-	/*! 
-	 * \brief Provides the number of species present in the plasma
-	 * \return: The number of species present in the plasma, read from input file
-	 */
-	unsigned short GetnSpecies(void);
-
-	/*! 
-	 * \brief Provides the number of chemical reactions in the chemistry model
-	 * \return: The number of chemical reactions, read from input file
-	 */
-	unsigned short GetnReactions(void);
-
-	/*! 
-	 * \brief Provides the number of chemical reactions in the chemistry model
-	 * \return: The number of chemical reactions, read from input file
-	 */
-	double GetArrheniusCoeff(unsigned short iReaction);
-
-	/*! 
-	 * \brief Provides the number of chemical reactions in the chemistry model
-	 * \return: The number of chemical reactions, read from input file
-	 */
-	double GetArrheniusEta(unsigned short iReaction);
-
-	/*! 
-	 * \brief Provides the number of chemical reactions in the chemistry model
-	 * \return: The number of chemical reactions, read from input file
-	 */
-	double GetArrheniusTheta(unsigned short iReaction);
-
-  /*!
-	 * \brief Provides the rate controlling temperature exponents for chemistry.
-	 * \return: Rate controlling temperature exponents.
-	 */
-  double* GetRxnTcf_a(void);
-  
-  /*!
-	 * \brief Provides the rate controlling temperature exponents for chemistry.
-	 * \return: Rate controlling temperature exponents.
-	 */
-  double* GetRxnTcf_b(void);
-  
-  /*!
-	 * \brief Provides the rate controlling temperature exponents for chemistry.
-	 * \return: Rate controlling temperature exponents.
-	 */
-  double* GetRxnTcb_a(void);
-  
-  /*!
-	 * \brief Provides the rate controlling temperature exponents for chemistry.
-	 * \return: Rate controlling temperature exponents.
-	 */
-  double* GetRxnTcb_b(void);
-  
-  /*!
-	 * \brief Dissociation potential of species.
-	 * \return: Dissociation potential.
-	 */
-	double* GetDissociationPot(void);
-
-	/*!
-	 * \brief Provides the number of rotational modes of energy storage
-	 * \return: Vector of rotational mode count
-	 */
-  double* GetRotationModes(void);
-  
-	/*!
-	 * \brief Provides the characteristic vibrational temperature for calculating e_vib
-	 * \return: Vector of characteristic vibrational temperatures [K]
-	 */
-	double* GetCharVibTemp(void);
-  
-  /*!
-	 * \brief Provides the characteristic electronic temperature for calculating e_el
-	 * \return: Vector of characteristic vibrational temperatures [K]
-	 */
-	double** GetCharElTemp(void);
-  
-  /*!
-	 * \brief Provides the degeneracy of electron states for calculating e_el
-	 * \return: Vector of characteristic vibrational temperatures [K]
-	 */
-	double** GetElDegeneracy(void);
-  
-  /*!
-	 * \brief Provides number electron states for calculating e_el
-	 * \return: Vector of number of electron states for each species 
-	 */
-	unsigned short* GetnElStates(void);
-  
-
-  /*!
-	 * \brief Provides the thermodynamic reference temperatures from the JANAF tables
-	 * \return: Vector of reference temperatures [K]
-	 */
-  double* GetRefTemperature(void);
-  
-  /*!
-	 * \brief Provides the characteristic vibrational temperature for calculating e_vib
-	 * \return: The number of chemical reactions, read from input file
-	 */
-	double GetCharVibTemp(unsigned short iSpecies);	
-
-	/*! 
-	 * \brief Provides a table of equilibrium constants for a particular chemical reaction for a supplied gas model.
-	 * \return: Matrix of reaction constants
-	 */
-	void GetChemistryEquilConstants(double **RxnConstantTable, unsigned short iReaction);
-
-	/*!
-	 * \brief Provides the molar mass of each species present in multi species fluid
-	 * \return: Vector of molar mass of each species in kg/kmol
-	 */
-	double* GetMolar_Mass(void);
-	
-  /*!
-	 * \brief Provides the molar mass of each species present in multi species fluid
-	 * \return: Mass of each species in Kg
-	 */
-	double GetMolar_Mass(unsigned short iSpecies);
-
-	/*!
-	 * \brief Retrieves the number of monatomic species in the multicomponent gas.
-	 * \return: Number of monatomic species.
-	 */
-	unsigned short GetnMonatomics(void);
-
-	/*!
-	 * \brief Retrieves the number of monatomic species in the multicomponent gas.
-	 * \return: Number of monatomic species.
-	 */
-	unsigned short GetnDiatomics(void);	
-
-	/*!
-	 * \brief Provides the molar mass of each species present in multi species fluid
-	 * \return: Molar mass of the specified gas consituent [kg/kmol]
-	 */
-	double GetInitial_Gas_Composition(unsigned short iSpecies);
-
-	/*!
-	 * \brief Retrieves the multi-species fluid mixture molar mass.
-	 * \return: Molar mass of the fluid mixture
-	 */
-	double GetMixtureMolar_Mass();
-
-  /*!
-	 * \brief Provides the formation enthalpy of the specified species at standard conditions
-	 * \return: Enthalpy of formation
-	 */
-	double* GetEnthalpy_Formation(void);
-  
-	/*!
-	 * \brief Provides the formation enthalpy of the specified species at standard conditions
-	 * \return: Enthalpy of formation
-	 */
-	double GetEnthalpy_Formation(unsigned short iSpecies);
 
 	/*!
 	 * \brief Provides the restart information.
@@ -3402,50 +2403,10 @@ public:
 	double GetCauchy_Eps_FullMG(void);
 
 	/*! 
-	 * \brief If we are prforming an unsteady simulation, there is only 
-	 *        one value of the time step for the complete simulation.
-	 * \return Value of the time step in an unsteady simulation (non dimensional). 
-	 */
-	double GetDelta_UnstTimeND(void);
-
-	/*! 
-	 * \brief If we are prforming an unsteady simulation, there is only 
-	 *        one value of the time step for the complete simulation.
-	 * \return Value of the time step in an unsteady simulation.
-	 */
-	double GetDelta_UnstTime(void);
-
-	/*! 
-	 * \brief Set the value of the unsteadty time step using the CFL number.
-	 * \param[in] val_delta_unsttimend - Value of the unsteady time step using CFL number.
-	 */
-	void SetDelta_UnstTimeND(double val_delta_unsttimend);
-
-	/*!
-	 * \brief If we are performing an unsteady simulation, this is the
-	 * 	value of max physical time for which we run the simulation
-	 * \return Value of the physical time in an unsteady simulation.
-	 */
-	double GetTotal_UnstTime(void);
-
-	/*!
-	 * \brief If we are performing an unsteady simulation, this is the
-	 * 	value of current time.
-	 * \return Value of the physical time in an unsteady simulation.
-	 */
-	double GetCurrent_UnstTime(void);
-
-	/*! 
 	 * \brief Divide the rectbles and hexahedron.
 	 * \return <code>TRUE</code> if the elements must be divided; otherwise <code>FALSE</code>.
 	 */
 	bool GetDivide_Element(void);
-  
-  /*!
-	 * \brief Divide the rectbles and hexahedron.
-	 * \return <code>TRUE</code> if the elements must be divided; otherwise <code>FALSE</code>.
-	 */
-	bool GetEngine_Intake(void);
 
 	/*! 
 	 * \brief Value of the design variable step, we use this value in design problems.
@@ -3453,228 +2414,6 @@ public:
 	 * \return Design variable step.
 	 */	
 	double GetDV_Value(unsigned short val_dv);
-
-	/*! 
-	 * \brief Get information about the grid movement.
-	 * \return <code>TRUE</code> if there is a grid movement; otherwise <code>FALSE</code>.
-	 */
-	bool GetGrid_Movement(void);
-
-	/*!
-	 * \brief Get the type of dynamic mesh motion.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Type of dynamic mesh motion.
-	 */
-	unsigned short GetKind_GridMovement(unsigned short val_iZone);
-
-	/*!
-	 * \brief Set the type of dynamic mesh motion.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \param[in] motion_Type - Specify motion type.
-	 */
-	void SetKind_GridMovement(unsigned short val_iZone, unsigned short motion_Type);
-
-	/*!
-	 * \brief Get the mach number based on the mesh velocity and freestream quantities.
-	 * \return Mach number based on the mesh velocity and freestream quantities.
-	 */
-	double GetMach_Motion(void);
-
-	/*!
-	 * \brief Get x-coordinate of the mesh motion origin.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return X-coordinate of the mesh motion origin.
-	 */
-	double GetMotion_Origin_X(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get y-coordinate of the mesh motion origin
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Y-coordinate of the mesh motion origin.
-	 */
-	double GetMotion_Origin_Y(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get z-coordinate of the mesh motion origin
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Z-coordinate of the mesh motion origin.
-	 */
-	double GetMotion_Origin_Z(unsigned short val_iZone);
-
-	/*!
-	 * \brief Set x-coordinate of the mesh motion origin.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \param[in] val_origin - New x-coordinate of the mesh motion origin.
-	 */
-	void SetMotion_Origin_X(unsigned short val_iZone, double val_origin);
-
-	/*!
-	 * \brief Set y-coordinate of the mesh motion origin
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \param[in] val_origin - New y-coordinate of the mesh motion origin.
-	 */
-	void SetMotion_Origin_Y(unsigned short val_iZone, double val_origin);
-
-	/*!
-	 * \brief Set z-coordinate of the mesh motion origin
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \param[in] val_origin - New y-coordinate of the mesh motion origin.
-	 */
-	void SetMotion_Origin_Z(unsigned short val_iZone, double val_origin);
-
-	/*!
-	 * \brief Get the translational velocity of the mesh in the x-direction.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Translational velocity of the mesh in the x-direction.
-	 */
-	double GetTranslation_Rate_X(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the translational velocity of the mesh in the y-direction.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Translational velocity of the mesh in the y-direction.
-	 */
-	double GetTranslation_Rate_Y(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the translational velocity of the mesh in the z-direction.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Translational velocity of the mesh in the z-direction.
-	 */
-	double GetTranslation_Rate_Z(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the angular velocity of the mesh about the x-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Angular velocity of the mesh about the x-axis.
-	 */
-	double GetRotation_Rate_X(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the angular velocity of the mesh about the y-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Angular velocity of the mesh about the y-axis.
-	 */
-	double GetRotation_Rate_Y(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the angular velocity of the mesh about the z-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Angular velocity of the mesh about the z-axis.
-	 */
-	double GetRotation_Rate_Z(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the angular frequency of a mesh pitching about the x-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Angular frequency of a mesh pitching about the x-axis.
-	 */
-	double GetPitching_Omega_X(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the angular frequency of a mesh pitching about the y-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Angular frequency of a mesh pitching about the y-axis.
-	 */
-	double GetPitching_Omega_Y(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the angular frequency of a mesh pitching about the z-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Angular frequency of a mesh pitching about the z-axis.
-	 */
-	double GetPitching_Omega_Z(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the pitching amplitude about the x-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Pitching amplitude about the x-axis.
-	 */
-	double GetPitching_Ampl_X(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the pitching amplitude about the y-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Pitching amplitude about the y-axis.
-	 */
-	double GetPitching_Ampl_Y(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the pitching amplitude about the z-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Pitching amplitude about the z-axis.
-	 */
-	double GetPitching_Ampl_Z(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the pitching phase offset about the x-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Pitching phase offset about the x-axis.
-	 */
-	double GetPitching_Phase_X(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the pitching phase offset about the y-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Pitching phase offset about the y-axis.
-	 */
-	double GetPitching_Phase_Y(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the pitching phase offset about the z-axis.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Pitching phase offset about the z-axis.
-	 */
-	double GetPitching_Phase_Z(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the angular frequency of a mesh plunging in the x-direction.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Angular frequency of a mesh plunging in the x-direction.
-	 */
-	double GetPlunging_Omega_X(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the angular frequency of a mesh plunging in the y-direction.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Angular frequency of a mesh plunging in the y-direction.
-	 */
-	double GetPlunging_Omega_Y(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the angular frequency of a mesh plunging in the z-direction.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Angular frequency of a mesh plunging in the z-direction.
-	 */
-	double GetPlunging_Omega_Z(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the plunging amplitude in the x-direction.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Plunging amplitude in the x-direction.
-	 */
-	double GetPlunging_Ampl_X(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the plunging amplitude in the y-direction.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Plunging amplitude in the y-direction.
-	 */
-	double GetPlunging_Ampl_Y(unsigned short val_iZone);
-
-	/*!
-	 * \brief Get the plunging amplitude in the z-direction.
-	 * \param[in] val_iZone - Number for the current zone in the mesh (each zone has independent motion).
-	 * \return Plunging amplitude in the z-direction.
-	 */
-	double GetPlunging_Ampl_Z(unsigned short val_iZone);
-
-  /*!
-	 * \brief Get if we should update the motion origin.
-	 * \param[in] val_marker - Value of the marker in which we are interested.
-	 * \return yes or no to update motion origin.
-	 */
-	unsigned short GetMoveMotion_Origin(unsigned short val_marker);
   
 	/*!
 	 * \brief Get the minimum value of Beta for Roe-Turkel preconditioner
@@ -3858,12 +2597,6 @@ public:
 	 * \return Value of the minimum residual value (log10 scale).
 	 */	
 	double GetMinLogResidual(void);
-
-    /*!
-	 * \brief Value of the damping factor for the engine inlet bc.
-	 * \return Value of the damping factor.
-	 */
-	double GetDamp_Nacelle_Inflow(void);
     
 	/*! 
 	 * \brief Value of the damping factor for the residual restriction.
@@ -3876,24 +2609,6 @@ public:
 	 * \return Value of the damping factor.
 	 */	
 	double GetDamp_Correc_Prolong(void);
-
-	/*! 
-	 * \brief Value of the position of the Near Field (y coordinate for 2D, and z coordinate for 3D).
-	 * \return Value of the Near Field position.
-	 */	
-	double GetPosition_Plane(void);
-
-	/*! 
-	 * \brief Value of the weight of the drag coefficient in the Sonic Boom optimization.
-	 * \return Value of the weight of the drag coefficient in the Sonic Boom optimization.
-	 */	
-	double GetWeightCd(void);
-
-	/*!
-	 * \brief Value of ther constant viscous drag for Cl/Cd computation.
-	 * \return Value of ther constant viscous drag for Cl/Cd computation.
-	 */
-	double GetCteViscDrag(void);
 
 	/*! 
 	 * \brief Update the CFL number using the ramp information.
@@ -3909,41 +2624,6 @@ public:
 	void SetGlobalParam(unsigned short val_solver, unsigned short val_system, unsigned long val_extiter);
 
 	/*!
-	 * \brief Center of rotation for a rotational periodic boundary.
-	 */	
-	double *GetPeriodicRotCenter(string val_marker);
-
-	/*!
-	 * \brief Angles of rotation for a rotational periodic boundary.
-	 */	
-	double *GetPeriodicRotAngles(string val_marker);
-
-	/*!
-	 * \brief Translation vector for a rotational periodic boundary.
-	 */	
-	double *GetPeriodicTranslation(string val_marker);
-
-	/*! 
-	 * \brief Get the rotationally periodic donor marker for boundary <i>val_marker</i>.
-	 * \return Periodic donor marker from the config information for the marker <i>val_marker</i>.
-	 */	
-	unsigned short GetMarker_Periodic_Donor(string val_marker);
-  
-  /*!
-	 * \brief Get the internal index for a moving boundary <i>val_marker</i>.
-	 * \return Internal index for a moving boundary <i>val_marker</i>.
-	 */
-	unsigned short GetMarker_Moving(string val_marker);
-  
-  /*!
-	 * \brief Get the name of the surface defined in the geometry file.
-	 * \param[in] val_marker - Value of the marker in which we are interested.
-	 * \return Name that is in the geometry file for the surface that
-	 *         has the marker <i>val_marker</i>.
-	 */
-	string GetMarker_Moving(unsigned short val_marker);
-
-	/*!
 	 * \brief Get information about converting a mesh from CGNS to SU2 format.
 	 * \return <code>TRUE</code> if a conversion is requested; otherwise <code>FALSE</code>.
 	 */
@@ -3955,176 +2635,25 @@ public:
 	 */
 	bool GetWrite_Converted_Mesh(void);
 
-	/*!
-	 * \brief Set the total number of SEND_RECEIVE periodic transformations.
-	 * \param[in] val_index - Total number of transformations.
-	 */	
-	void SetnPeriodicIndex(unsigned short val_index);
-
-	/*!
-	 * \brief Get the total number of SEND_RECEIVE periodic transformations.
-	 * \return Total number of transformations.
-	 */	
-	unsigned short GetnPeriodicIndex(void);
-
-	/*!
-	 * \brief Set the rotation center for a periodic transformation.
-	 * \param[in] val_index - Index corresponding to the periodic transformation.
-	 * \param[in] center - Pointer to a vector containing the coordinate of the center.
-	 */	
-	void SetPeriodicCenter(unsigned short val_index, double* center);
-
-	/*!
-	 * \brief Get the rotation center for a periodic transformation.
-	 * \param[in] val_index - Index corresponding to the periodic transformation.
-	 * \return A vector containing coordinates of the center point.
-	 */	
-	double* GetPeriodicCenter(unsigned short val_index);
-
-	/*!
-	 * \brief Set the rotation angles for a periodic transformation.
-	 * \param[in] val_index - Index corresponding to the periodic transformation.
-	 * \param[in] rotation - Pointer to a vector containing the rotation angles.
-	 */	
-	void SetPeriodicRotation(unsigned short val_index, double* rotation);
-
-	/*!
-	 * \brief Get the rotation angles for a periodic transformation.
-	 * \param[in] val_index - Index corresponding to the periodic transformation.
-	 * \return A vector containing the angles of rotation.
-	 */	
-	double* GetPeriodicRotation(unsigned short val_index);
-
-	/*!
-	 * \brief Set the translation vector for a periodic transformation.
-	 * \param[in] val_index - Index corresponding to the periodic transformation.
-	 * \param[in] translate - Pointer to a vector containing the coordinate of the center.
-	 */	
-	void SetPeriodicTranslate(unsigned short val_index, double* translate);
-
-	/*!
-	 * \brief Get the translation vector for a periodic transformation.
-	 * \param[in] val_index - Index corresponding to the periodic transformation.
-	 * \return The translation vector.
-	 */	
-	double* GetPeriodicTranslate(unsigned short val_index);
-
-	/*!
-	 * \brief Get the total temperature at a nacelle boundary.
-	 * \param[in] val_index - Index corresponding to the inlet boundary.
-	 * \return The total temperature.
-	 */	
-	double GetNozzle_Ttotal(string val_index);
-
-	/*!
-	 * \brief Get the total temperature at an inlet boundary.
-	 * \param[in] val_index - Index corresponding to the inlet boundary.
-	 * \return The total temperature.
-	 */	
-	double GetInlet_Ttotal(string val_index);
-
-	/*!
-	 * \brief Get the temperature at a supersonic inlet boundary.
-	 * \param[in] val_index - Index corresponding to the inlet boundary.
-	 * \return The inlet density.
-	 */	
-	double GetInlet_Temperature(string val_index);
-
-	/*!
-	 * \brief Get the pressure at a supersonic inlet boundary.
-	 * \param[in] val_index - Index corresponding to the inlet boundary.
-	 * \return The inlet pressure.
-	 */	
-	double GetInlet_Pressure(string val_index);
-
-	/*!
-	 * \brief Get the velocity vector at a supersonic inlet boundary.
-	 * \param[in] val_index - Index corresponding to the inlet boundary.
-	 * \return The inlet velocity vector.
+  /*!
+	 * \brief Value of the CFL reduction factor for the turbulence model.
+	 * \return Value of the CFL reduction factor for the turbulence model.
 	 */
-	double* GetInlet_Velocity(string val_index);
-
-	/*!
-	 * \brief Get the fixed value at the Dirichlet boundary.
-	 * \param[in] val_index - Index corresponding to the Dirichlet boundary.
-	 * \return The total temperature.
-	 */
-	double GetDirichlet_Value(string val_index);
-
-	/*!
-	 * \brief Get whether this is a Dirichlet or a Neumann boundary.
-	 * \param[in] val_index - Index corresponding to the Dirichlet boundary.
-	 * \return Yes or No.
-	 */
-	bool GetDirichlet_Boundary(string val_index);
-
+	double GetTurb_CFLRedCoeff(void);
+  
 	/*!
 	 * \brief Get the total pressure at an inlet boundary.
 	 * \param[in] val_index - Index corresponding to the inlet boundary.
 	 * \return The total pressure.
 	 */
 	double GetInlet_Ptotal(string val_index);
-
-	/*!
-	 * \brief Get the total pressure at an nacelle boundary.
-	 * \param[in] val_index - Index corresponding to the inlet boundary.
-	 * \return The total pressure.
-	 */
-	double GetNozzle_Ptotal(string val_index);
-
-	/*!
-	 * \brief If inlet and outlet conditions are defined for multi species
-	 * \return true/false
-	 */
-	bool GetInletConditionsDefined();
-
-	/*!
-	 * \brief Get the temperature at an inlet boundary.
-	 * \param[in] iSpecies - Index of the species
-	 * \return The total temperature.
-	 */
-	double GetInlet_Species_Temperature(unsigned short iSpecies);
-
-	/*!
-	 * \brief Get the temperature at an outlet boundary.
-	 * \param[in] iSpecies - Index of the species
-	 * \return The total temperature.
-	 */
-	double GetOutlet_Species_Temperature(unsigned short iSpecies);
-
-	/*!
-	 * \brief Get the pressure at an inlet boundary.
-	 * \param[in] iSpecies - Index of the species
-	 * \return The total temperature.
-	 */
-	double GetInlet_Species_Pressure(unsigned short iSpecies);
-
-	/*!
-	 * \brief Get the pressure at an outlet boundary.
-	 * \param[in] iSpecies - Index of the species
-	 * \return The total temperature.
-	 */
-	double GetOutlet_Species_Pressure(unsigned short iSpecies);
-
-	/*!
-	 * \brief Get the velocity at an inlet boundary.
-	 * \param[in] iSpecies - Index of the species
-	 * \return The total temperature.
-	 */
-	double GetInlet_Species_Velocity(unsigned short iSpecies);
-
-	/*!
-	 * \brief Get the velocity at an outlet boundary.
-	 * \param[in] iSpecies - Index of the species
-	 * \return The total temperature.
-	 */
-	double GetOutlet_Species_Velocity(unsigned short iSpecies);
   
   /*!
-	 * \brief Value of the CFL reduction in LevelSet problems.
-	 * \return Value of the CFL reduction in LevelSet problems.
+	 * \brief Get the total temperature at an inlet boundary.
+	 * \param[in] val_index - Index corresponding to the inlet boundary.
+	 * \return The total temperature.
 	 */
-	double GetTurb_CFLRedCoeff(void);
+	double GetInlet_Ttotal(string val_index);
 
 	/*!
 	 * \brief Get the flow direction unit vector at an inlet boundary.
@@ -4153,80 +2682,6 @@ public:
 	 * \return The heat flux.
 	 */
 	double GetWall_HeatFlux(string val_index);
-
-	/*!
-	 * \brief Get the back pressure (static) at an outlet boundary.
-	 * \param[in] val_index - Index corresponding to the outlet boundary.
-	 * \return The outlet pressure.
-	 */
-	double GetFanFace_Mach_Target(string val_marker);
-
-    /*!
-	 * \brief Get the back pressure (static) at an outlet boundary.
-	 * \param[in] val_index - Index corresponding to the outlet boundary.
-	 * \return The outlet pressure.
-	 */
-	double GetFanFace_Mach(string val_marker);
-    
-    /*!
-	 * \brief Get the back pressure (static) at an outlet boundary.
-	 * \param[in] val_index - Index corresponding to the outlet boundary.
-	 * \return The outlet pressure.
-	 */
-	void SetFanFace_Mach(unsigned short val_imarker, double val_fanface_mach);
-    
-    /*!
-	 * \brief Get the back pressure (static) at an outlet boundary.
-	 * \param[in] val_index - Index corresponding to the outlet boundary.
-	 * \return The outlet pressure.
-	 */
-	double GetFanFace_Pressure(string val_marker);
-    
-    /*!
-	 * \brief Get the back pressure (static) at an outlet boundary.
-	 * \param[in] val_index - Index corresponding to the outlet boundary.
-	 * \return The outlet pressure.
-	 */
-	void SetFanFace_Pressure(unsigned short val_imarker, double val_fanface_pressure);
-    
-	/*!
-	 * \brief Get the displacement value at an displacement boundary.
-	 * \param[in] val_index - Index corresponding to the displacement boundary.
-	 * \return The displacement value.
-	 */
-	double GetDispl_Value(string val_index);
-
-	/*!
-	 * \brief Get the force value at an load boundary.
-	 * \param[in] val_index - Index corresponding to the load boundary.
-	 * \return The load value.
-	 */
-	double GetLoad_Value(string val_index);
-
-	/*!
-	 * \brief Get the force value at an load boundary.
-	 * \param[in] val_index - Index corresponding to the load boundary.
-	 * \return The load value.
-	 */
-	double GetFlowLoad_Value(string val_index);
-
-	/*!
-	 * \brief Cyclic pitch amplitude for rotor blades.
-	 * \return The specified cyclic pitch amplitude.
-	 */	
-	double GetCyclic_Pitch(void);
-
-	/*!
-	 * \brief Collective pitch setting for rotor blades.
-	 * \return The specified collective pitch setting.
-	 */	
-	double GetCollective_Pitch(void);
-
-	/*!
-	 * \brief Get name of the arbitrary mesh motion input file.
-	 * \return File name of the arbitrary mesh motion input file.
-	 */
-	string GetMotion_FileName(void);
 
 	/*!
 	 * \brief Set the non-dimensionalization for SU2_CFD.

@@ -23,8 +23,6 @@
 
 #include "../include/output_structure.hpp"
 
-string AssembleVariableNames(CGeometry *geometry, CConfig *config, unsigned short nVar_Consv, unsigned short *NVar);
-
 void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_sol) {
   
   /*--- Local variables and initialization ---*/
@@ -36,7 +34,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
   unsigned long *LocalIndex = NULL;
   bool *SurfacePoint = NULL;
   
-  bool grid_movement  = config->GetGrid_Movement();
   bool adjoint = config->GetAdjoint();
   
   char cstr[200], buffer[50];
@@ -56,23 +53,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
     filename = config->GetFlow_FileName();
   }
   
-  if (Kind_Solver == LINEAR_ELASTICITY) {
-    if (surf_sol) filename = config->GetSurfStructure_FileName().c_str();
-    else filename = config->GetStructure_FileName().c_str();
-  }
-  
-  if (Kind_Solver == WAVE_EQUATION) {
-    if (surf_sol) filename = config->GetSurfWave_FileName().c_str();
-    else filename = config->GetWave_FileName().c_str();
-  }
-  
-  if (Kind_Solver == HEAT_EQUATION) {
-    if (surf_sol) filename = config->GetSurfHeat_FileName().c_str();
-    else filename = config->GetHeat_FileName().c_str();
-  }
-  
-  if (Kind_Solver == POISSON_EQUATION)
-  filename = config->GetStructure_FileName().c_str();
   
 #ifndef NO_MPI
   /*--- Remove the domain number from the surface csv filename ---*/
@@ -81,7 +61,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
 #endif
   
   strcpy (cstr, filename.c_str());
-  if (Kind_Solver == POISSON_EQUATION) strcpy (cstr, config->GetStructure_FileName().c_str());
   
   
   /*--- Special cases where a number needs to be appended to the file name. ---*/
@@ -90,15 +69,7 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
     strcat(cstr,buffer);
   }
   
- if (config->GetUnsteady_Simulation() && config->GetWrt_Unsteady()) {
-    if (int(iExtIter) < 10) sprintf (buffer, "_0000%d.dat", int(iExtIter));
-    if ((int(iExtIter) >= 10) && (int(iExtIter) < 100)) sprintf (buffer, "_000%d.dat", int(iExtIter));
-    if ((int(iExtIter) >= 100) && (int(iExtIter) < 1000)) sprintf (buffer, "_00%d.dat", int(iExtIter));
-    if ((int(iExtIter) >= 1000) && (int(iExtIter) < 10000)) sprintf (buffer, "_0%d.dat", int(iExtIter));
-    if (int(iExtIter) >= 10000) sprintf (buffer, "_%d.dat", int(iExtIter));
-  } else {
     sprintf (buffer, ".dat");
-  }
   
   strcat(cstr,buffer);
   
@@ -143,17 +114,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
     }
     
     /*--- Add names for any extra variables (this will need to be adjusted). ---*/
-    if (grid_movement) {
-      if (nDim == 2) {
-        Tecplot_File << ",\"Grid_Velx\",\"Grid_Vely\"";
-      } else {
-        Tecplot_File << ",\"Grid_Velx\",\"Grid_Vely\",\"Grid_Velz\"";
-      }
-    }
-    
-    if (config->GetKind_Regime() == FREESURFACE) {
-      Tecplot_File << ",\"Density\"";
-    }
     
     if ((Kind_Solver == EULER) || (Kind_Solver == NAVIER_STOKES) || (Kind_Solver == RANS)) {
       Tecplot_File << ",\"Pressure\",\"Pressure_Coefficient\",\"Mach\"";
@@ -169,30 +129,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
     
     if ((Kind_Solver == EULER) || (Kind_Solver == NAVIER_STOKES) || (Kind_Solver == RANS)) {
       Tecplot_File << ", \"Sharp_Edge_Dist\"";
-    }
-    
-    if ((Kind_Solver == TNE2_EULER) || (Kind_Solver == TNE2_NAVIER_STOKES)) {
-      Tecplot_File << ",\"Mach\",\"Pressure\",\"Temperature\",\"Temperature_ve\"";
-    }
-    
-    if (Kind_Solver == TNE2_NAVIER_STOKES) {
-      for (unsigned short iSpecies = 0; iSpecies < config->GetnSpecies(); iSpecies++)
-      Tecplot_File << ",\"DiffusionCoeff_" << iSpecies << "\"";
-      Tecplot_File << ",\"Laminar_Viscosity\",\"ThermConductivity\",\"ThermConductivity_ve\"";
-    }
-    
-    if (Kind_Solver == POISSON_EQUATION) {
-      unsigned short iDim;
-      for (iDim = 0; iDim < geometry->GetnDim(); iDim++)
-      Tecplot_File << ",\"poissonField_" << iDim+1 << "\"";
-    }
-    
-    if ((Kind_Solver == ADJ_EULER) || (Kind_Solver == ADJ_NAVIER_STOKES) || (Kind_Solver == ADJ_RANS)) {
-      Tecplot_File << ", \"Surface_Sensitivity\", \"Solution_Sensor\"";
-    }
-    
-    if (Kind_Solver == LINEAR_ELASTICITY) {
-      Tecplot_File << ", \"Von_Mises_Stress\", \"Flow_Pressure\"";
     }
     
     if (config->GetExtraOutput()) {
@@ -244,14 +180,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
   
   /*--- Write the header ---*/
   Tecplot_File << "ZONE ";
-  if (config->GetUnsteady_Simulation() && config->GetWrt_Unsteady()) {
-    Tecplot_File << "STRANDID="<<int(iExtIter+1)<<", SOLUTIONTIME="<<config->GetDelta_UnstTime()*iExtIter<<", ";
-  } else if (config->GetUnsteady_Simulation() == TIME_SPECTRAL) {
-    /*--- Compute period of oscillation & compute time interval using nTimeInstances ---*/
-    double period = config->GetTimeSpectral_Period();
-    double deltaT = period/(double)(config->GetnTimeInstances());
-    Tecplot_File << "STRANDID="<<int(iExtIter+1)<<", SOLUTIONTIME="<<deltaT*iExtIter<<", ";
-  }
   
   if (nDim == 2) {
     if (surf_sol) Tecplot_File << "NODES= "<< nSurf_Poin <<", ELEMENTS= "<< nSurf_Elem <<", DATAPACKING=POINT, ZONETYPE=FELINESEG"<< endl;

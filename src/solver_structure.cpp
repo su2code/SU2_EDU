@@ -1371,11 +1371,6 @@ CBaselineSolver::CBaselineSolver(CGeometry *geometry, CConfig *config, unsigned 
 		filename = config->GetSolution_FlowFileName();
   }
   
-	/*--- Unsteady problems require an iteration number to be appended. ---*/
-  if (config->GetWrt_Unsteady() || config->GetUnsteady_Simulation() == TIME_SPECTRAL) {
-		filename = config->GetUnsteady_FileName(filename, int(iExtIter));
-	}
-  
   /*--- Open the restart file ---*/
   restart_file.open(filename.data(), ios::in);
   
@@ -1514,48 +1509,9 @@ void CBaselineSolver::Set_MPI_Solution(CGeometry *geometry, CConfig *config) {
       /*--- Do the coordinate transformation ---*/
       for (iVertex = 0; iVertex < nVertexR; iVertex++) {
         
-        /*--- Find point and its type of transformation ---*/
-        iPoint = geometry->vertex[MarkerR][iVertex]->GetNode();
-        iPeriodic_Index = geometry->vertex[MarkerR][iVertex]->GetRotation_Type();
-        
-        /*--- Retrieve the supplied periodic information. ---*/
-        angles = config->GetPeriodicRotation(iPeriodic_Index);
-        
-        /*--- Store angles separately for clarity. ---*/
-        theta    = angles[0];   phi    = angles[1];     psi    = angles[2];
-        cosTheta = cos(theta);  cosPhi = cos(phi);      cosPsi = cos(psi);
-        sinTheta = sin(theta);  sinPhi = sin(phi);      sinPsi = sin(psi);
-        
-        /*--- Compute the rotation matrix. Note that the implicit
-         ordering is rotation about the x-axis, y-axis,
-         then z-axis. Note that this is the transpose of the matrix
-         used during the preprocessing stage. ---*/
-        rotMatrix[0][0] = cosPhi*cosPsi;    rotMatrix[1][0] = sinTheta*sinPhi*cosPsi - cosTheta*sinPsi;     rotMatrix[2][0] = cosTheta*sinPhi*cosPsi + sinTheta*sinPsi;
-        rotMatrix[0][1] = cosPhi*sinPsi;    rotMatrix[1][1] = sinTheta*sinPhi*sinPsi + cosTheta*cosPsi;     rotMatrix[2][1] = cosTheta*sinPhi*sinPsi - sinTheta*cosPsi;
-        rotMatrix[0][2] = -sinPhi;          rotMatrix[1][2] = sinTheta*cosPhi;                              rotMatrix[2][2] = cosTheta*cosPhi;
-        
         /*--- Copy conserved variables before performing transformation. ---*/
         for (iVar = 0; iVar < nVar; iVar++)
         Solution[iVar] = Buffer_Receive_U[iVar*nVertexR+iVertex];
-        
-        /*--- Rotate the momentum components. ---*/
-        if (nDim == 2) {
-          Solution[1] = rotMatrix[0][0]*Buffer_Receive_U[1*nVertexR+iVertex] +
-          rotMatrix[0][1]*Buffer_Receive_U[2*nVertexR+iVertex];
-          Solution[2] = rotMatrix[1][0]*Buffer_Receive_U[1*nVertexR+iVertex] +
-          rotMatrix[1][1]*Buffer_Receive_U[2*nVertexR+iVertex];
-        }
-        else {
-          Solution[1] = rotMatrix[0][0]*Buffer_Receive_U[1*nVertexR+iVertex] +
-          rotMatrix[0][1]*Buffer_Receive_U[2*nVertexR+iVertex] +
-          rotMatrix[0][2]*Buffer_Receive_U[3*nVertexR+iVertex];
-          Solution[2] = rotMatrix[1][0]*Buffer_Receive_U[1*nVertexR+iVertex] +
-          rotMatrix[1][1]*Buffer_Receive_U[2*nVertexR+iVertex] +
-          rotMatrix[1][2]*Buffer_Receive_U[3*nVertexR+iVertex];
-          Solution[3] = rotMatrix[2][0]*Buffer_Receive_U[1*nVertexR+iVertex] +
-          rotMatrix[2][1]*Buffer_Receive_U[2*nVertexR+iVertex] +
-          rotMatrix[2][2]*Buffer_Receive_U[3*nVertexR+iVertex];
-        }
         
         /*--- Copy transformed conserved variables back into buffer. ---*/
         for (iVar = 0; iVar < nVar; iVar++)
@@ -1571,105 +1527,6 @@ void CBaselineSolver::Set_MPI_Solution(CGeometry *geometry, CConfig *config) {
   }
   
   delete [] Solution;
-  
-}
-
-void CBaselineSolver::LoadRestart(CGeometry **geometry, CSolver ***solver, CConfig *config, int val_iter) {
-  
-	int rank = MASTER_NODE;
-#ifndef NO_MPI
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
-  
-	/*--- Restart the solution from file information ---*/
-	string filename;
-	unsigned long iPoint, index;
-	string UnstExt, text_line, AdjExt;
-	ifstream solution_file;
-  unsigned short iField;
-  unsigned long iExtIter = config->GetExtIter();
-  
-  /*--- Retrieve filename from config ---*/
-	if (config->GetAdjoint()) {
-		filename = config->GetSolution_AdjFileName();
-    filename = config->GetObjFunc_Extension(filename);
-  } else {
-		filename = config->GetSolution_FlowFileName();
-  }
-  
-	/*--- Unsteady problems require an iteration number to be appended. ---*/
-  if (config->GetWrt_Unsteady() || config->GetUnsteady_Simulation() == TIME_SPECTRAL) {
-		filename = config->GetUnsteady_FileName(filename, int(iExtIter));
-	}
-  
-  /*--- Open the restart file ---*/
-  solution_file.open(filename.data(), ios::in);
-  
-	/*--- In case there is no file ---*/
-	if (solution_file.fail()) {
-		cout << "There is no SU2 restart file!!" << endl;
-		exit(1);
-	}
-  
-  /*--- Output the file name to the console. ---*/
-  if (rank == MASTER_NODE)
-  cout << "Reading and storing the solution from " << filename
-  << "." << endl;
-  
-  /*--- Set the number of variables, one per field in the
-   restart file (without including the PointID) ---*/
-  nVar = config->fields.size() - 1;
-  double Solution[nVar];
-  
-	/*--- In case this is a parallel simulation, we need to perform the
-   Global2Local index transformation first. ---*/
-	long *Global2Local = NULL;
-	Global2Local = new long[geometry[ZONE_0]->GetGlobal_nPointDomain()];
-	/*--- First, set all indices to a negative value by default ---*/
-	for(iPoint = 0; iPoint < geometry[ZONE_0]->GetGlobal_nPointDomain(); iPoint++) {
-		Global2Local[iPoint] = -1;
-	}
-  
-	/*--- Now fill array with the transform values only for local points ---*/
-	for(iPoint = 0; iPoint < geometry[ZONE_0]->GetnPointDomain(); iPoint++) {
-		Global2Local[geometry[ZONE_0]->node[iPoint]->GetGlobalIndex()] = iPoint;
-	}
-  
-	/*--- Read all lines in the restart file ---*/
-	long iPoint_Local = 0; unsigned long iPoint_Global = 0;
-  
-	/*--- The first line is the header ---*/
-	getline (solution_file, text_line);
-  
-	while (getline (solution_file,text_line)) {
-		istringstream point_line(text_line);
-    
-		/*--- Retrieve local index. If this node from the restart file lives
-     on a different processor, the value of iPoint_Local will be -1, as
-     initialized above. Otherwise, the local index for this node on the
-     current processor will be returned and used to instantiate the vars. ---*/
-		iPoint_Local = Global2Local[iPoint_Global];
-		if (iPoint_Local >= 0) {
-      
-      /*--- The PointID is not stored --*/
-      point_line >> index;
-      
-      /*--- Store the solution (starting with node coordinates) --*/
-      for (iField = 0; iField < nVar; iField++)
-      point_line >> Solution[iField];
-      
-      node[iPoint_Local]->SetSolution(Solution);
-      
-      
-		}
-		iPoint_Global++;
-	}
-  
-	/*--- Close the restart file ---*/
-	solution_file.close();
-  
-	/*--- Free memory needed for the transformation ---*/
-	delete [] Global2Local;
   
 }
 

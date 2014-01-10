@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
    & boundary markers). MESH_0 is the index of the original (finest) mesh in
    the multigrid structure which is stored in the CPhysicalGeometry class. ---*/
   
-  geometry_container = new CGeometry *[config_container->GetMGLevels()+1];
+  geometry_container = new CGeometry*[config_container->GetMGLevels()+1];
   geometry_container[MESH_0] = new CPhysicalGeometry(config_container);
   
   if (rank == MASTER_NODE)
@@ -240,10 +240,6 @@ int main(int argc, char *argv[]) {
   
   if (rank == MASTER_NODE)
     output->SetHistory_Header(&ConvHist_file, config_container);
-  
-  /*--- Check for an unsteady restart. Update ExtIter if necessary. ---*/
-  if (config_container->GetWrt_Unsteady() && config_container->GetRestart())
-    ExtIter = config_container->GetUnst_RestartIter();
   
   /*--- Main external loop of the solver. Within this loop, each iteration ---*/
   

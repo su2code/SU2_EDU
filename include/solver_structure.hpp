@@ -1558,16 +1558,6 @@ public:
                                     CSolver ***fea_solution);
   
 	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-   * \param[in] solver - Container vector with all of the solvers.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_iter - Current external iteration number.
-	 */
-	virtual void LoadRestart(CGeometry **geometry, CSolver ***solver,
-                           CConfig *config, int val_iter);
-  
-	/*!
 	 * \brief Gauss method for solving a linear system.
 	 * \param[in] A - Matrix Ax = b.
 	 * \param[in] rhs - Right hand side.
@@ -1646,15 +1636,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	void Set_MPI_Solution(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Load a solution from a restart file.
-	 * \param[in] geometry - Geometrical definition of the problem.
-   * \param[in] solver - Container vector with all of the solvers.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_iter - Current external iteration number.
-	 */
-	void LoadRestart(CGeometry **geometry, CSolver ***solver, CConfig *config, int val_iter);
   
 	/*!
 	 * \brief Destructor of the class.
@@ -2367,15 +2348,6 @@ public:
 	double *GetCharacPrimVar(unsigned short val_marker, unsigned short val_vertex);
   
 	/*!
-	 * \brief Load a solution from a restart file.
-	 * \param[in] geometry - Geometrical definition of the problem.
-   * \param[in] solver - Container vector with all of the solvers.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_iter - Current external iteration number.
-	 */
-	void LoadRestart(CGeometry **geometry, CSolver ***solver, CConfig *config, int val_iter);
-  
-	/*!
 	 * \brief Set the initial condition for the Euler Equations.
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] solver_container - Container with all the solutions.
@@ -2837,17 +2809,7 @@ public:
 	 */
   
 	void BC_Outlet(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics, CNumerics *visc_numerics, CConfig *config,
-                 unsigned short val_marker);
-  
-  /*!
-	 * \brief Load a solution from a restart file.
-	 * \param[in] geometry - Geometrical definition of the problem.
-   * \param[in] solver - Container vector with all of the solvers.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_iter - Current external iteration number.
-	 */
-	void LoadRestart(CGeometry **geometry, CSolver ***solver, CConfig *config, int val_iter);
-  
+                 unsigned short val_marker);  
   
 };
 

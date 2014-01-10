@@ -23,53 +23,6 @@
 
 #include "../include/definition_structure.hpp"
 
-unsigned short GetnDim(string val_mesh_filename, unsigned short val_format) {
-  
-  string text_line, Marker_Tag;
-  ifstream mesh_file;
-  short nDim = 3;
-  bool isFound = false;
-  char cstr[200];
-  string::size_type position;
-  
-#ifndef NO_MPI
-  if (MPI::COMM_WORLD.Get_size() != 1) {
-    unsigned short lastindex = val_mesh_filename.find_last_of(".");
-    val_mesh_filename = val_mesh_filename.substr(0, lastindex);
-    val_mesh_filename = val_mesh_filename + "_1.su2";
-  }
-#endif
-  
-  switch (val_format) {
-    case SU2:
-      
-      /*--- Open grid file ---*/
-      strcpy (cstr, val_mesh_filename.c_str());
-      mesh_file.open(cstr, ios::in);
-      
-      /*--- Read SU2 mesh file ---*/
-      while (getline (mesh_file,text_line)) {
-        /*--- Search for the "NDIM" keyword to see if there are multiple Zones ---*/
-        position = text_line.find ("NDIME=",0);
-        if (position != string::npos) {
-          text_line.erase (0,6); nDim = atoi(text_line.c_str()); isFound = true;
-        }
-      }
-      break;
-      
-    case CGNS:
-      nDim = 3;
-      break;
-      
-    case NETCDF_ASCII:
-      nDim = 3;
-      break;
-  }
-  return (unsigned short) nDim;
-}
-
-
-
 void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   
   unsigned short iMGlevel;
@@ -81,56 +34,56 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
 #endif
   
   
-    /*--- Compute elements surrounding points, points surrounding points,
-     and elements surrounding elements ---*/
-    
-    if (rank == MASTER_NODE) cout << "Setting point connectivity." << endl;
-    geometry[MESH_0]->SetEsuP();
-    geometry[MESH_0]->SetPsuP();
-    
-    if (rank == MASTER_NODE) cout << "Renumbering using a Reverse Cuthill-McKee Algorithm." << endl;
-    geometry[MESH_0]->SetRCM(config);
-    
-    if (rank == MASTER_NODE) cout << "Recomputing point connectivity." << endl;
-    geometry[MESH_0]->SetEsuP();
-    geometry[MESH_0]->SetPsuP();
-    
-    if (rank == MASTER_NODE) cout << "Setting element connectivity." << endl;
-    
-    geometry[MESH_0]->SetEsuE();
-    
-    /*--- Check the orientation before computing geometrical quantities ---*/
-    
-    if (rank == MASTER_NODE) cout << "Checking the numerical grid orientation." << endl;
-    geometry[MESH_0]->SetBoundVolume();
-    geometry[MESH_0]->Check_Orientation(config);
-    
-    /*--- Create the edge structure ---*/
-    
-    if (rank == MASTER_NODE) cout << "Identifying edges and vertices." << endl;
-    geometry[MESH_0]->SetEdges();
-    geometry[MESH_0]->SetVertex(config);
-    
-    /*--- Compute cell center of gravity ---*/
-    
-    if (rank == MASTER_NODE) cout << "Computing centers of gravity." << endl;
-    geometry[MESH_0]->SetCG();
-    
-    /*--- Create the control volume structures ---*/
-    
-    if (rank == MASTER_NODE) cout << "Setting the control volume structure." << endl;
-    geometry[MESH_0]->SetControlVolume(config, ALLOCATE);
-    geometry[MESH_0]->SetBoundControlVolume(config, ALLOCATE);
-    
-    /*--- Identify closest normal neighbor ---*/
-    
-    if (rank == MASTER_NODE) cout << "Searching for the closest normal neighbors to the surfaces." << endl;
-    geometry[MESH_0]->FindNormal_Neighbor(config);
-    
-    /*--- Compute the surface curvature ---*/
-    
-    if (rank == MASTER_NODE) cout << "Compute the surface curvature." << endl;
-    geometry[MESH_0]->ComputeSurf_Curvature(config);
+  /*--- Compute elements surrounding points, points surrounding points,
+   and elements surrounding elements ---*/
+  
+  if (rank == MASTER_NODE) cout << "Setting point connectivity." << endl;
+  geometry[MESH_0]->SetEsuP();
+  geometry[MESH_0]->SetPsuP();
+  
+  if (rank == MASTER_NODE) cout << "Renumbering using a Reverse Cuthill-McKee Algorithm." << endl;
+  geometry[MESH_0]->SetRCM(config);
+  
+  if (rank == MASTER_NODE) cout << "Recomputing point connectivity." << endl;
+  geometry[MESH_0]->SetEsuP();
+  geometry[MESH_0]->SetPsuP();
+  
+  if (rank == MASTER_NODE) cout << "Setting element connectivity." << endl;
+  
+  geometry[MESH_0]->SetEsuE();
+  
+  /*--- Check the orientation before computing geometrical quantities ---*/
+  
+  if (rank == MASTER_NODE) cout << "Checking the numerical grid orientation." << endl;
+  geometry[MESH_0]->SetBoundVolume();
+  geometry[MESH_0]->Check_Orientation(config);
+  
+  /*--- Create the edge structure ---*/
+  
+  if (rank == MASTER_NODE) cout << "Identifying edges and vertices." << endl;
+  geometry[MESH_0]->SetEdges();
+  geometry[MESH_0]->SetVertex(config);
+  
+  /*--- Compute cell center of gravity ---*/
+  
+  if (rank == MASTER_NODE) cout << "Computing centers of gravity." << endl;
+  geometry[MESH_0]->SetCG();
+  
+  /*--- Create the control volume structures ---*/
+  
+  if (rank == MASTER_NODE) cout << "Setting the control volume structure." << endl;
+  geometry[MESH_0]->SetControlVolume(config, ALLOCATE);
+  geometry[MESH_0]->SetBoundControlVolume(config, ALLOCATE);
+  
+  /*--- Identify closest normal neighbor ---*/
+  
+  if (rank == MASTER_NODE) cout << "Searching for the closest normal neighbors to the surfaces." << endl;
+  geometry[MESH_0]->FindNormal_Neighbor(config);
+  
+  /*--- Compute the surface curvature ---*/
+  
+  if (rank == MASTER_NODE) cout << "Compute the surface curvature." << endl;
+  geometry[MESH_0]->ComputeSurf_Curvature(config);
   
   /*--- Computation of wall distances for turbulence modeling ---*/
   
@@ -144,8 +97,8 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   geometry[MESH_0]->ComputeReference_Area(config);
   
   
-    if ((config->GetMGLevels() != 0) && (rank == MASTER_NODE))
-      cout << "Setting the multigrid structure." <<endl;
+  if ((config->GetMGLevels() != 0) && (rank == MASTER_NODE))
+    cout << "Setting the multigrid structure." <<endl;
   
 #ifndef NO_MPI
   /*--- Synchronization point before the multigrid algorithm ---*/
@@ -155,50 +108,31 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   /*--- Loop over all the new grid ---*/
   
   for (iMGlevel = 1; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-      
-      /*--- Create main agglomeration structure ---*/
-      
-      geometry[iMGlevel] = new CMultiGridGeometry(geometry, config, iMGlevel);
-      
-      /*--- Compute points surrounding points. ---*/
-      
-      geometry[iMGlevel]->SetPsuP(geometry[iMGlevel-1]);
-      
-      /*--- Create the edge structure ---*/
-      
-      geometry[iMGlevel]->SetEdges();
-      geometry[iMGlevel]->SetVertex(geometry[iMGlevel-1], config);
-      
-      /*--- Create the control volume structures ---*/
-      
-      geometry[iMGlevel]->SetControlVolume(config,geometry[iMGlevel-1], ALLOCATE);
-      geometry[iMGlevel]->SetBoundControlVolume(config,geometry[iMGlevel-1], ALLOCATE);
-      geometry[iMGlevel]->SetCoord(geometry[iMGlevel-1]);
-      
-      /*--- Find closest neighbor to a surface point ---*/
-      
-      geometry[iMGlevel]->FindNormal_Neighbor(config);
-      
-    }
-  
-  /*--- For unsteady simulations, initialize the grid volumes
-   and coordinates for previous solutions. Loop over all zones/grids ---*/
-  
-    if (config->GetUnsteady_Simulation() && config->GetGrid_Movement())
-      for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-        for (iPoint = 0; iPoint < geometry[iMGlevel]->GetnPoint(); iPoint++) {
-          
-          /*--- Update cell volume ---*/
-          
-          geometry[iMGlevel]->node[iPoint]->SetVolume_n();
-          geometry[iMGlevel]->node[iPoint]->SetVolume_nM1();
-          
-          /*--- Update point coordinates ---*/
-          geometry[iMGlevel]->node[iPoint]->SetCoord_n();
-          geometry[iMGlevel]->node[iPoint]->SetCoord_n1();
-          
-        }
-      }
+    
+    /*--- Create main agglomeration structure ---*/
+    
+    geometry[iMGlevel] = new CMultiGridGeometry(geometry, config, iMGlevel);
+    
+    /*--- Compute points surrounding points. ---*/
+    
+    geometry[iMGlevel]->SetPsuP(geometry[iMGlevel-1]);
+    
+    /*--- Create the edge structure ---*/
+    
+    geometry[iMGlevel]->SetEdges();
+    geometry[iMGlevel]->SetVertex(geometry[iMGlevel-1], config);
+    
+    /*--- Create the control volume structures ---*/
+    
+    geometry[iMGlevel]->SetControlVolume(config,geometry[iMGlevel-1], ALLOCATE);
+    geometry[iMGlevel]->SetBoundControlVolume(config,geometry[iMGlevel-1], ALLOCATE);
+    geometry[iMGlevel]->SetCoord(geometry[iMGlevel-1]);
+    
+    /*--- Find closest neighbor to a surface point ---*/
+    
+    geometry[iMGlevel]->FindNormal_Neighbor(config);
+    
+  }
   
 }
 
@@ -210,7 +144,7 @@ void Solver_Preprocessing(CSolver ***solver_container, CGeometry **geometry, CCo
   /*--- Initialize some useful booleans ---*/
   euler = false;  ns = false;  turbulent = false;
   menter_sst = false;  spalart_allmaras = false;
-
+  
   /*--- Assign booleans ---*/
   switch (config->GetKind_Solver()) {
     case EULER : euler = true; break;
@@ -361,15 +295,10 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
             default : cout << "Centered scheme not implemented." << endl; exit(1); break;
           }
           
-          if (!config->GetLowFidelitySim()) {
+            /*--- Definition of the numerics on the coarse levels ---*/
+            
             for (iMGlevel = 1; iMGlevel <= config->GetMGLevels(); iMGlevel++)
               numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CCentLax_Flow(nDim, nVar_Flow, config);
-          }
-          else {
-            numerics_container[MESH_1][FLOW_SOL][CONV_TERM] = new CCentJST_Flow(nDim, nVar_Flow, config);
-            for (iMGlevel = 2; iMGlevel <= config->GetMGLevels(); iMGlevel++)
-              numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CCentLax_Flow(nDim, nVar_Flow, config);
-          }
           
           /*--- Definition of the boundary condition method ---*/
           for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++)
@@ -442,19 +371,6 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
               for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
                 numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwArtComp_Flow(nDim, nVar_Flow, config);
                 numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwArtComp_Flow(nDim, nVar_Flow, config);
-              }
-              break;
-            default : cout << "Upwind scheme not implemented." << endl; exit(1); break;
-          }
-        }
-        if (freesurface) {
-          /*--- Incompressible flow, use artificial compressibility method ---*/
-          switch (config->GetKind_Upwind_Flow()) {
-            case NO_UPWIND : cout << "No upwind scheme." << endl; break;
-            case ROE_1ST : case ROE_2ND :
-              for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwArtComp_FreeSurf_Flow(nDim, nVar_Flow, config);
-                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwArtComp_FreeSurf_Flow(nDim, nVar_Flow, config);
               }
               break;
             default : cout << "Upwind scheme not implemented." << endl; exit(1); break;
@@ -543,9 +459,7 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
         
         for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
           
-          if (config->GetRotating_Frame() == YES)
-            numerics_container[iMGlevel][FLOW_SOL][SOURCE_FIRST_TERM] = new CSourceRotatingFrame_Flow(nDim, nVar_Flow, config);
-          else if (config->GetAxisymmetric() == YES)
+          if (config->GetAxisymmetric() == YES)
             numerics_container[iMGlevel][FLOW_SOL][SOURCE_FIRST_TERM] = new CSourceAxisymmetric_Flow(nDim,nVar_Flow, config);
           else if (config->GetGravityForce() == YES)
             numerics_container[iMGlevel][FLOW_SOL][SOURCE_FIRST_TERM] = new CSourceGravity(nDim, nVar_Flow, config);

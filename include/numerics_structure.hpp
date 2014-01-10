@@ -178,10 +178,6 @@ public:
 	*U_nM1,		/*!< \brief Vector of conservative variables at time n-1. */
 	*U_nP1;		/*!< \brief Vector of conservative variables at time n+1. */
 	double vel2_inf; /*!< \brief value of the square of freestream speed. */
-  double *WindGust_i,	/*!< \brief Wind gust at point i. */
-	*WindGust_j;			/*!< \brief Wind gust at point j. */
-  double *WindGustDer_i,	/*!< \brief Wind gust derivatives at point i. */
-	*WindGustDer_j;			/*!< \brief Wind gust derivatives at point j. */
   
   double *l, *m;
   double *dPdU_i, *dPdU_j;
@@ -1551,53 +1547,6 @@ public:
 	 * \brief Destructor of the class.
 	 */
 	~CUpwArtComp_Flow(void);
-  
-	/*!
-	 * \brief Compute the Roe's flux between two nodes i and j.
-	 * \param[out] val_residual - Pointer to the total residual.
-	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
-	 * \param[out] val_Jacobian_j - Jacobian of the numerical method at node j (implicit computation).
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config);
-};
-
-/*!
- * \class CUpwArtComp_FreeSurf_Flow
- * \brief Class for solving an approximate Riemann solver of Roe for the incompressible flow equations.
- * \ingroup ConvDiscr
- * \author F. Palacios.
- * \version 1.0.0
- */
-class CUpwArtComp_FreeSurf_Flow : public CNumerics {
-private:
-	bool implicit;
-	bool gravity;
-	double Froude;
-	double *Diff_U;
-	double *Velocity_i, *Velocity_j, *MeanVelocity;
-	double *Proj_flux_tensor_i, *Proj_flux_tensor_j;
-	double *Lambda, *Epsilon;
-	double **P_Tensor, **invP_Tensor;
-	double sq_vel, Proj_ModJac_Tensor_ij, Density_i, Pressure_i, LevelSet_i, dDensityInc_i, dDensityInc_j,
-	Density_j, Pressure_j, LevelSet_j, MeanDensityInc, dMeanDensityInc, MeanPressure, MeanLevelSet, MeanBetaInc2,
-	ProjVelocity, ProjVelocity_i, ProjVelocity_j, proj_delta_vel, Distance_i, Distance_j;
-	unsigned short iDim, jDim, iVar, jVar, kVar;
-  
-public:
-  
-	/*!
-	 * \brief Constructor of the class.
-	 * \param[in] val_nDim - Number of dimensions of the problem.
-	 * \param[in] val_nVar - Number of variables of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CUpwArtComp_FreeSurf_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	~CUpwArtComp_FreeSurf_Flow(void);
   
 	/*!
 	 * \brief Compute the Roe's flux between two nodes i and j.
@@ -4141,70 +4090,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	void ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config);
-};
-
-/*!
- * \class CSourceRotatingFrame_Flow
- * \brief Class for a rotating frame source term.
- * \ingroup SourceDiscr
- * \author F. Palacios, T. Economon.
- * \version 1.0.0
- */
-class CSourceRotatingFrame_Flow : public CNumerics {
-public:
-  
-	/*!
-	 * \brief Constructor of the class.
-	 * \param[in] val_nDim - Number of dimensions of the problem.
-	 * \param[in] val_nVar - Number of variables of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CSourceRotatingFrame_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	~CSourceRotatingFrame_Flow(void);
-  
-	/*!
-	 * \brief Residual of the rotational frame source term.
-	 * \param[out] val_residual - Pointer to the total residual.
-   * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void ComputeResidual(double *val_residual, double **val_Jacobian_i, CConfig *config);
-};
-
-/*!
- * \class CSourceRotatingFrame_AdjFlow
- * \brief Source term class for rotating frame adjoint.
- * \ingroup SourceDiscr
- * \author T. Economon.
- * \version 1.0.0
- */
-class CSourceRotatingFrame_AdjFlow : public CNumerics {
-public:
-  
-	/*!
-	 * \brief Constructor of the class.
-	 * \param[in] val_nDim - Number of dimensions of the problem.
-	 * \param[in] val_nVar - Number of variables of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CSourceRotatingFrame_AdjFlow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	~CSourceRotatingFrame_AdjFlow(void);
-  
-	/*!
-	 * \brief Residual of the adjoint rotating frame source term.
-	 * \param[out] val_residual - Pointer to the total residual.
-   * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void ComputeResidual(double *val_residual, double **val_Jacobian_i, CConfig *config);
 };
 
 /*!

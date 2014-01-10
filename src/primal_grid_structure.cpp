@@ -27,18 +27,19 @@ unsigned short CPrimalGrid::nDim;
 
 CPrimalGrid::CPrimalGrid(void) {
   
-  /*--- Set the default values for the pointers ---*/
-  Nodes = NULL;
-	Neighbor_Elements = NULL;
-	Coord_CG = NULL;
+  /*--- Pointer initialization ---*/
+  
+  Nodes              = NULL;
+	Neighbor_Elements  = NULL;
+	Coord_CG           = NULL;
 	Coord_FaceElems_CG = NULL;
   
 }
 
 CPrimalGrid::~CPrimalGrid() {
 
-	if (Nodes != NULL) delete[] Nodes;
-	if (Coord_CG != NULL) delete[] Coord_CG;
+	if (Nodes             != NULL) delete[] Nodes;
+	if (Coord_CG          != NULL) delete[] Coord_CG;
   if (Neighbor_Elements != NULL) delete[] Neighbor_Elements;
    
 }

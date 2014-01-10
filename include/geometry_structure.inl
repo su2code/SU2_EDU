@@ -65,20 +65,6 @@ inline void CGeometry::Check_Orientation(CConfig *config) { }
 
 inline void CGeometry::DivideConnectivity(CConfig *config, unsigned short Elem_Type) { }
 
-inline void CGeometry::SetRotationalVelocity(CConfig *config) { }
-
-inline void CGeometry::SetGridVelocity(CConfig *config, unsigned long iter) { }
-
-inline void CGeometry::SetRestricted_GridVelocity(CGeometry *fine_mesh, CConfig *config) { } 
-
-inline void CGeometry::Set_MPI_Coord(CConfig *config) { } 
-
-inline void CGeometry::Set_MPI_GridVel(CConfig *config) { } 
-
-inline void CGeometry::SetPeriodicBoundary(CConfig *config) { }
-
-inline void CGeometry::SetPeriodicBoundary(CGeometry *geometry, CConfig *config) { }
-
 inline void CGeometry::SetSendReceive(CConfig *config) { }
 
 inline void CGeometry::ComputeWall_Distance(CConfig *config) { }
@@ -186,8 +172,6 @@ inline double CGeometry::Compute_Thickness(double *Plane_P0, double *Plane_Norma
 inline double CGeometry::Compute_Area(double *Plane_P0, double *Plane_Normal, unsigned short iSection, vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface) { return 0; }
 
 inline void CGeometry::FindNormal_Neighbor(CConfig *config) { }
-
-inline void CGeometry::SetBoundSensitivity(CConfig *config) { }
 
 inline void CPhysicalGeometry::SetPsuP(CGeometry *geometry) { CGeometry::SetPsuP(geometry); } 
 
