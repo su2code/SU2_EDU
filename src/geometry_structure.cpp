@@ -6805,7 +6805,7 @@ CDomainGeometry::CDomainGeometry(CGeometry *geometry, CConfig *config) {
 #ifndef NO_MPI
   
   unsigned long nElemTotal, nPointTotal, nPointDomainTotal, nPointGhost, nPointPeriodic, nElemTriangle, nElemRectangle, nElemTetrahedron, nElemHexahedron, nElemWedge, nElemPyramid, iElemTotal, iPointTotal, iPointGhost, iPointDomain, iPointPeriodic, iElemTriangle, iElemRectangle, iElemTetrahedron, iElemHexahedron, iElemWedge, iElemPyramid, nVertexDomain[MAX_NUMBER_MARKER], iPoint, jPoint, iElem, iVertex, nBoundLine[MAX_NUMBER_MARKER], nBoundLineTotal, iBoundLineTotal, nBoundTriangle[MAX_NUMBER_MARKER], nBoundTriangleTotal, iBoundTriangleTotal, nBoundRectangle[MAX_NUMBER_MARKER], nBoundRectangleTotal, iBoundRectangleTotal;
-  unsigned short iVertexDomain, iBoundLine, iBoundTriangle, iBoundRectangle, iNode, iDim, iMarker, nMarkerDomain, iMarkerDomain, nDomain, iDomain, jDomain, jNode, nPeriodic, iPeriodic;
+  unsigned short iVertexDomain, iBoundLine, iBoundTriangle, iBoundRectangle, iNode, iDim, iMarker, nMarkerDomain, iMarkerDomain, nDomain, iDomain, jDomain, jNode, iPeriodic;
   
   long vnodes_local[8];
   double coord[3];
@@ -6846,7 +6846,6 @@ CDomainGeometry::CDomainGeometry(CGeometry *geometry, CConfig *config) {
     VertexIn[iMarker] = new bool [geometry->GetnElem_Bound(iMarker)];
     
     nDim = geometry->GetnDim();
-    nPeriodic = config->GetnPeriodicIndex();
     
     Global_to_Local_Point =  new long[geometry->GetnPoint()];
     for (iPoint = 0; iPoint < geometry->GetnPoint(); iPoint++)
@@ -7000,9 +6999,6 @@ CDomainGeometry::CDomainGeometry(CGeometry *geometry, CConfig *config) {
       MPI::COMM_WORLD.Bsend(Marker_All_SendRecv,   MAX_NUMBER_MARKER, MPI::SHORT, iDomain, 20);
       MPI::COMM_WORLD.Bsend(Marker_All_Tag,        MAX_NUMBER_MARKER*200, MPI::CHAR, iDomain, 21);
       
-      /*--- Send the size of buffers ---*/
-      MPI::COMM_WORLD.Bsend(&nPeriodic, 1, MPI::UNSIGNED_SHORT, iDomain, 22);
-      
     }
     
     if (rank == iDomain) {
@@ -7034,17 +7030,6 @@ CDomainGeometry::CDomainGeometry(CGeometry *geometry, CConfig *config) {
       MPI::COMM_WORLD.Recv(Marker_All_Tag,        MAX_NUMBER_MARKER*200, MPI::CHAR, MASTER_NODE, 21);
       for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
         config->SetMarker_All_Tag(iMarker, string(Marker_All_Tag[iMarker]));
-      }
-      
-      /*--- Receive the size of buffers ---*/
-      MPI::COMM_WORLD.Recv(&nPeriodic, 1, MPI::UNSIGNED_SHORT, MASTER_NODE, 22);
-      config->SetnPeriodicIndex(nPeriodic);
-      double* center = new double[3]; double* rotation  = new double[3]; double* translate = new double[3];
-      for (iPeriodic = 0; iPeriodic < nPeriodic; iPeriodic++) {
-        for (iDim = 0; iDim < 3; iDim++) { center[iDim] = 0.0; rotation[iDim] = 0.0; translate[iDim] = 0.0; }
-        config->SetPeriodicCenter(iPeriodic, center);
-        config->SetPeriodicRotation(iPeriodic, rotation);
-        config->SetPeriodicTranslate(iPeriodic, translate);
       }
       
       /*--- Allocate the receive buffer vector ---*/

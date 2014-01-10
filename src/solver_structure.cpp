@@ -1509,6 +1509,9 @@ void CBaselineSolver::Set_MPI_Solution(CGeometry *geometry, CConfig *config) {
       /*--- Do the coordinate transformation ---*/
       for (iVertex = 0; iVertex < nVertexR; iVertex++) {
         
+        /*--- Find point and its type of transformation ---*/
+        iPoint = geometry->vertex[MarkerR][iVertex]->GetNode();
+        
         /*--- Copy conserved variables before performing transformation. ---*/
         for (iVar = 0; iVar < nVar; iVar++)
         Solution[iVar] = Buffer_Receive_U[iVar*nVertexR+iVertex];

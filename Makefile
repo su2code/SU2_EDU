@@ -119,9 +119,9 @@ AUTOHEADER = ${SHELL} /Users/economon/SU2_EDU/missing --run autoheader
 AUTOMAKE = ${SHELL} /Users/economon/SU2_EDU/missing --run automake-1.11
 AWK = awk
 CPPFLAGS = 
-CXX = icpc
+CXX = mpicxx
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3 -ip -parallel -fPIC -DTIME -DNO_MPI
+CXXFLAGS = -O3 -ip -parallel -fPIC -DTIME
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"SU2_EDU\" -DPACKAGE_TARNAME=\"SU2_EDU\" -DPACKAGE_VERSION=\"1.0.0\" -DPACKAGE_STRING=\"SU2_EDU\ 1.0.0\" -DPACKAGE_BUGREPORT=\"susquared-dev@lists.stanford.edu\" -DPACKAGE_URL=\"http://su2.stanford.edu\" -DPACKAGE=\"SU2_EDU\" -DVERSION=\"1.0.0\"
 DEPDIR = .deps
@@ -185,7 +185,7 @@ mandir = ${datarootdir}/man
 mkdir_p = $(top_builddir)/./install-sh -c -d
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /usr/local
+prefix = /Users/economon/SU2_EDU
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin

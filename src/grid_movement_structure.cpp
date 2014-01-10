@@ -1427,6 +1427,7 @@ void CSurfaceMovement::SetSurface_Deformation(CGeometry *geometry, CConfig *conf
   unsigned short iDV;
 	string FFDBoxTag;
   
+  int rank = MASTER_NODE;
 #ifndef NO_MPI
 	/*--- MPI initialization, and buffer setting ---*/
 	rank = MPI::COMM_WORLD.Get_rank();
