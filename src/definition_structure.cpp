@@ -25,7 +25,6 @@
 void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   
   unsigned short iMGlevel;
-  unsigned long iPoint;
   
   int rank = MASTER_NODE;
 #ifndef NO_MPI
@@ -39,9 +38,6 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   if (rank == MASTER_NODE) cout << "Setting point connectivity." << endl;
   geometry[MESH_0]->SetEsuP();
   geometry[MESH_0]->SetPsuP();
-  
-  if (rank == MASTER_NODE) cout << "Renumbering using a Reverse Cuthill-McKee Algorithm." << endl;
-  geometry[MESH_0]->SetRCM(config);
   
   if (rank == MASTER_NODE) cout << "Recomputing point connectivity." << endl;
   geometry[MESH_0]->SetEsuP();
