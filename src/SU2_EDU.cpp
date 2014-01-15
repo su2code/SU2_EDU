@@ -65,15 +65,20 @@ int main(int argc, char *argv[]) {
   cout <<"|  | (___   | |  | |    ) |   Twitter: @su2code                         |" << endl;
   cout <<"|   \\___ \\  | |  | |   / /    Forum: www.cfd-online.com/Forums/su2/     |" << endl;
   cout <<"|   ____) | | |__| |  / /_                                              |" << endl;
-  cout <<"|  |_____/   \\____/  |____|   Suite (Educational Code)                  |" << endl;
+  cout <<"|  |_____/   \\____/  |____|   Educational Code                          |" << endl;
   cout <<"|                             Release 1.0.0                             |" << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
-  cout << "| Stanford University Unstructured (SU2).                               |" << endl;
-  cout << "| Copyright (C) 2012-2013 Aerospace Design Laboratory (ADL).            |" << endl;
+  cout << "| SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).       |" << endl;
   cout << "| SU2 is distributed in the hope that it will be useful,                |" << endl;
   cout << "| but WITHOUT ANY WARRANTY; without even the implied warranty of        |" << endl;
   cout << "| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |" << endl;
   cout << "| Lesser General Public License (version 2.1) for more details.         |" << endl;
+  cout <<"-------------------------------------------------------------------------" << endl;
+  cout << endl;
+  cout <<"-------------------------------------------------------------------------" << endl;
+  cout << "| Please check that the SU2_EDU binary, config files, and meshes are    |" << endl;
+  cout << "| all located in the same directory (SU2_EDU/bin/ by default).          |" << endl;
+  cout << "| For detailed use instructions, see the SU2_EDU/README file.           |" << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
   
   /*--- Get user input for the simulation type (viscous/inviscid) ---*/

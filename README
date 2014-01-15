@@ -1,19 +1,20 @@
 ---------------------------------------------------
-  SU^2 (Stanford University Unstructured) ver 1.0.0
-  Educational Version (SU2_EDU)
+  SU2 Educational Version (SU2_EDU) ver 1.0.0
 ---------------------------------------------------
 
-Computational analysis tools have revolutionized the way we design aerospace systems, but most established codes are proprietary, unavailable, or prohibitively expensive for many users. The SU^2 team is changing this, making computational analysis and design freely available as open-source software and involving everyone in its creation and development. 
+SU2_EDU is a new, educational version of the Euler/Navier-Stokes/RANS solver from the SU2 suite. The simplified structure of the code makes it suitable for students and beginners in CFD. By focusing on a handful of key numerical methods and capabilities, SU2_EDU is ideal for use in CFD courses, for independent studies, or just to learn about a new field! Due to their common class heirarchy and organization, SU2_EDU acts as a natural stepping stone to the more comprehensive, fully-featured SU2 suite.
+
+Lastly, SU2_EDU is also geared toward anyone interested in airfoil analysis. The initial version of SU2_EDU is an intuitive, easy to use tool for computing the performance of airfoils in inviscid, laminar, or turbulent flow, by simply supplying the airfoil coordinates.
 
 ---------------------------------------------------
-  SU^2 INTRODUCTION 
+  SU2 INTRODUCTION 
 ---------------------------------------------------
 
-SU^2 (Stanford University Unstructured) is a suite of open-source software tools written in C++ for the numerical solution of partial differential equations (PDE) and performing PDE constrained optimization. 
+SU2 is a suite of open-source software tools written in C++ for the numerical solution of partial differential equations (PDE) and performing PDE constrained optimization. 
 
 The primary applications are computational fluid dynamics and aerodynamic shape optimization, but has been extended to treat more general equations such as electrodynamics and chemically reacting flows. 
 
-SU^2 is under development in the Aerospace Design Laboratory (ADL) of the Department of Aeronautics and Astronautics at Stanford University.
+SU2 is under development in the Aerospace Design Laboratory (ADL) of the Department of Aeronautics and Astronautics at Stanford University.
 
 You will find more information and the latest news in:
    - Webpage:   http://su2.stanford.edu
@@ -24,22 +25,27 @@ You will find more information and the latest news in:
    - Facebook:  https://www.facebook.com/pages/SU2/266488403453493
 
 ---------------------------------------------------
-  SU^2 PATH SETUP 
+  SU2_EDU INSTALLATION
 ---------------------------------------------------
 
-When make install is complete, please be sure to add the $SU2_HOME and $SU2_RUN environment variables, and update your $PATH with $SU2_RUN. 
+To build SU2_EDU from source, basic steps are to run the './configure', 'make', and 'make install' commands in the root directory of the source distribution. Please note that more detailed instructions on the configure and build process can be found within the INSTALL file. 
 
-For example, add these lines to your .bashrc file -
+---------------------------------------------------
+  RUNNING SU2_EDU
+---------------------------------------------------
 
-export SU2_RUN="your_prefix/bin"
-export SU2_HOME="your_SU2v2.0/trunk"
-export PATH=$PATH:$SU2_RUN
+After installation, the SU2_EDU binary executable can be found in the SU2_EDU/bin/ directory. To run SU2_EDU, follow these easy steps:
 
-$SU2_RUN should point to the folder where all binaries and python scripts were installed.  This is the prefix you set with ./configure -prefix 
+1. Adapt the config files for your particular problem. For inviscid flow, modify the Inviscid_ConfigFile.cfg file, and for viscous flow, modify Viscous_ConfigFile.cfg. For example, you may wish to modify the angle of attack, Mach number, or Reynolds number.
 
-$SU2_HOME should point to the source code's trunk folder.  This is (..)/SU2v2.0/trunk
+2. Prepare an airfoil definition by either obtaining a set of airfoil coordinates or creating your own definition. For instance, an example airfoil definition is included in the bin/ directory within the airfoil_e174.dat file. We also recommend the excellence airfoil database website hosted by the UIUC Applied Aerodynamics Group (http://aerospace.illinois.edu/m-selig/ads/coord_database.html) which contains nearly 1,600 airfoil definitions.
 
-Thanks for building, and happy optimizing!
+3. Run the executable by entering the command "./SU2_EDU" in the terminal. You will prompted for your airfoil definition filename, format, and trailing edge type. SU2_EDU will then compute the flow around the airfoil and print output to the console in the process.
+
+4. Post-process the results. Several output files will be written which contain the surface (surface_flow.dat, surface_flow.csv) and volume (flow.dat) solutions. A history of the solver convergence and force coefficients can be found in the history.plt file.
+
+
+Thanks for building, and happy analyzing!
 - The SU2 Development Team
   http://su2.stanford.edu
 

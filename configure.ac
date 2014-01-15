@@ -37,7 +37,15 @@ AC_PROG_RANLIB
 AC_OUTPUT(Makefile)
 
 abs_srcdir=`(cd $srcdir && pwd)`
-abs_prefix=`(cd $prefix && pwd)`
+
+########################## Force installation into /path/to/SU2_EDU/bin/
+
+#abs_prefix=`(cd $prefix && pwd)`
+abs_prefix=`(pwd)`
+
+######################### Force -O3 optimization
+
+CXXFLAGS=""$CXXFLAGS" -O3"
 
 AC_MSG_RESULT([
 
