@@ -4,8 +4,7 @@
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
  * \version 1.0.0
  *
- * Stanford University Unstructured (SU2).
- * Copyright (C) 2012-2013 Aerospace Design Laboratory (ADL).
+ * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
  * SU2 is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -281,7 +280,7 @@ void CConfig::SetConfig_Options() {
 	/* DESCRIPTION: Minimum error threshold for the linear solver for the implicit formulation */
 	AddScalarOption("LINEAR_SOLVER_ERROR", Linear_Solver_Error, 1E-5);
 	/* DESCRIPTION: Maximum number of iterations of the linear solver for the implicit formulation */
-	AddScalarOption("LINEAR_SOLVER_ITER", Linear_Solver_Iter, 10);
+	AddScalarOption("LINEAR_SOLVER_ITER", Linear_Solver_Iter, 2);
 	/* DESCRIPTION: Relaxation of the linear solver for the implicit formulation */
 	AddScalarOption("LINEAR_SOLVER_RELAX", Linear_Solver_Relax, 1.0);
   /* DESCRIPTION: Roe-Turkel preconditioning for low Mach number flows */
@@ -291,7 +290,7 @@ void CConfig::SetConfig_Options() {
 	/* DESCRIPTION: Time Step for dual time stepping simulations (s) */
 	AddScalarOption("MAX_ROE_TURKEL_PREC", Max_Beta_RoeTurkel, 0.2);
 	/* DESCRIPTION: Linear solver for the turbulent adjoint systems */
-	AddEnumOption("ADJTURB_LIN_SOLVER", Kind_AdjTurb_Linear_Solver, Linear_Solver_Map, "FGMRES");
+	AddEnumOption("ADJTURB_LIN_SOLVER", Kind_AdjTurb_Linear_Solver, Linear_Solver_Map, "BCGSTAB");
 	/* DESCRIPTION: Preconditioner for the turbulent adjoint Krylov linear solvers */
 	AddEnumOption("ADJTURB_LIN_PREC", Kind_AdjTurb_Linear_Prec, Linear_Solver_Prec_Map, "LU_SGS");
 	/* DESCRIPTION: Minimum error threshold for the turbulent adjoint linear solver for the implicit formulation */

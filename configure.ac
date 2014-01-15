@@ -59,8 +59,7 @@ AC_MSG_RESULT([
 Release 1.0.0 (su2.stanford.edu)
 
 -------------------------------------------------------------------------
-| Stanford University Unstructured (SU2).                               | 
-| Copyright (C) 2012-2013 Aerospace Design Laboratory (ADL).            |
+| SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).       |
 | SU2 is distributed in the hope that it will be useful,                |
 | but WITHOUT ANY WARRANTY; without even the implied warranty of        |
 | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |
