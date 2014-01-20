@@ -143,19 +143,11 @@ unsigned long CSysSolve::ConjugateGradient(const CSysVector & b, CSysVector & x,
                                            CPreconditioner & precond, double tol, unsigned long m, bool monitoring) {
 	
   int rank = 0;
-#ifndef NO_MPI
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
   
   /*--- Check the subspace size ---*/
   if (m < 1) {
     if (rank == 0) cerr << "CSysSolve::ConjugateGradient: illegal value for subspace size, m = " << m << endl;
-#ifdef NO_MPI
     exit(1);
-#else
-    MPI::COMM_WORLD.Abort(1);
-    MPI::Finalize();
-#endif
   }
   
   CSysVector r(b);
@@ -248,30 +240,17 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
                                 CPreconditioner & precond, double tol, unsigned long m, bool monitoring) {
 	
   int rank = 0;
-#ifndef NO_MPI
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
   
   /*---  Check the subspace size ---*/
   if (m < 1) {
     if (rank == 0) cerr << "CSysSolve::FGMRES: illegal value for subspace size, m = " << m << endl;
-#ifdef NO_MPI
     exit(1);
-#else
-    MPI::COMM_WORLD.Abort(1);
-    MPI::Finalize();
-#endif
   }
   
   /*---  Check the subspace size ---*/
   if (m > 1000) {
     if (rank == 0) cerr << "CSysSolve::FGMRES: illegal value for subspace size (too high), m = " << m << endl;
-#ifdef NO_MPI
     exit(1);
-#else
-    MPI::COMM_WORLD.Abort(1);
-    MPI::Finalize();
-#endif
   }
   
   /*---  Define various arrays
@@ -380,19 +359,11 @@ unsigned long CSysSolve::BCGSTAB(const CSysVector & b, CSysVector & x, CMatrixVe
                                  CPreconditioner & precond, double tol, unsigned long m, bool monitoring) {
 	
   int rank = 0;
-#ifndef NO_MPI
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
   
   /*--- Check the subspace size ---*/
   if (m < 1) {
     if (rank == 0) cerr << "CSysSolve::BCGSTAB: illegal value for subspace size, m = " << m << endl;
-#ifdef NO_MPI
     exit(1);
-#else
-    MPI::COMM_WORLD.Abort(1);
-    MPI::Finalize();
-#endif
   }
 	
   CSysVector r(b);

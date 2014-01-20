@@ -52,13 +52,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
     filename = config->GetFlow_FileName();
   }
   
-  
-#ifndef NO_MPI
-  /*--- Remove the domain number from the surface csv filename ---*/
-  int nProcessor = MPI::COMM_WORLD.Get_size();
-  if (nProcessor > 1) filename.erase (filename.end()-2, filename.end());
-#endif
-  
   strcpy (cstr, filename.c_str());
   
   

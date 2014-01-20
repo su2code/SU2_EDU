@@ -205,27 +205,6 @@ void CVariable::AddConservativeSolution(unsigned short val_var, double val_solut
   
 }
 
-void CVariable::Set_Solution(void) {
-  
-  for (unsigned short iVar = 0; iVar < nVar; iVar++)
-    Solution[iVar] = Solution_Old[iVar];
-  
-}
-
-void CVariable::Set_Solution_time_n(void) {
-  
-  for (unsigned short iVar = 0; iVar < nVar; iVar++)
-    Solution_time_n[iVar] = Solution[iVar];
-  
-}
-
-void CVariable::Set_Solution_time_n1(void) {
-  
-  for (unsigned short iVar = 0; iVar < nVar; iVar++)
-    Solution_time_n1[iVar] = Solution_time_n[iVar];
-  
-}
-
 void CVariable::AddRes_TruncError(double *val_truncation_error) {
   
   for (unsigned short iVar = 0; iVar < nVar; iVar++)
@@ -281,24 +260,10 @@ void CVariable::SetVelSolutionZero(void) {
   
 }
 
-void CVariable::SetVelSolutionVector(double *val_vector) {
-  
-  for (unsigned short iDim = 0; iDim < nDim; iDim++)
-    Solution[iDim+1] = val_vector[iDim];
-  
-}
-
 void CVariable::SetVelSolutionOldZero(void) {
   
   for (unsigned short iDim = 0; iDim < nDim; iDim++)
     Solution_Old[iDim+1] = 0.0;
-  
-}
-
-void CVariable::SetVelSolutionOldVector(double *val_vector) {
-  
-  for (unsigned short iDim = 0; iDim < nDim; iDim++)
-    Solution_Old[iDim+1] = val_vector[iDim];
   
 }
 
@@ -371,15 +336,3 @@ void CVariable::GetResTruncError(double *val_trunc_error) {
     val_trunc_error[iVar] = Res_TruncError[iVar];
   
 }
-
-CBaselineVariable::CBaselineVariable(void) : CVariable() { }
-
-CBaselineVariable::CBaselineVariable(double *val_solution, unsigned short val_nvar, CConfig *config)
-: CVariable(val_nvar, config) {
-  
-  for (unsigned short iVar = 0; iVar < nVar; iVar++)
-    Solution[iVar] = val_solution[iVar];
-  
-}
-
-CBaselineVariable::~CBaselineVariable(void) { }

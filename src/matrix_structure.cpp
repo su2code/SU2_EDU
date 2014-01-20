@@ -299,43 +299,6 @@ void CSysMatrix::AddVal2Diag(unsigned long block_i, double val_matrix) {
   
 }
 
-void CSysMatrix::AddVal2Diag(unsigned long block_i,  double* val_matrix, unsigned short num_dim) {
-  
-  unsigned long step = 0, iVar, iSpecies;
-  
-  for (unsigned long index = row_ptr[block_i]; index < row_ptr[block_i+1]; index++) {
-    step++;
-    if (col_ind[index] == block_i) {	// Only elements on the diagonal
-      for (iVar = 0; iVar < nVar; iVar++) {
-        iSpecies = iVar/(num_dim + 2);
-        matrix[(row_ptr[block_i]+step-1)*nVar*nVar+iVar*nVar+iVar] += val_matrix[iSpecies];
-      }
-      break;
-    }
-  }
-  
-}
-
-void CSysMatrix::AddVal2Diag(unsigned long block_i,  double* val_matrix, unsigned short val_nDim,
-                             unsigned short val_nDiatomics) {
-  
-  unsigned long step = 0, iVar, iSpecies;
-  
-  for (unsigned long index = row_ptr[block_i]; index < row_ptr[block_i+1]; index++) {
-    step++;
-    if (col_ind[index] == block_i) {	// Only elements on the diagonal
-      for (iVar = 0; iVar < nVar; iVar++) {
-        if (iVar < (val_nDim+3)*val_nDiatomics) iSpecies = iVar / (val_nDim+3);
-        else iSpecies = (iVar - (val_nDim+3)*val_nDiatomics) / (val_nDim+2) + val_nDiatomics;
-        matrix[(row_ptr[block_i]+step-1)*nVar*nVar+iVar*nVar+iVar] += val_matrix[iSpecies];
-      }
-      break;
-    }
-  }
-  
-}
-
-
 void CSysMatrix::DeleteValsRowi(unsigned long i) {
   
   unsigned long block_i = i/nVar;
@@ -547,15 +510,6 @@ void CSysMatrix::SendReceive_Solution(CSysVector & x, CGeometry *geometry, CConf
         Buffer_Send[iVertex*nVar+iVar] = x[iPoint*nVar+iVar];
       }
       
-#ifndef NO_MPI
-      
-      /*--- Send/Receive information using Sendrecv ---*/
-      
-      MPI::COMM_WORLD.Sendrecv(Buffer_Send, nBufferS_Vector, MPI::DOUBLE, send_to, 0,
-                               Buffer_Receive, nBufferR_Vector, MPI::DOUBLE, receive_from, 0);
-      
-#else
-      
       /*--- Receive information without MPI ---*/
       
       for (iVertex = 0; iVertex < nVertexR; iVertex++) {
@@ -563,9 +517,7 @@ void CSysMatrix::SendReceive_Solution(CSysVector & x, CGeometry *geometry, CConf
         for (iVar = 0; iVar < nVar; iVar++)
         Buffer_Receive[iVar*nVertexR+iVertex] = Buffer_Send[iVar*nVertexR+iVertex];
       }
-      
-#endif
-      
+            
       /*--- Deallocate send buffer ---*/
       
       delete [] Buffer_Send;
@@ -914,13 +866,8 @@ unsigned short CSysMatrix::BuildLineletPreconditioner(CGeometry *geometry, CConf
   }
   Local_nLineLets = nLinelet;
   
-#ifdef NO_MPI
   Global_nPoints = Local_nPoints;
   Global_nLineLets = Local_nLineLets;
-#else
-  MPI::COMM_WORLD.Allreduce(&Local_nPoints, &Global_nPoints, 1, MPI::UNSIGNED_LONG, MPI::SUM);
-  MPI::COMM_WORLD.Allreduce(&Local_nLineLets, &Global_nLineLets, 1, MPI::UNSIGNED_LONG, MPI::SUM);
-#endif
   
   MeanPoints = int(double(Global_nPoints)/double(Global_nLineLets));
   

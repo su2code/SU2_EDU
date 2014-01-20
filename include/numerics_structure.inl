@@ -159,11 +159,6 @@ inline void CNumerics::SetThermalConductivity(double val_therm_conductivity_i, d
 	Thermal_Conductivity_j = val_therm_conductivity_j;
 }
 
-inline void CNumerics::SetThermalConductivity_ve(double val_therm_conductivity_ve_i, double val_therm_conductivity_ve_j) {
-	Thermal_Conductivity_ve_i = val_therm_conductivity_ve_i;
-	Thermal_Conductivity_ve_j = val_therm_conductivity_ve_j;
-}
-
 inline void CNumerics::SetDiffusionCoeff(double* val_diffusioncoeff_i, double* val_diffusioncoeff_j) {
 	Diffusion_Coeff_i = val_diffusioncoeff_i;
 	Diffusion_Coeff_j = val_diffusioncoeff_j;
@@ -298,16 +293,6 @@ inline void CNumerics::SetGridVel(double *val_gridvel_i, double *val_gridvel_j) 
 inline void CNumerics::SetPressure(double val_pressure_i, double val_pressure_j) {
 	Pressure_i = val_pressure_i;
 	Pressure_j = val_pressure_j;
-}
-
-inline void CNumerics::SetDensityInc(double val_densityinc_i, double val_densityinc_j) {
-	DensityInc_i = val_densityinc_i;
-	DensityInc_j = val_densityinc_j;
-}
-
-inline void CNumerics::SetBetaInc2(double val_betainc2_i, double val_betainc2_j) {
-	BetaInc2_i = val_betainc2_i;
-	BetaInc2_j = val_betainc2_j;
 }
 
 inline void CNumerics::SetSoundSpeed(double val_soundspeed_i, double val_soundspeed_j) {

@@ -48,10 +48,6 @@ inline double *CConfig::GetHold_GridFixed_Coord(void) { return Hold_GridFixed_Co
 
 inline double CConfig::GetMaxDimension(void) { return MaxDimension; }
 
-inline double CConfig::GetRatioDensity(void) { return RatioDensity; }
-
-inline double CConfig::GetRatioViscosity(void) { return RatioViscosity; }
-
 inline unsigned short CConfig::GetAnalytical_Surface(void) { return Analytical_Surface; }
 
 inline double CConfig::GetDualVol_Power(void) { return DualVol_Power; }
@@ -93,10 +89,6 @@ inline double CConfig::GetGas_Constant(void) { return Gas_Constant; }
 inline double CConfig::GetGas_ConstantND(void) { return Gas_ConstantND; }
 
 inline double CConfig::GetWallTemperature(void) { return Wall_Temperature; }
-
-inline double CConfig::GetFreeSurface_Zero(void) { return FreeSurface_Zero; }
-
-inline double CConfig::GetFreeSurface_Depth(void) { return FreeSurface_Depth; }
 
 inline double CConfig::GetGas_Constant_Ref(void) { return Gas_Constant_Ref; }
 

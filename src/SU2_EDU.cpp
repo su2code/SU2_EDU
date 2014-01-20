@@ -34,13 +34,6 @@ int main(int argc, char *argv[]) {
   int rank = MASTER_NODE;
   int size = SINGLE_NODE;
   
-#ifndef NO_MPI
-  /*--- MPI initialization, and buffer setting ---*/
-  MPI::Init(argc, argv);
-  rank = MPI::COMM_WORLD.Get_rank();
-  size = MPI::COMM_WORLD.Get_size();
-#endif
-  
   /*--- Create pointers to all of the classes that may be used throughout
    the SU2_EDU code. In general, the pointers are instantiated down a
    heirarchy over all zones, multigrid levels, equation sets, and equation
@@ -119,11 +112,6 @@ int main(int argc, char *argv[]) {
   
   config_container = new CConfig(config_file_name, SU2_EDU, VERB_HIGH);
   
-#ifndef NO_MPI
-  /*--- Change the name of the input/output files for a parallel computation ---*/
-  config_container->SetFileNameDomain(rank+1);
-#endif
-  
   /*--- Perform the non-dimensionalization for the flow equations using the
    specified reference values. ---*/
   
@@ -147,11 +135,6 @@ int main(int argc, char *argv[]) {
   
   Geometrical_Preprocessing(geometry_container, config_container);
   
-#ifndef NO_MPI
-  /*--- Synchronization point after the geometrical definition subroutine ---*/
-  MPI::COMM_WORLD.Barrier();
-#endif
-  
   if (rank == MASTER_NODE)
     cout << endl <<"------------------------- Solver Preprocessing --------------------------" << endl;
   
@@ -174,11 +157,6 @@ int main(int argc, char *argv[]) {
   
   Solver_Preprocessing(solver_container, geometry_container, config_container);
   
-#ifndef NO_MPI
-  /*--- Synchronization point after the solution preprocessing subroutine ---*/
-  MPI::COMM_WORLD.Barrier();
-#endif
-  
   /*--- Definition of the integration class: integration_container[#EQ_SYSTEMS].
    The integration class orchestrates the execution of the spatial integration
    subroutines contained in the solver class (including multigrid) for computing
@@ -187,11 +165,6 @@ int main(int argc, char *argv[]) {
   
   integration_container = new CIntegration*[MAX_SOLS];
   Integration_Preprocessing(integration_container, geometry_container, config_container);
-  
-#ifndef NO_MPI
-  /*--- Synchronization point after the integration definition subroutine ---*/
-  MPI::COMM_WORLD.Barrier();
-#endif
   
   /*--- Definition of the numerical method class:
    numerics_container[#MG_GRIDS][#EQ_SYSTEMS][#EQ_TERMS].
@@ -203,11 +176,6 @@ int main(int argc, char *argv[]) {
   numerics_container = new CNumerics***[config_container->GetMGLevels()+1];
   Numerics_Preprocessing(numerics_container, solver_container,geometry_container, config_container);
   
-#ifndef NO_MPI
-  /*--- Synchronization point after the solver definition subroutine ---*/
-  MPI::COMM_WORLD.Barrier();
-#endif
-  
   /*--- Surface grid deformation using design variables ---*/
   if (rank == MASTER_NODE) cout << endl << "------------------------- Surface grid deformation ----------------------" << endl;
   
@@ -217,11 +185,6 @@ int main(int argc, char *argv[]) {
   /*--- Surface grid deformation ---*/
   if (rank == MASTER_NODE) cout << "Performing the deformation of the surface grid." << endl;
   surface_movement->SetAirfoil(geometry_container[MESH_0], config_container);
-  
-#ifndef NO_MPI
-  /*--- MPI syncronization point ---*/
-  MPI::COMM_WORLD.Barrier();
-#endif
   
   /*--- Volumetric grid deformation ---*/
   if (rank == MASTER_NODE) cout << endl << "----------------------- Volumetric grid deformation ---------------------" << endl;
@@ -250,12 +213,7 @@ int main(int argc, char *argv[]) {
   if (rank == MASTER_NODE)
     cout << endl <<"------------------------------ Begin Solver -----------------------------" << endl;
   
-#ifdef NO_MPI
   StartTime = double(clock())/double(CLOCKS_PER_SEC);
-#else
-  MPI::COMM_WORLD.Barrier();
-  StartTime = MPI::Wtime();
-#endif
   
   while (ExtIter < config_container->GetnExtIter()) {
     
@@ -274,12 +232,7 @@ int main(int argc, char *argv[]) {
     /*--- Synchronization point after a single solver iteration. Compute the
      wall clock time required. ---*/
     
-#ifdef NO_MPI
     StopTime = double(clock())/double(CLOCKS_PER_SEC);
-#else
-    MPI::COMM_WORLD.Barrier();
-    StopTime = MPI::Wtime();
-#endif
     
     UsedTime = (StopTime - StartTime);
     
@@ -346,12 +299,7 @@ int main(int argc, char *argv[]) {
   /*--- Integration class deallocation ---*/
   //  cout <<"Integration container, deallocated." << endl;
   
-#ifdef NO_MPI
   StopTime = double(clock())/double(CLOCKS_PER_SEC);
-#else
-  MPI::COMM_WORLD.Barrier();
-  StopTime = MPI::Wtime();
-#endif
   
   /*--- Compute/print the total time for performance benchmarking. ---*/
   
@@ -365,11 +313,7 @@ int main(int argc, char *argv[]) {
   
   if (rank == MASTER_NODE)
     cout << endl <<"------------------------- Exit Success (SU2_EDU) ------------------------" << endl << endl;
-  
-  /*--- Finalize MPI parallelization ---*/
-#ifndef NO_MPI
-  MPI::Finalize();
-#endif
+
   
   return EXIT_SUCCESS;
   

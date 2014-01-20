@@ -23,9 +23,6 @@
 
 #pragma once
 
-#ifndef NO_MPI
-#include <mpi.h>
-#endif
 #include <ctime>
 
 #include "solver_structure.hpp"

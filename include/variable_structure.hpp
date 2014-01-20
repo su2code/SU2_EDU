@@ -142,41 +142,14 @@ public:
 	void Set_OldSolution(void);
   
 	/*!
-	 * \brief Set variables to the value of the old variables.
-	 */
-	void Set_Solution(void);
-  
-	/*!
-	 * \brief Set the variable solution at time n.
-	 */
-	void Set_Solution_time_n(void);
-  
-	/*!
-	 * \brief Set the variable solution at time n-1.
-	 */
-	void Set_Solution_time_n1(void);
-  
-	/*!
 	 * \brief Set to zero the velocity components of the solution.
 	 */
 	void SetVelSolutionZero(void);
-  
-  /*!
-	 * \brief Specify a vector to set the velocity components of the solution.
-   * \param[in] val_vector - Pointer to the vector.
-	 */
-	void SetVelSolutionVector(double *val_vector);
   
 	/*!
 	 * \brief Set to zero velocity components of the solution.
 	 */
 	void SetVelSolutionOldZero(void);
-  
-  /*!
-	 * \brief Specify a vector to set the velocity components of the old solution.
-   * \param[in] val_vector - Pointer to the vector.
-	 */
-	void SetVelSolutionOldVector(double *val_vector);
   
 	/*!
 	 * \brief Set to zero the solution.
@@ -229,18 +202,6 @@ public:
 	double *GetSolution_Old(void);
   
 	/*!
-	 * \brief Get the solution at time n.
-	 * \return Pointer to the solution (at time n) vector.
-	 */
-	double *GetSolution_time_n(void);
-  
-	/*!
-	 * \brief Get the solution at time n-1.
-	 * \return Pointer to the solution (at time n-1) vector.
-	 */
-	double *GetSolution_time_n1(void);
-  
-	/*!
 	 * \brief Set the value of the old residual.
 	 * \param[in] val_residual_old - Pointer to the residual vector.
 	 */
@@ -256,11 +217,6 @@ public:
 	 * \brief Set summed residual vector to zero value.
 	 */
 	void SetResidualSumZero(void);
-  
-  /*!
-	 * \brief Set the velocity of the truncation error to zero.
-	 */
-	virtual void SetVel_ResTruncError_Zero(unsigned short iSpecies);
   
 	/*!
 	 * \brief Get the value of the summed residual.
@@ -505,24 +461,10 @@ public:
 	void SetDelta_Time(double val_delta_time);
   
 	/*!
-	 * \brief Set the value of the time step.
-	 * \param[in] val_delta_time - Value of the time step.
-	 * \param[in] iSpecies - Index of the Species .
-	 */
-	virtual void SetDelta_Time(double val_delta_time, unsigned short iSpecies);
-  
-	/*!
 	 * \brief Get the value of the time step.
 	 * \return Value of the time step.
 	 */
 	double GetDelta_Time(void);
-  
-	/*!
-	 * \brief Get the value of the time step.
-	 * \param[in] iSpecies - Index of the Species
-	 * \return Value of the time step.
-	 */
-	virtual double GetDelta_Time(unsigned short iSpecies);
   
 	/*!
 	 * \brief Set the value of the maximum eigenvalue.
@@ -599,24 +541,10 @@ public:
 	void SetLambda(double val_lambda);
   
 	/*!
-	 * \brief Set the value of the spectral radius.
-	 * \param[in] val_lambda - Value of the spectral radius.
-	 * \param[in] val_iSpecies -Index of species
-	 */
-	virtual void SetLambda(double val_lambda, unsigned short val_iSpecies);
-  
-	/*!
 	 * \brief Add the value of the spectral radius.
 	 * \param[in] val_lambda - Value of the spectral radius.
 	 */
 	void AddLambda(double val_lambda);
-  
-	/*!
-	 * \brief Add the value of the spectral radius.
-	 * \param[in] val_iSpecies -Index of species
-	 * \param[in] val_lambda - Value of the spectral radius.
-	 */
-	virtual void AddLambda(double val_lambda, unsigned short val_iSpecies);
   
 	/*!
 	 * \brief Get the value of the spectral radius.
@@ -625,37 +553,16 @@ public:
 	double GetLambda(void);
   
 	/*!
-	 * \brief Get the value of the spectral radius.
-	 * \param[in] val_iSpecies -Index of species
-	 * \return Value of the spectral radius.
-	 */
-	virtual double GetLambda(unsigned short val_iSpecies);
-  
-	/*!
 	 * \brief Set pressure sensor.
 	 * \param[in] val_sensor - Value of the pressure sensor.
 	 */
 	void SetSensor(double val_sensor);
   
 	/*!
-	 * \brief Set pressure sensor.
-	 * \param[in] val_sensor - Value of the pressure sensor.
-	 * \param[in] val_sensor - Index of the Species.
-	 */
-	virtual void SetSensor(double val_sensor, unsigned short iSpecies);
-  
-	/*!
 	 * \brief Get the pressure sensor.
 	 * \return Value of the pressure sensor.
 	 */
 	double GetSensor(void);
-  
-	/*!
-	 * \brief Get the pressure sensor.
-	 * \param[in] iSpecies - index of species
-	 * \return Value of the pressure sensor.
-	 */
-	virtual double GetSensor(unsigned short iSpecies);
   
 	/*!
 	 * \brief Set the value of the undivided laplacian of the solution.
@@ -713,12 +620,6 @@ public:
 	 * \return Value of the flow density.
 	 */
 	virtual double GetDensity(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the flow density.
-	 */
-	virtual double GetDensity(unsigned short val_iSpecies);
   
   /*!
 	 * \brief A virtual member.
@@ -790,18 +691,6 @@ public:
 	 */
 	virtual double GetSoundSpeed(void);
   
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the density for the incompressible flow.
-	 */
-	virtual double GetDensityInc(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \return Value of the levelset for the freesurface flows.
-	 */
-	virtual double GetLevelSet(void);
-  
   /*!
 	 * \brief A virtual member.
 	 * \return Value of the distance for the freesurface flows.
@@ -810,33 +699,9 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \return Value of the beta for the incompressible flow.
-	 */
-	virtual double GetBetaInc2(void);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \return Value of the temperature.
 	 */
 	virtual double GetTemperature(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \return Value of the vibrational-electronic temperature.
-	 */
-	virtual double GetTemperature_ve(void);
-  
-  /*!
-   * \brief A virtual member -- Get the mixture specific heat at constant volume (trans.-rot.).
-   * \return \f$\rho C^{t-r}_{v} \f$
-   */
-  virtual double GetRhoCv_tr(void);
-  
-  /*!
-   * \brief A virtual member -- Get the mixture specific heat at constant volume (vib.-el.).
-   * \return \f$\rho C^{v-e}_{v} \f$
-   */
-  virtual double GetRhoCv_ve(void);
   
   /*!
 	 * \brief A virtual member.
@@ -863,18 +728,6 @@ public:
 	 */
 	virtual double GetLaminarViscosity(void);
   
-	/*!
-	 * \brief A virtual member.
-	 * \return The laminar viscosity of the incompressible flow.
-	 */
-	virtual double GetLaminarViscosityInc(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return The laminar viscosity of the flow.
-	 */
-	virtual double GetLaminarViscosity(unsigned short iSpecies);
-  
   /*!
    * \brief A virtual member.
    * \return Value of the species diffusion coefficient.
@@ -886,12 +739,6 @@ public:
    * \return Value of the thermal conductivity (translational/rotational)
    */
   virtual double GetThermalConductivity(void);
-  
-  /*!
-   * \brief A virtual member.
-   * \return Value of the thermal conductivity (vibrational)
-   */
-  virtual double GetThermalConductivity_ve(void);
   
 	/*!
 	 * \brief A virtual member.
@@ -930,12 +777,6 @@ public:
 	 */
 	virtual void SetEddyViscosity(double eddy_visc);
   
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_eddy_viscosity - Value of the eddy viscosity.
-	 */
-	virtual void SetEddyViscosityInc(double eddy_visc);
-  
 	/*!
 	 * \brief A virtual member.
 	 */
@@ -950,26 +791,11 @@ public:
 	 * \brief A virtual member.
 	 */
 	virtual bool SetPrimVar_Compressible(double SharpEdge_Distance, bool check, CConfig *config);
-	
-  /*!
-	 * \brief A virtual member.
-	 */
-	virtual bool SetPrimVar_Incompressible(double SharpEdge_Distance, bool check, CConfig *config);
   
 	/*!
 	 * \brief A virtual member.
 	 */
 	virtual bool SetPrimVar_Compressible(double eddy_visc, double turb_ke, CConfig *config);
-	
-	/*!
-	 * \brief A virtual member.
-	 */
-	virtual bool SetPrimVar_Incompressible(double Density_Inf, CConfig *config);
-	
-	/*!
-	 * \brief A virtual member.
-	 */
-	virtual bool SetPrimVar_Incompressible(double Density_Inf, double Viscosity_Inf, double eddy_visc, double turb_ke, CConfig *config);
 	
 	/*!
 	 * \brief A virtual member.
@@ -1121,12 +947,6 @@ public:
 	virtual bool SetTemperature(double Gas_Constant);
   
   /*!
-	 * \brief Sets the vibrational electronic temperature of the flow.
-	 * \return Value of the temperature of the flow.
-	 */
-  virtual bool SetTemperature_ve(double val_Tve);
-  
-  /*!
 	 * \brief A virtual member.
 	 * \param[in] config - Configuration parameters.
 	 */
@@ -1222,12 +1042,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	virtual void SetLaminarViscosity(CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_laminar_viscosity_inc - Value of the laminar viscosity (incompressible flows).
-	 */
-	virtual void SetLaminarViscosityInc(double val_laminar_viscosity_inc);
   
 	/*!
 	 * \brief A virtual member.
@@ -1350,20 +1164,6 @@ public:
 	virtual void SetmuT(double val_muT);
   
 	/*!
-	 * \brief Add a value to the maximum eigenvalue for the inviscid terms of the PDE.
-	 * \param[in] val_max_lambda - Value of the maximum eigenvalue for the inviscid terms of the PDE.
-	 * \param[in] iSpecies - Value of iSpecies to which the eigenvalue belongs
-	 */
-	virtual void AddMax_Lambda_Inv(double val_max_lambda, unsigned short iSpecies);
-  
-	/*!
-	 * \brief Add a value to the maximum eigenvalue for the viscous terms of the PDE.
-	 * \param[in] val_max_lambda - Value of the maximum eigenvalue for the viscous terms of the PDE.
-	 * \param[in] iSpecies - Value of iSpecies to which the eigenvalue belongs
-	 */
-	virtual void AddMax_Lambda_Visc(double val_max_lambda, unsigned short iSpecies);
-  
-	/*!
 	 * \brief A virtual member.
 	 * \param[in] val_difflevelset - Value of the diff level set (value-target).
 	 */
@@ -1456,35 +1256,6 @@ public:
 	 * \return Pointer to the direct solution vector.
 	 */
 	virtual double *GetSolution_Direct(void);
-  
-};
-
-/*!
- * \class CBaselineVariable
- * \brief Main class for defining the variables of a baseline solution from a restart file (for output).
- * \author F. Palacios, T. Economon.
- * \version 1.0.0
- */
-class CBaselineVariable : public CVariable {
-public:
-  
-	/*!
-	 * \brief Constructor of the class.
-	 */
-	CBaselineVariable(void);
-  
-	/*!
-	 * \overload
-	 * \param[in] val_solution - Pointer to the flow value (initialization value).
-	 * \param[in] val_nvar - Number of variables of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CBaselineVariable(double *val_solution, unsigned short val_nvar, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	virtual ~CBaselineVariable(void);
   
 };
 
@@ -1625,11 +1396,6 @@ public:
 	bool SetPrimVar_Compressible(CConfig *config);
 	
 	/*!
-	 * \brief Set all the primitive variables for incompressible flows.
-	 */
-	bool SetPrimVar_Incompressible(double Density_Inf, CConfig *config);
-	
-	/*!
 	 * \brief Get the primitive variables.
 	 * \param[in] val_var - Index of the variable.
 	 * \return Value of the primitive variable for the index <i>val_var</i>.
@@ -1656,31 +1422,11 @@ public:
 	 * \return Pointer to the primitive variable vector.
 	 */
 	double *GetPrimVar(void);
-	
-	/*!
-	 * \brief Set the value of the density for the incompressible flows.
-	 */
-	void SetDensityInc(double val_density);
   
   /*!
 	 * \brief Set the value of the density for the incompressible flows.
 	 */
 	bool SetDensity(void);
-  
-  /*!
-	 * \brief Set the value of the density for the incompressible flows.
-	 */
-	void SetPressureInc(void);
-  
-  /*!
-	 * \brief Set the value of the density for the incompressible flows.
-	 */
-	void SetVelocityInc(void);
-  
-	/*!
-	 * \brief Set the value of the beta coeffient for incompressible flows.
-	 */
-	void SetBetaInc2(double val_betainc2);
   
 	/*!
 	 * \brief Set the value of the temperature.
@@ -1712,29 +1458,11 @@ public:
 	 */
 	double GetSoundSpeed(void);
   
-	/*!
-	 * \brief Get the value of density for the incompressible flow
-	 * \return Value of beta squared.
-	 */
-	double GetDensityInc(void);
-  
-  /*!
-	 * \brief Get the value of levelset for the freesurface flows
-	 * \return Value of beta squared.
-	 */
-	double GetLevelSet(void);
-  
   /*!
 	 * \brief Get the value of distance for the freesurface flows
 	 * \return Value of beta squared.
 	 */
 	double GetDistance(void);
-  
-	/*!
-	 * \brief Get the value of beta squared for the incompressible flow
-	 * \return Value of beta squared.
-	 */
-	double GetBetaInc2(void);
   
 	/*!
 	 * \brief Get the enthalpy of the flow.
@@ -1860,12 +1588,6 @@ public:
 	void SetLaminarViscosity(CConfig *config);
   
 	/*!
-	 * \overload
-	 * \param[in] val_laminar_viscosity_inc - Value of the laminar viscosity (incompressible flows).
-	 */
-	void SetLaminarViscosityInc(double val_laminar_viscosity_inc);
-  
-	/*!
 	 * \brief Set the vorticity value.
 	 */
 	void SetVorticity(void);
@@ -1881,23 +1603,11 @@ public:
 	 */
 	void SetEddyViscosity(double eddy_visc);
   
-  /*!
-	 * \overload
-	 * \param[in] val_eddy_viscosity - Value of the eddy viscosity.
-	 */
-	void SetEddyViscosityInc(double eddy_visc);
-  
 	/*!
 	 * \brief Get the laminar viscosity of the flow.
 	 * \return Value of the laminar viscosity of the flow.
 	 */
 	double GetLaminarViscosity(void);
-  
-	/*!
-	 * \brief Get the laminar viscosity of the incompressible flow.
-	 * \return Value of the laminar viscosity of the incompressible flow.
-	 */
-	double GetLaminarViscosityInc(void);
   
 	/*!
 	 * \brief Get the eddy viscosity of the flow.
@@ -1938,11 +1648,6 @@ public:
 	 * \brief Set all the primitive variables for compressible flows
 	 */
 	bool SetPrimVar_Compressible(double eddy_visc, double turb_ke, CConfig *config);
-	
-	/*!
-	 * \brief Set all the primitive variables for incompressible flows
-	 */
-	bool SetPrimVar_Incompressible(double Density_Inf, double Viscosity_Inf, double eddy_visc, double turb_ke, CConfig *config);
 
 };
 

@@ -23,9 +23,6 @@
 
 #pragma once
 
-#ifndef NO_MPI
-#include <mpi.h>
-#endif
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
@@ -63,8 +60,6 @@ private:
 	OneShot,				/*!< \brief Flag to know if the code is solving a one shot problem. */
 	Linearized,				/*!< \brief Flag to know if the code is solving a linearized problem. */
 	Grid_Movement,			/*!< \brief Flag to know if there is grid movement. */
-    Wind_Gust,              /*!< \brief Flag to know if there is a wind gust. */
-    Aeroelastic_Simulation, /*!< \brief Flag to know if there is an aeroelastic simulation. */
 	Rotating_Frame,			/*!< \brief Flag to know if there is a rotating frame. */
 	PoissonSolver,			/*!< \brief Flag to know if we are solving  poisson forces  in plasma solver. */
 	Low_Mach_Precon,		/*!< \brief Flag to know if we are using a low Mach number preconditioner. */
@@ -99,12 +94,6 @@ private:
 	unsigned short Continuous_Eqns;	/*!< \brief Which equations to treat continuously (Hybrid adjoint) */
 	unsigned short Discrete_Eqns;	/*!< \brief Which equations to treat discretely (Hybrid adjoint). */
 	unsigned short *Design_Variable; /*!< \brief Kind of design variable. */
-	double RatioDensity,				/*!< \brief Ratio of density for a free surface problem. */
-	RatioViscosity,				/*!< \brief Ratio of viscosity for a free surface problem. */
-	FreeSurface_Thickness,  /*!< \brief Thickness of the interfase for a free surface problem. */
-	FreeSurface_Outlet,  /*!< \brief Outlet of the interfase for a free surface problem. */
-	FreeSurface_Damping_Coeff,  /*!< \brief Damping coefficient of the free surface for a free surface problem. */
-	FreeSurface_Damping_Length;  /*!< \brief Damping length of the free surface for a free surface problem. */
 	unsigned short Kind_Adaptation;	/*!< \brief Kind of numerical grid adaptation. */
 	unsigned short nTimeInstances;  /*!< \brief Number of periodic time instances for Time Spectral integration. */
 	double TimeSpectral_Period;		/*!< \brief Period of oscillation to be used with time-spectral computations. */
@@ -445,8 +434,6 @@ private:
 	SurfLinCoeff_FileName,			/*!< \brief Output file with the linearized variables on the surface. */
 	New_SU2_FileName;        		/*!< \brief Output SU2 mesh file converted from CGNS format. */
 	bool CGNS_To_SU2;      		 	/*!< \brief Flag to specify whether a CGNS mesh is converted to SU2 format. */
-	unsigned short nSpecies, 		/*!< \brief No of species present in plasma */
-	nReactions;									/*!< \brief Number of reactions in chemical model. */
 	bool Wrt_Vol_Sol,                /*!< \brief Write a volume solution file */
 	Wrt_Srf_Sol,                /*!< \brief Write a surface solution file */
 	Wrt_Restart,                /*!< \brief Write a restart solution file */
@@ -454,39 +441,13 @@ private:
 	Wrt_Residuals,              /*!< \brief Write residuals to solution file */
   Wrt_Halo,                   /*!< \brief Write rind layers in solution files */
   Wrt_Sectional_Forces;       /*!< \brief Write sectional forces for specified markers. */
-	double *ArrheniusCoefficient,					/*!< \brief Arrhenius reaction coefficient */
-	*ArrheniusEta,								/*!< \brief Arrhenius reaction temperature exponent */
-	*ArrheniusTheta,							/*!< \brief Arrhenius reaction characteristic temperature */
-	*CharVibTemp,									/*!< \brief Characteristic vibrational temperature for e_vib */
-  *RotationModes,				/*!< \brief Rotational modes of energy storage */
-  *Ref_Temperature,   			/*!< \brief Reference temperature for thermodynamic relations */
-  *Tcf_a,   /*!< \brief Rate controlling temperature exponent (fwd) */
-  *Tcf_b,   /*!< \brief Rate controlling temperature exponent (fwd) */
-  *Tcb_a,   /*!< \brief Rate controlling temperature exponent (bkw) */
-  *Tcb_b,   /*!< \brief Rate controlling temperature exponent (bkw) */
-  *Diss;                /*!< \brief Dissociation potential. */
-	unsigned short nMass,                 /*!< \brief No of particle masses */
-	nTemp;						/*!< \brief No of freestream temperatures specified */
 	bool Inlet_Outlet_Defined; /*!< \brief  that inlet and outlet conditions are defined for each species*/
-	double *Particle_Mass,					/*!< \brief Mass of all particles present in the plasma */
-	*Molar_Mass,								/*!< \brief Molar mass of species in the plasma [kg/kmol] */
-	Mixture_Molar_mass,				/*!< \brief Molar mass of the multi-species fluid [kg/kmol] */
-	*Gas_Composition,					/*!< \brief Initial mass fractions of flow [dimensionless] */
-	*Enthalpy_Formation,			/*!< \brief Enthalpy of formation */
-	**Blottner,               /*!< \brief Blottner viscosity coefficients */
-	*Species_Ref_Temperature,	/*!< \brief Reference Temperature for viscosity of all particles present in the plasma */
-	*Species_Ref_Viscosity;		/*!< \brief Reference viscosity  of all particles present in the plasma */
-  unsigned short *nElStates; /*!< \brief Number of electron states. */
-  double **CharElTemp, /*!< \brief Characteristic temperature of electron states. */
-  **degen; /*!< \brief Degeneracy of electron states. */
 	double Gamma,			/*!< \brief Ratio of specific heats of the gas. */
 	Bulk_Modulus,			/*!< \brief Value of the bulk modulus for incompressible flows. */ 
 	ArtComp_Factor,			/*!< \brief Value of the artificial compresibility factor for incompressible flows. */
 	Gas_Constant,     /*!< \brief Specific gas constant. */
 	Gas_ConstantND,     /*!< \brief Non-dimensional specific gas constant. */
 	Gas_Constant_Ref, /*!< \brief Reference specific gas constant. */
-	FreeSurface_Zero,	/*!< \brief Coordinate of the level set zero. */
-	FreeSurface_Depth,	/*!< \brief Coordinate of the level set zero. */
 	*Velocity_FreeStream,     /*!< \brief Total velocity of the fluid.  */
 	Density_FreeStream,     /*!< \brief Total density of the fluid.  */
 	Viscosity_FreeStream,     /*!< \brief Total density of the fluid.  */
@@ -517,9 +478,6 @@ private:
 	*Velocity_FreeStreamND,    /*!< \brief Farfield velocity values (external flow). */
 	Energy_FreeStreamND,       /*!< \brief Farfield energy value (external flow). */
 	Viscosity_FreeStreamND;    /*!< \brief Farfield viscosity value (external flow). */
-	int ***Reactions;					/*!< \brief Reaction map for chemically reacting, multi-species flows. */
-	double ***Omega00,        /*!< \brief Collision integrals (Omega(0,0)) */
-	***Omega11;                  /*!< \brief Collision integrals (Omega(1,1)) */
 	bool Write_Converted_Mesh; /*!< \brief Flag to specify whether a new mesh should be written in the converted units. */
 	double ElasticyMod,			/*!< \brief Young's modulus of elasticity. */
 	PoissonRatio,						/*!< \brief Poisson's ratio. */
@@ -580,20 +538,6 @@ private:
 	nPlunging_Ampl_Z,           /*!< \brief Number of Plunging amplitudes in the z-direction. */
   nMoveMotion_Origin,         /*!< \brief Number of motion origins. */
   *MoveMotion_Origin;         /*!< \brief Keeps track if we should move moment origin. */
-	double *Aeroelastic_np1, /*!< \brief Structural source terms used for Aeroelastic computation at time level n+1. */
-	*Aeroelastic_n, /*!< \brief Structural source terms used for Aeroelastic computation at time level n. */
-	*Aeroelastic_n1; /*!< \brief Structural Source terms used for Aeroelastic computation at time level n-1. */
-  double FreqPlungeAeroelastic, /*!< \brief Plunging natural frequency for Aeroelastic. */
-	FreqPitchAeroelastic; /*!< \brief Pitch natural frequency for Aeroelastic. */
-  double *Aeroelastic_plunge, /*!< \brief Value of plunging coordinate at the end of an external iteration. */
-	*Aeroelastic_pitch; /*!< \brief Value of pitching coordinate at the end of an external iteration. */
-  unsigned short Gust_Type,	/*!< \brief Type of Gust. */
-  Gust_Dir;   /*!< \brief Direction of the gust */
-  double Gust_WaveLength,     /*!< \brief The gust wavelength. */
-  Gust_Periods,              /*!< \brief Number of gust periods. */
-  Gust_Ampl,                  /*!< \brief Gust amplitude. */
-  Gust_Begin_Time,            /*!< \brief Time at which to begin the gust. */
-  Gust_Begin_Loc;             /*!< \brief Location at which the gust begins. */
 
   bool ExtraOutput;
 
@@ -1033,18 +977,6 @@ public:
 	 * \return Value of the artificial compresibility factor.
 	 */
 	double GetArtComp_Factor(void);
-
-	/*! 
-	 * \brief Get the Level set zero for free surface .
-	 * \return Value of the level set zero coordinate
-	 */
-	double GetFreeSurface_Zero(void);
-
-	/*!
-	 * \brief Get the Level set zero for free surface .
-	 * \return Value of the level set zero coordinate
-	 */
-	double GetFreeSurface_Depth(void);
 
 	/*! 
 	 * \brief Get the value of specific gas constant.

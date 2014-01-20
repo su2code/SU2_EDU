@@ -28,10 +28,6 @@ void MeanFlowIteration(COutput *output, CIntegration **integration_container, CG
   unsigned long IntIter = 0; config_container->SetIntIter(IntIter);
   unsigned long ExtIter = config_container->GetExtIter();
   
-#ifndef NO_MPI
-	int rank = MPI::COMM_WORLD.Get_rank();
-#endif
-  
   /*--- Set the value of the internal iteration ---*/
   
   IntIter = ExtIter;

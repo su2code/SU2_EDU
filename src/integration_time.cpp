@@ -204,10 +204,6 @@ void CMultiGridIntegration::GetProlongated_Correction(unsigned short RunTime_EqS
     }
   }
   
-  /*--- MPI the set solution old ---*/
-  
-  sol_coarse->Set_MPI_Solution_Old(geo_coarse, config);
-  
   for (Point_Coarse = 0; Point_Coarse < geo_coarse->GetnPointDomain(); Point_Coarse++) {
     for (iChildren = 0; iChildren < geo_coarse->node[Point_Coarse]->GetnChildren_CV(); iChildren++) {
       Point_Fine = geo_coarse->node[Point_Coarse]->GetChildren_CV(iChildren);
@@ -308,10 +304,6 @@ void CMultiGridIntegration::SetProlongated_Correction(CSolver *sol_fine, CGeomet
     sol_fine->node[Point_Fine]->SetSolution(Solution);
   }
   
-  /*--- MPI the new interpolated solution ---*/
-  
-  sol_fine->Set_MPI_Solution(geo_fine, config);
-  
   delete [] Solution;
   
 }
@@ -405,10 +397,6 @@ void CMultiGridIntegration::SetRestricted_Solution(unsigned short RunTime_EqSyst
       }
     }
   }
-  
-  /*--- MPI the new interpolated solution ---*/
-  
-  sol_coarse->Set_MPI_Solution(geo_coarse, config);
   
   delete [] Solution;
   
@@ -515,10 +503,6 @@ void CSingleGridIntegration::SetRestricted_Solution(unsigned short RunTime_EqSys
     sol_coarse[SolContainer_Position]->node[Point_Coarse]->SetSolution(Solution);
     
   }
-  
-  /*--- MPI the new interpolated solution ---*/
-  
-  sol_coarse[SolContainer_Position]->Set_MPI_Solution(geo_coarse, config);
   
   /*--- Update solution at the no slip wall boundary ---*/
   

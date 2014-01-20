@@ -24,55 +24,15 @@
 
 inline void CSolver::SetIterLinSolver(unsigned short val_iterlinsolver) { IterLinSolver = val_iterlinsolver; }
 
-inline unsigned short CSolver::GetnSpecies(void) { return 0; }
-
-inline void CSolver::Set_MPI_Solution_Gradient(CGeometry *geometry, CConfig *config) { }
-
-inline void CSolver::Set_MPI_Solution(CGeometry *geometry, CConfig *config) { }
-
-inline void CSolver::Set_MPI_Primitive(CGeometry *geometry, CConfig *config) { }
-
-inline void CSolver::Set_MPI_Solution_Old(CGeometry *geometry, CConfig *config) { }
-
-inline void CSolver::Set_MPI_Solution_Limiter(CGeometry *geometry, CConfig *config) { }
-
-inline void CSolver::Set_MPI_Primitive_Limiter(CGeometry *geometry, CConfig *config) { }
-
 inline unsigned short CSolver::GetIterLinSolver(void) { return IterLinSolver; }
-
-inline double CSolver::GetCSensitivity(unsigned short val_marker, unsigned short val_vertex) { return 0; }
-
-inline void CSolver::SetFreeSurface_Distance(CGeometry *geometry, CConfig *config) { }
-
-inline void CSolver::SetFEA_Load(CSolver ***flow_solution, CGeometry **fea_geometry, CGeometry **flow_geometry, CConfig *fea_config, CConfig *flow_config) { }
 
 inline void CSolver::GetSurface_Pressure(CGeometry *geometry, CConfig *config) { }
 
 inline void CSolver::SetInitialCondition(CGeometry **geometry, CSolver ***solver_container, CConfig *config, unsigned long ExtIter) { }
 
-inline void CSolver::SetFlow_Displacement(CGeometry **flow_geometry, CVolumetricMovement *flow_grid_movement, CConfig *flow_config, CConfig *fea_config, CGeometry **fea_geometry, CSolver ***fea_solution) { }
-
-inline void CSolver::SetCSensitivity(unsigned short val_marker, unsigned short val_vertex, double val_sensitivity) { }
-
-inline void CSolver::Inviscid_Sensitivity(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config) { }
-
-inline void CSolver::Smooth_Sensitivity(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config) { }
-
-inline void CSolver::Viscous_Sensitivity(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config) { }
-
-inline double CSolver::GetPhi_Inf(unsigned short val_dim) { return 0; }
-
-inline double CSolver::GetPsiRho_Inf(void) { return 0; }
-
-inline double* CSolver::GetPsiRhos_Inf(void) { return NULL; }
-
-inline double CSolver::GetPsiE_Inf(void) { return 0; }
-
 inline void CSolver::SetPrimVar_Gradient_GG(CGeometry *geometry, CConfig *config) { }
 
 inline void CSolver::SetPrimVar_Gradient_LS(CGeometry *geometry, CConfig *config) { }
-
-inline void CSolver::Set_MPI_Primitive_Gradient(CGeometry *geometry, CConfig *config) { }
 
 inline void CSolver::SetPrimVar_Limiter_MPI(CGeometry *geometry, CConfig *config) { }
 
@@ -97,14 +57,6 @@ inline double CSolver::GetSurface_CMx(unsigned short val_marker) { return 0; }
 inline double CSolver::GetSurface_CMy(unsigned short val_marker) { return 0; }
 
 inline double CSolver::GetSurface_CMz(unsigned short val_marker) { return 0; }
-
-inline double CSolver::GetFanFace_MassFlow(unsigned short val_marker) { return 0; }
-
-inline double CSolver::GetExhaust_MassFlow(unsigned short val_marker) { return 0; }
-
-inline double CSolver::GetFanFace_Pressure(unsigned short val_marker) { return 0; }
-
-inline double CSolver::GetFanFace_Mach(unsigned short val_marker) { return 0; }
 
 inline double CSolver::GetCSideForce_Inv(unsigned short val_marker) { return 0; }
 
@@ -132,10 +84,6 @@ inline double CSolver::GetAllBound_CSideForce_Visc() { return 0; }
 
 inline double CSolver::GetAllBound_CDrag_Visc() { return 0; }
 
-inline void CSolver::SetForceProj_Vector(CGeometry *geometry, CSolver **solver_container, CConfig *config) { }
-
-inline void CSolver::SetIntBoundary_Jump(CGeometry *geometry, CSolver **solver_container, CConfig *config) { }
-
 inline double CSolver::GetTotal_CLift() { return 0; }
 
 inline double CSolver::GetTotal_CDrag() { return 0; }
@@ -156,49 +104,13 @@ inline double CSolver::GetTotal_CSideForce() { return 0; }
 
 inline double CSolver::GetTotal_CEff() { return 0; }
 
-inline double CSolver::GetTotal_CT() { return 0; }
-
-inline void CSolver::SetTotal_CT(double val_Total_CT) { }
-
-inline double CSolver::GetTotal_CQ() { return 0; }
-
-inline double CSolver::GetTotal_Q() { return 0; }
-
-inline double CSolver::GetTotal_MaxQ() { return 0; }
-
 inline double CSolver::Get_PressureDrag() { return 0; }
 
 inline double CSolver::Get_ViscDrag() { return 0; }
 
-inline void CSolver::SetTotal_CQ(double val_Total_CQ) { }
-
-inline void CSolver::SetTotal_Q(double val_Total_Q) { }
-
-inline void CSolver::SetTotal_MaxQ(double val_Total_Q) { }
-
-inline double CSolver::GetTotal_CMerit() { return 0; }
-
-inline double CSolver::GetTotal_CEquivArea() { return 0; }
-
-inline double CSolver::GetTotal_CFreeSurface() { return 0; }
-
-inline double CSolver::GetTotal_CFEA() { return 0; }
-
-inline double CSolver::GetTotal_CNearFieldOF() { return 0; }
-
-inline void CSolver::SetTotal_CEquivArea(double val_cequivarea) { }
-
-inline void CSolver::SetTotal_CFEA(double val_cfea) { }
-
-inline void CSolver::SetTotal_CFreeSurface(double val_freesurface) { }
-
-inline void CSolver::SetTotal_CNearFieldOF(double val_cnearfieldpress) { }
-
 inline double CSolver::GetTotal_CDeltaLift() { return 0; }
 
 inline double CSolver::GetTotal_CDeltaDrag() { return 0; }
-
-inline double CSolver::GetTotal_CWave() { return 0; }
 
 inline double CSolver::GetTotal_CHeat() { return 0; }
 
@@ -232,16 +144,6 @@ inline void CSolver::Source_Residual(CGeometry *geometry, CSolver **solver_conta
 
 inline void CSolver::Source_Template(CGeometry *geometry, CSolver **solver_container,
                                      CNumerics *numerics, CConfig *config, unsigned short iMesh) { }
-
-inline double CSolver::GetTotal_Sens_Geo() { return 0; }
-
-inline double CSolver::GetTotal_Sens_Mach() { return 0; }
-
-inline double CSolver::GetTotal_Sens_AoA() { return 0; }
-
-inline double CSolver::GetTotal_Sens_Press() { return 0; }
-
-inline double CSolver::GetTotal_Sens_Temp() { return 0; }
 
 inline double CSolver::GetDensity_Inf(void) { return 0; }
 
@@ -337,8 +239,6 @@ inline void CSolver::BC_Dielec(CGeometry *geometry, CSolver **solver_container, 
 inline void CSolver::BC_Electrode(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
                                   CConfig *config, unsigned short val_marker) { }
 
-inline void CSolver::GetNacelle_Properties(CGeometry *geometry, CConfig *config, unsigned short iMesh) { }
-
 inline void CSolver::SetTime_Step(CGeometry *geometry, CSolver **solver_container, CConfig *config,
                                   unsigned short iMesh, unsigned long Iteration) { }
 
@@ -355,15 +255,9 @@ inline void CSolver::Preprocessing(CGeometry *geometry, CSolver **solver_contain
 
 inline void CSolver::SetDissipation_Switch(CGeometry *geometry, CConfig *config) { }
 
-inline void CSolver::Set_MPI_Dissipation_Switch(CGeometry *geometry, CConfig *config) { }
-
 inline void CSolver::SetUndivided_Laplacian(CGeometry *geometry, CConfig *config) { }
 
-inline void CSolver::Set_MPI_Undivided_Laplacian(CGeometry *geometry, CConfig *config) { }
-
 inline void CSolver::SetMax_Eigenvalue(CGeometry *geometry, CConfig *config) { }
-
-inline void CSolver::Set_MPI_MaxEigenvalue(CGeometry *geometry, CConfig *config) { }
 
 inline void CSolver::Inviscid_Forces(CGeometry *geometry, CConfig *config) { }
 
@@ -425,9 +319,6 @@ inline double CSolver::GetMin_Delta_Time(void) { return Min_Delta_Time; }
 inline double CSolver::GetMax_Delta_Time(unsigned short val_Species) { return 0.0; }
 
 inline double CSolver::GetMin_Delta_Time(unsigned short val_Species) { return 0.0; }
-
-inline void CSolver::Copy_Zone_Solution(CSolver ***solver1_solution, CGeometry **solver1_geometry, CConfig *solver1_config,
-                                        CSolver ***solver2_solution, CGeometry **solver2_geometry, CConfig *solver2_config) {};
 
 inline double CEulerSolver::GetDensity_Inlet(void) { return Density_Inlet; }
 
@@ -509,16 +400,6 @@ inline double CEulerSolver::GetTotal_CFz() { return Total_CFz; }
 inline double CEulerSolver::GetTotal_CSideForce() { return Total_CSideForce; }
 
 inline double CEulerSolver::GetTotal_CEff() { return Total_CEff; }
-
-inline double CEulerSolver::GetTotal_CT() { return Total_CT; }
-
-inline double CEulerSolver::GetTotal_Q() { return Total_Q; }
-
-inline double CEulerSolver::GetTotal_MaxQ() { return Total_Maxq; }
-
-inline void CEulerSolver::SetTotal_Q(double val_Total_Q) { Total_Q = val_Total_Q; }
-
-inline void CEulerSolver::SetTotal_MaxQ(double val_Total_MaxQ) { Total_Maxq = val_Total_MaxQ; }
 
 inline void CEulerSolver::SetTotal_CLift(double val_Total_CLift) { Total_CLift = val_Total_CLift; }
 

@@ -92,9 +92,6 @@ void CVolumetricMovement::SetVolume_Deformation(CGeometry *geometry, CConfig *co
   bool Screen_Output = true;
   
   int rank = MASTER_NODE;
-#ifndef NO_MPI
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
   
   /*--- Decide if there is going to be a screen output ---*/
   
@@ -200,10 +197,6 @@ double CVolumetricMovement::Check_Grid(CGeometry *geometry) {
   
   int rank = MASTER_NODE;
   
-#ifndef NO_MPI
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
-  
 	/*--- Load up each triangle and tetrahedron to check for negative volumes. ---*/
   
 	for (iElem = 0; iElem < geometry->GetnElem(); iElem++) {
@@ -257,16 +250,6 @@ double CVolumetricMovement::Check_Grid(CGeometry *geometry) {
     
 	}
   
-#ifndef NO_MPI
-  unsigned long ElemCounter_Local = ElemCounter; ElemCounter = 0;
-  double MaxVolume_Local = MaxVolume; MaxVolume = 0.0;
-  double MinVolume_Local = MinVolume; MinVolume = 0.0;
-  
-  MPI::COMM_WORLD.Allreduce(&ElemCounter_Local, &ElemCounter, 1, MPI::UNSIGNED_LONG, MPI::SUM);
-  MPI::COMM_WORLD.Allreduce(&MaxVolume_Local, &MaxVolume, 1, MPI::DOUBLE, MPI::MAX);
-  MPI::COMM_WORLD.Allreduce(&MinVolume_Local, &MinVolume, 1, MPI::DOUBLE, MPI::MIN);
-#endif
-  
   if ((ElemCounter != 0) && (rank == MASTER_NODE))
     cout <<"There are " << ElemCounter << " elements with negative volume.\n" << endl;
   
@@ -284,9 +267,6 @@ double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) 
   bool RightVol;
   
   int rank = MASTER_NODE;
-#ifndef NO_MPI
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
   
   /*--- Allocate maximum size (rectangle and hexahedron) ---*/
   
@@ -351,11 +331,6 @@ double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) 
       
 	}
   
-#ifndef NO_MPI
-  unsigned long ElemCounter_Local = ElemCounter; ElemCounter = 0;
-  MPI::COMM_WORLD.Allreduce(&ElemCounter_Local, &ElemCounter, 1, MPI::UNSIGNED_LONG, MPI::SUM);
-#endif
-  
   if ((ElemCounter != 0) && (rank == MASTER_NODE))
     cout <<"There are " << ElemCounter << " degenerate elements in the original grid." << endl;
   
@@ -376,11 +351,6 @@ double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) 
   
   /*--- If there are no degenerate cells, use the minimum volume instead ---*/
   if (ElemCounter == 0) MinLength = Scale;
-  
-#ifndef NO_MPI
-  double MinLength_Local = MinLength; MinLength = 0.0;
-  MPI::COMM_WORLD.Allreduce(&MinLength_Local, &MinLength, 1, MPI::DOUBLE, MPI::MIN);
-#endif
       
 	return MinLength;
 }
@@ -1426,12 +1396,6 @@ void CSurfaceMovement::SetSurface_Deformation(CGeometry *geometry, CConfig *conf
   unsigned short iDV;
 	string FFDBoxTag;
   
-  int rank = MASTER_NODE;
-#ifndef NO_MPI
-	/*--- MPI initialization, and buffer setting ---*/
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
-  
   /*--- Apply the design variables to the control point position ---*/
   for (iDV = 0; iDV < config->GetnDV(); iDV++) {
     SetAirfoil(geometry, config);
@@ -1465,7 +1429,6 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   double x_i, x_ip1, y_i, y_ip1;
   string AirfoilFile;
   char AirfoilFormat[15];
-  char MeshOrientation[15];
   char AirfoilClose[15];
   double AirfoilScale = 1.0;
   double TrailingEdge = 0.95;

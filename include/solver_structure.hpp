@@ -25,10 +25,6 @@
 
 #pragma once
 
-#ifndef NO_MPI
-#include <mpi.h>
-#endif
-
 #include <cmath>
 #include <string>
 #include <fstream>
@@ -130,43 +126,11 @@ public:
 	 */
 	void SetIterLinSolver(unsigned short val_iterlinsolver);
   
-	/*!
-	 * \brief Set number of linear solver iterations.
-	 * \param[in] val_iterlinsolver - Number of linear iterations.
-	 */
-	virtual void Set_MPI_Solution(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Set number of linear solver iterations.
-	 * \param[in] val_iterlinsolver - Number of linear iterations.
-	 */
-	virtual void Set_MPI_Primitive(CGeometry *geometry, CConfig *config);
-  
   /*!
 	 * \brief Set the value of the max residual and RMS residual.
 	 * \param[in] val_iterlinsolver - Number of linear iterations.
 	 */
 	void SetResidual_RMS(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Set number of linear solver iterations.
-	 * \param[in] val_iterlinsolver - Number of linear iterations.
-	 */
-	virtual void Set_MPI_Solution_Old(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  virtual void Set_MPI_Solution_Limiter(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  virtual void Set_MPI_Primitive_Limiter(CGeometry *geometry, CConfig *config);
   
 	/*!
 	 * \brief Get number of linear solver iterations.
@@ -308,13 +272,6 @@ public:
 	void SetSolution_Gradient_LS(CGeometry *geometry, CConfig *config);
   
   /*!
-	 * \brief MPI gradients.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  virtual void Set_MPI_Solution_Gradient(CGeometry *geometry, CConfig *config);
-  
-  /*!
 	 * \brief Compute the Least Squares gradient of the grid velocity.
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
@@ -422,21 +379,7 @@ public:
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-	virtual void Set_MPI_Undivided_Laplacian(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
 	virtual void SetMax_Eigenvalue(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void Set_MPI_MaxEigenvalue(CGeometry *geometry, CConfig *config);
   
 	/*!
 	 * \brief A virtual member.
@@ -445,14 +388,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	virtual void SetDissipation_Switch(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void Set_MPI_Dissipation_Switch(CGeometry *geometry, CConfig *config);
   
 	/*!
 	 * \brief A virtual member.
@@ -779,13 +714,6 @@ public:
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-	virtual void Set_MPI_Primitive_Gradient(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
 	virtual void SetPrimVar_Limiter_MPI(CGeometry *geometry, CConfig *config);
   
 	/*!
@@ -848,30 +776,6 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \param[in] val_vertex - Vertex of the marker <i>val_marker</i> where the coefficient is evaluated.
-	 * \param[in] val_sensitivity - Value of the sensitivity coefficient.
-	 */
-	virtual void SetCSensitivity(unsigned short val_marker, unsigned short val_vertex, double val_sensitivity);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetForceProj_Vector(CGeometry *geometry, CSolver **solver_container, CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetIntBoundary_Jump(CGeometry *geometry, CSolver **solver_container, CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \param[in] val_Total_CDrag - Value of the total drag coefficient.
 	 */
 	virtual void SetTotal_CDrag(double val_Total_CDrag);
@@ -884,61 +788,10 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \param[in] val_Total_CT - Value of the total thrust coefficient.
-	 */
-	virtual void SetTotal_CT(double val_Total_CT);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_Total_CQ - Value of the total torque coefficient.
-	 */
-	virtual void SetTotal_CQ(double val_Total_CQ);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_Total_Q - Value of the total heat load.
-	 */
-	virtual void SetTotal_Q(double val_Total_Q);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_Total_MaxQ - Value of the total heat load.
-	 */
-	virtual void SetTotal_MaxQ(double val_Total_MaxQ);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	virtual void SetDistance(CGeometry *geometry, CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void Inviscid_Sensitivity(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void Smooth_Sensitivity(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void Viscous_Sensitivity(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config);
   
 	/*!
 	 * \brief A virtual member.
@@ -1020,34 +873,6 @@ public:
 	/*!
 	 * \brief A virtual member.
 	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the mass flow rate on the surface <i>val_marker</i>.
-	 */
-	virtual double GetFanFace_MassFlow(unsigned short val_marker);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the mass flow rate on the surface <i>val_marker</i>.
-	 */
-	virtual double GetExhaust_MassFlow(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the fan face pressure on the surface <i>val_marker</i>.
-	 */
-	virtual double GetFanFace_Pressure(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the fan face mach on the surface <i>val_marker</i>.
-	 */
-	virtual double GetFanFace_Mach(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
 	 * \return Value of the sideforce coefficient (inviscid contribution) on the surface <i>val_marker</i>.
 	 */
 	virtual double GetCSideForce_Inv(unsigned short val_marker);
@@ -1084,30 +909,6 @@ public:
 	 */
 	virtual double GetTotal_CEff(void);
   
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the thrust coefficient (force in the -x direction, inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_CT(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the torque coefficient (moment in the -x direction, inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_CQ(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \return Value of the heat load (integrated heat flux).
-	 */
-	virtual double GetTotal_Q(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \return Value of the heat load (integrated heat flux).
-	 */
-	virtual double GetTotal_MaxQ(void);
-  
   /*!
 	 * \brief Provide the total (inviscid + viscous) non dimensional drag coefficient.
 	 * \return Value of the drag coefficient (inviscid + viscous contribution).
@@ -1119,60 +920,6 @@ public:
 	 * \return Value of the drag coefficient (inviscid + viscous contribution).
 	 */
 	virtual double Get_ViscDrag(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the rotor Figure of Merit (FM) (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_CMerit(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the Equivalent Area coefficient (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_CEquivArea(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the Free Surface coefficient (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_CFreeSurface(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the FEA coefficient (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_CFEA(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the Near-Field Pressure coefficient (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_CNearFieldOF(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_cequivarea - Value of the Equivalent Area coefficient.
-	 */
-	virtual void SetTotal_CEquivArea(double val_cequivarea);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_cfreesurface - Value of the Free Surface coefficient.
-	 */
-	virtual void SetTotal_CFreeSurface(double val_cfreesurface);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_cfea - Value of the FEA coefficient.
-	 */
-	virtual void SetTotal_CFEA(double val_cfea);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_cnearfieldpress - Value of the Near-Field pressure coefficient.
-	 */
-	virtual void SetTotal_CNearFieldOF(double val_cnearfieldpress);
   
 	/*!
 	 * \brief A virtual member.
@@ -1221,12 +968,6 @@ public:
 	 * \return Value of the force y coefficient (inviscid + viscous contribution).
 	 */
 	virtual double GetTotal_CFz(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the wave strength.
-	 */
-	virtual double GetTotal_CWave(void);
   
 	/*!
 	 * \brief A virtual member.
@@ -1324,66 +1065,6 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \return Value of the adjoint density at the infinity.
-	 */
-	virtual double GetPsiRho_Inf(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \return Value of the adjoint density at the infinity.
-	 */
-	virtual double* GetPsiRhos_Inf(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the adjoint energy at the infinity.
-	 */
-	virtual double GetPsiE_Inf(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_dim - Index of the adjoint velocity vector.
-	 * \return Value of the adjoint velocity vector at the infinity.
-	 */
-	virtual double GetPhi_Inf(unsigned short val_dim);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the geometrical sensitivity coefficient
-	 *         (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_Sens_Geo(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the Mach sensitivity coefficient
-	 *         (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_Sens_Mach(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the angle of attack sensitivity coefficient
-	 *         (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_Sens_AoA(void);
-  
-	/*!
-	 * \brief Set the total farfield pressure sensitivity coefficient.
-	 * \return Value of the farfield pressure sensitivity coefficient
-	 *         (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_Sens_Press(void);
-  
-	/*!
-	 * \brief Set the total farfield temperature sensitivity coefficient.
-	 * \return Value of the farfield temperature sensitivity coefficient
-	 *         (inviscid + viscous contribution).
-	 */
-	virtual double GetTotal_Sens_Temp(void);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \return Value of the density at the infinity.
 	 */
 	virtual double GetDensity_Inf(void);
@@ -1443,14 +1124,6 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \param[in] val_vertex - Vertex of the marker <i>val_marker</i> where the coefficient is evaluated.
-	 * \return Value of the sensitivity coefficient.
-	 */
-	virtual double GetCSensitivity(unsigned short val_marker, unsigned short val_vertex);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \return Value of the density at the inlet.
 	 */
 	virtual double GetDensity_Inlet(void);
@@ -1489,13 +1162,6 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetFreeSurface_Distance(CGeometry *geometry, CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \return A pointer to an array containing a set of constants
 	 */
 	virtual double* GetConstants();
@@ -1513,48 +1179,9 @@ public:
 	 * \param[in] flow_solution - Container vector with all the solutions.
 	 * \param[in] fea_config - Definition of the particular problem.
 	 */
-	virtual void SetFEA_Load(CSolver ***flow_solution, CGeometry **fea_geometry,
-                           CGeometry **flow_geometry, CConfig *fea_config,
-                           CConfig *flow_config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] solver1_geometry - Geometrical definition of the problem.
-	 * \param[in] solver1_solution - Container vector with all the solutions.
-	 * \param[in] solver1_config - Definition of the particular problem.
-	 * \param[in] solver2_geometry - Geometrical definition of the problem.
-	 * \param[in] solver2_solution - Container vector with all the solutions.
-	 * \param[in] solver2_config - Definition of the particular problem.
-	 */
-	virtual void Copy_Zone_Solution(CSolver ***solver1_solution,
-                                  CGeometry **solver1_geometry,
-                                  CConfig *solver1_config,
-                                  CSolver ***solver2_solution,
-                                  CGeometry **solver2_geometry,
-                                  CConfig *solver2_config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] fea_geometry - Geometrical definition of the problem.
-	 * \param[in] flow_solution - Container vector with all the solutions.
-	 * \param[in] fea_config - Definition of the particular problem.
-	 */
 	virtual void SetInitialCondition(CGeometry **geometry,
                                    CSolver ***solver_container,
                                    CConfig *config, unsigned long ExtIter);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] flow_geometry - Geometrical definition of the problem.
-	 * \param[in] flow_grid_movement - Geometrical definition of the problem.
-	 * \param[in] flow_config - Geometrical definition of the problem.
-	 * \param[in] fea_geometry - Definition of the particular problem.
-	 */
-	virtual void SetFlow_Displacement(CGeometry **flow_geometry,
-                                    CVolumetricMovement *flow_grid_movement,
-                                    CConfig *flow_config, CConfig *fea_config,
-                                    CGeometry **fea_geometry,
-                                    CSolver ***fea_solution);
   
 	/*!
 	 * \brief Gauss method for solving a linear system.
@@ -1563,83 +1190,6 @@ public:
 	 * \param[in] nVar - Number of variables.
 	 */
 	void Gauss_Elimination(double** A, double* rhs, unsigned long nVar);
-  
-  /*!
-	 * \brief Get the number of Species present in the flow.
-	 */
-	virtual unsigned short GetnSpecies(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solution - Container vector with all the solutions.
-	 */
-	virtual void GetNacelle_Properties(CGeometry *geometry, CConfig *config, unsigned short iMesh);
-  
-  /*!
-	 * \brief Prepares and solves the aeroelastic equations.
-   * \param[in] surface_movement - Surface movement classes of the problem.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] iter - Current sudo time iteration.
-	 */
-	void Aeroelastic(CSurfaceMovement *surface_movement, CGeometry *geometry, CConfig *config, unsigned long IntIter);
-  
-  
-  /*!
-	 * \brief Sets up the generalized eigenvectors and eigenvalues needed to solve the aeroelastic equations.
-   * \param[in] PHI - Matrix of the generalized eigenvectors.
-   * \param[in] lambda - The eigenvalues of the generalized eigensystem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  void SetUpTypicalSectionWingModel(double (&PHI)[2][2],double (&lambda)[2], CConfig *config);
-  
-  /*!
-	 * \brief Solve the typical section wing model.
-	 * \param[in] geometry - Geometrical definition of the problem.
-   * \param[in] Cl - Coefficient of lift at particular iteration.
-   * \param[in] Cm - Moment coefficient about z-axis at particular iteration.
-	 * \param[in] config - Definition of the particular problem.
-   * \param[in] iter - Sudo time iteration number.
-   * \param[in] val_Marker - Surface that is being monitored.
-   * \param[in] displacements - solution of typical section wing model.
-	 */
-  void SolveTypicalSectionWingModel(CGeometry *geometry, double Cl, double Cm, CConfig *config, unsigned long iter, unsigned short val_Marker, double (&displacements)[4]);
-  
-};
-
-/*!
- * \class CBaselineSolver
- * \brief Main class for defining a baseline solution from a restart file (for output).
- * \author F. Palacios, T. Economon.
- * \version 1.0.0
- */
-class CBaselineSolver : public CSolver {
-public:
-  
-	/*!
-	 * \brief Constructor of the class.
-	 */
-	CBaselineSolver(void);
-  
-	/*!
-	 * \overload
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CBaselineSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Solution(CGeometry *geometry, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	virtual ~CBaselineSolver(void);
   
 };
 
@@ -1747,8 +1297,7 @@ protected:
   Total_Q,    /*!< \brief Total heat load for all the boundaries. */
   Total_Maxq, /*!< \brief Maximum heat flux on all boundaries. */
 	Total_CEquivArea,			/*!< \brief Total Equivalent Area coefficient for all the boundaries. */
-	Total_CNearFieldOF,			/*!< \brief Total Near-Field Pressure coefficient for all the boundaries. */
-  Total_CFreeSurface;			/*!< \brief Total Free Surface coefficient for all the boundaries. */
+	Total_CNearFieldOF;			/*!< \brief Total Free Surface coefficient for all the boundaries. */
   double *Surface_CLift,   /*!< \brief Lift coefficient for each monitoring surface. */
   *Surface_CDrag,          /*!< \brief Drag coefficient for each monitoring surface. */
   *Surface_CMx,            /*!< \brief x Moment coefficient for each monitoring surface. */
@@ -1792,41 +1341,6 @@ public:
 	 * \brief Destructor of the class.
 	 */
 	virtual ~CEulerSolver(void);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Solution(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Solution_Gradient(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Solution_Old(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  void Set_MPI_Solution_Limiter(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  void Set_MPI_Primitive_Limiter(CGeometry *geometry, CConfig *config);
   
 	/*!
 	 * \brief Compute the density at the inlet.
@@ -1997,14 +1511,6 @@ public:
 	 */
 	void SetDissipation_Switch(CGeometry *geometry, CConfig *config);
   
-  /*!
-	 * \brief Parallelization of SetDissipation_Switch.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Dissipation_Switch(CGeometry *geometry, CConfig *config);
-  
 	/*!
 	 * \brief Compute the gradient of the primitive variables using Green-Gauss method,
 	 *        and stores the result in the <i>Gradient_Primitive</i> variable.
@@ -2021,14 +1527,6 @@ public:
 	 */
 	void SetPrimVar_Gradient_LS(CGeometry *geometry, CConfig *config);
   
-  /*!
-	 * \brief Compute the gradient of the primitive variables using a Least-Squares method,
-	 *        and stores the result in the <i>Gradient_Primitive</i> variable.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Primitive_Gradient(CGeometry *geometry, CConfig *config);
-  
 	/*!
 	 * \brief Compute the limiter of the primitive variables.
 	 * \param[in] geometry - Geometrical definition of the problem.
@@ -2044,25 +1542,11 @@ public:
 	void SetUndivided_Laplacian(CGeometry *geometry, CConfig *config);
   
   /*!
-	 * \brief Parallelization of Undivided Laplacian.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Undivided_Laplacian(CGeometry *geometry, CConfig *config);
-  
-  /*!
 	 * \brief Compute the max eigenvalue.
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	void SetMax_Eigenvalue(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Parallelization of the Max eigenvalue.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_MaxEigenvalue(CGeometry *geometry, CConfig *config);
   
 	/*!
 	 * \brief Impose via the residual the Euler wall boundary condition.
@@ -2269,36 +1753,6 @@ public:
 	 * \return Value of the force z coefficient (inviscid + viscous contribution).
 	 */
 	double GetTotal_CFz(void);
-  
-	/*!
-	 * \brief Provide the total (inviscid + viscous) non dimensional thrust coefficient.
-	 * \return Value of the rotor efficiency coefficient (inviscid + viscous contribution).
-	 */
-	double GetTotal_CT(void);
-  
-  /*!
-	 * \brief Provide the total heat load.
-	 * \return Value of the heat load (viscous contribution).
-	 */
-	double GetTotal_Q(void);
-  
-  /*!
-	 * \brief Provide the total heat load.
-	 * \return Value of the heat load (viscous contribution).
-	 */
-	double GetTotal_MaxQ(void);
-  
-  /*!
-	 * \brief Store the total heat load.
-	 * \param[in] val_Total_Q - Value of the heat load.
-	 */
-	void SetTotal_Q(double val_Total_Q);
-  
-  /*!
-	 * \brief Store the total heat load.
-	 * \param[in] val_Total_Q - Value of the heat load.
-	 */
-	void SetTotal_MaxQ(double val_Total_MaxQ);
   
 	/*!
 	 * \brief Store the total (inviscid + viscous) non dimensional drag coefficient.
@@ -2598,34 +2052,6 @@ public:
 	 * \brief Constructor of the class.
 	 */
 	CTurbSolver(CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Solution(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Solution_Old(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Solution_Gradient(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief Impose the send-receive boundary condition.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void Set_MPI_Solution_Limiter(CGeometry *geometry, CConfig *config);
   
 	/*!
 	 * \brief Compute the spatial integration using a upwind scheme.

@@ -156,63 +156,8 @@ CSolver::~CSolver(void) {
 void CSolver::SetResidual_RMS(CGeometry *geometry, CConfig *config) {
   unsigned short iVar;
   
-#ifdef NO_MPI
-  
 	for (iVar = 0; iVar < nVar; iVar++)
   SetRes_RMS(iVar, max(EPS, sqrt(GetRes_RMS(iVar)/geometry->GetnPoint())));
-  
-#else
-  
-  int iProcessor;
-  
-	int nProcessor = MPI::COMM_WORLD.Get_size();
-  double *sbuf_residual, *rbuf_residual;
-  unsigned long *sbuf_point, *rbuf_point, Local_nPointDomain, Global_nPointDomain;
-  
-  /*--- Set the L2 Norm residual in all the processors ---*/
-  sbuf_residual  = new double[nVar]; for (iVar = 0; iVar < nVar; iVar++) sbuf_residual[iVar] = 0.0;
-  rbuf_residual  = new double[nVar]; for (iVar = 0; iVar < nVar; iVar++) rbuf_residual[iVar] = 0.0;
-  
-  for (iVar = 0; iVar < nVar; iVar++) sbuf_residual[iVar] = GetRes_RMS(iVar);
-  Local_nPointDomain = geometry->GetnPointDomain();
-  
-  MPI::COMM_WORLD.Allreduce(sbuf_residual, rbuf_residual, nVar, MPI::DOUBLE, MPI::SUM);
-  MPI::COMM_WORLD.Allreduce(&Local_nPointDomain, &Global_nPointDomain, 1, MPI::UNSIGNED_LONG, MPI::SUM);
-  
-  for (iVar = 0; iVar < nVar; iVar++)
-  SetRes_RMS(iVar, max(EPS, sqrt(rbuf_residual[iVar]/Global_nPointDomain)));
-  
-  delete [] sbuf_residual;
-  delete [] rbuf_residual;
-  
-  /*--- Set the Maximum residual in all the processors ---*/
-  sbuf_residual = new double [nVar]; for (iVar = 0; iVar < nVar; iVar++) sbuf_residual[iVar] = 0.0;
-  sbuf_point = new unsigned long [nVar]; for (iVar = 0; iVar < nVar; iVar++) sbuf_point[iVar] = 0;
-  
-	rbuf_residual = new double [nProcessor*nVar]; for (iVar = 0; iVar < nProcessor*nVar; iVar++) rbuf_residual[iVar] = 0.0;
-	rbuf_point = new unsigned long [nProcessor*nVar]; for (iVar = 0; iVar < nProcessor*nVar; iVar++) rbuf_point[iVar] = 0;
-  
-  for (iVar = 0; iVar < nVar; iVar++) {
-    sbuf_residual[iVar] = GetRes_Max(iVar);
-    sbuf_point[iVar] = GetPoint_Max(iVar);
-  }
-  
-	MPI::COMM_WORLD.Allgather(sbuf_residual, nVar, MPI::DOUBLE, rbuf_residual, nVar, MPI::DOUBLE);
-  MPI::COMM_WORLD.Allgather(sbuf_point, nVar, MPI::UNSIGNED_LONG, rbuf_point, nVar, MPI::UNSIGNED_LONG);
-  
-  for (iVar = 0; iVar < nVar; iVar++) {
-    for (iProcessor = 0; iProcessor < nProcessor; iProcessor++) {
-      AddRes_Max(iVar, rbuf_residual[iProcessor*nVar+iVar], rbuf_point[iProcessor*nVar+iVar]);
-    }
-  }
-  
-  delete [] sbuf_residual;
-  delete [] rbuf_residual;
-  
-  delete [] sbuf_point;
-  delete [] rbuf_point;
-  
-#endif
   
 }
 
@@ -508,9 +453,6 @@ void CSolver::SetSolution_Gradient_GG(CGeometry *geometry, CConfig *config) {
     node[iPoint]->SetGradient(iVar,iDim,Grad_Val);
   }
   
-  /*--- Gradient MPI ---*/
-  Set_MPI_Solution_Gradient(geometry, config);
-  
 }
 
 void CSolver::SetSolution_Gradient_LS(CGeometry *geometry, CConfig *config) {
@@ -649,10 +591,6 @@ void CSolver::SetSolution_Gradient_LS(CGeometry *geometry, CConfig *config) {
   delete [] cvector[iVar];
 	delete [] cvector;
   
-  /*--- Gradient MPI ---*/
-  
-  Set_MPI_Solution_Gradient(geometry, config);
-  
 }
 
 void CSolver::SetGridVel_Gradient(CGeometry *geometry, CConfig *config) {
@@ -756,10 +694,6 @@ void CSolver::SetGridVel_Gradient(CGeometry *geometry, CConfig *config) {
 	for (iVar = 0; iVar < nDim; iVar++)
   delete [] cvector[iVar];
 	delete [] cvector;
-  
-  /*--- Gradient MPI ---*/
-  // TO DO!!!
-  //Set_MPI_Solution_Gradient(geometry, config);
   
 }
 
@@ -1220,9 +1154,6 @@ void CSolver::SetSolution_Limiter(CGeometry *geometry, CConfig *config) {
       break;
       
   }
-  
-  /*--- Limiter MPI ---*/
-  Set_MPI_Solution_Limiter(geometry, config);
 	
 }
 
@@ -1336,200 +1267,3 @@ void CSolver::Gauss_Elimination(double** A, double* rhs, unsigned long nVar) {
 		}
 	}
 }
-
-CBaselineSolver::CBaselineSolver(void) : CSolver() { }
-
-CBaselineSolver::CBaselineSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh) : CSolver() {
-  
-  int rank = MASTER_NODE;
-#ifndef NO_MPI
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
-  
-	unsigned long iPoint, index, iPoint_Global;
-  long iPoint_Local;
-  unsigned short iField, iVar;
-  string Tag, text_line, AdjExt, UnstExt;
-  unsigned long iExtIter = config->GetExtIter();
-  
-	/*--- Define geometry constants in the solver structure ---*/
-	nDim = geometry->GetnDim();
-  
-	/*--- Allocate the node variables ---*/
-	node = new CVariable*[geometry->GetnPoint()];
-  
-  /*--- Restart the solution from file information ---*/
-  ifstream restart_file;
-  string filename;
-  
-  /*--- Retrieve filename from config ---*/
-	if (config->GetAdjoint()) {
-		filename = config->GetSolution_AdjFileName();
-    filename = config->GetObjFunc_Extension(filename);
-  } else {
-		filename = config->GetSolution_FlowFileName();
-  }
-  
-  /*--- Open the restart file ---*/
-  restart_file.open(filename.data(), ios::in);
-  
-  /*--- In case there is no restart file ---*/
-  if (restart_file.fail()) {
-    cout << "SU2 flow file " << filename << " not found" << endl;
-    exit(1);
-  }
-  
-  /*--- Output the file name to the console. ---*/
-  if (rank == MASTER_NODE)
-  cout << "Reading and storing the solution from " << filename << "." << endl;
-  
-  /*--- In case this is a parallel simulation, we need to perform the
-   Global2Local index transformation first. ---*/
-  long *Global2Local = new long[geometry->GetGlobal_nPointDomain()];
-  
-  /*--- First, set all indices to a negative value by default ---*/
-  for(iPoint = 0; iPoint < geometry->GetGlobal_nPointDomain(); iPoint++)
-  Global2Local[iPoint] = -1;
-  
-  /*--- Now fill array with the transform values only for local points ---*/
-  for(iPoint = 0; iPoint < geometry->GetnPointDomain(); iPoint++)
-  Global2Local[geometry->node[iPoint]->GetGlobalIndex()] = iPoint;
-  
-  
-  /*--- Identify the number of fields (and names) in the restart file ---*/
-  getline (restart_file, text_line);
-  stringstream ss(text_line);
-  while (ss >> Tag) {
-    config->fields.push_back(Tag);
-    if (ss.peek() == ',') ss.ignore();
-  }
-  
-  /*--- Set the number of variables, one per field in the
-   restart file (without including the PointID) ---*/
-  nVar = config->fields.size() - 1;
-  double Solution[nVar];
-  
-  /*--- Read all lines in the restart file ---*/
-  iPoint_Global = 0;
-  while (getline (restart_file, text_line)) {
-    istringstream point_line(text_line);
-    
-    /*--- Retrieve local index. If this node from the restart file lives
-     on a different processor, the value of iPoint_Local will be -1.
-     Otherwise, the local index for this node on the current processor
-     will be returned and used to instantiate the vars. ---*/
-    iPoint_Local = Global2Local[iPoint_Global];
-    if (iPoint_Local >= 0) {
-      
-      /*--- The PointID is not stored --*/
-      point_line >> index;
-      
-      /*--- Store the solution (starting with node coordinates) --*/
-      for (iField = 0; iField < nVar; iField++)
-      point_line >> Solution[iField];
-      
-      node[iPoint_Local] = new CBaselineVariable(Solution, nVar, config);
-    }
-    iPoint_Global++;
-  }
-  
-  /*--- Instantiate the variable class with an arbitrary solution
-   at any halo/periodic nodes. The initial solution can be arbitrary,
-   because a send/recv is performed immediately in the solver. ---*/
-  for (iVar = 0; iVar < nVar; iVar++)
-  Solution[iVar] = 0.0;
-  
-  for(iPoint = geometry->GetnPointDomain(); iPoint < geometry->GetnPoint(); iPoint++)
-  node[iPoint] = new CBaselineVariable(Solution, nVar, config);
-  
-  /*--- Close the restart file ---*/
-  restart_file.close();
-  
-  /*--- Free memory needed for the transformation ---*/
-  delete [] Global2Local;
-  
-  /*--- MPI solution ---*/
-  Set_MPI_Solution(geometry, config);
-  
-}
-
-void CBaselineSolver::Set_MPI_Solution(CGeometry *geometry, CConfig *config) {
-  unsigned short iVar, iMarker, iPeriodic_Index, MarkerS, MarkerR;
-  unsigned long iVertex, iPoint, nVertexS, nVertexR, nBufferS_Vector, nBufferR_Vector;
-  double rotMatrix[3][3], *angles, theta, cosTheta, sinTheta, phi, cosPhi, sinPhi, psi, cosPsi, sinPsi, *Buffer_Receive_U = NULL, *Buffer_Send_U = NULL, *Solution = NULL;
-  int send_to, receive_from;
-  
-  Solution = new double[nVar];
-  
-  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-    
-    if ((config->GetMarker_All_Boundary(iMarker) == SEND_RECEIVE) &&
-        (config->GetMarker_All_SendRecv(iMarker) > 0)) {
-      
-      MarkerS = iMarker;  MarkerR = iMarker+1;
-      
-      send_to = config->GetMarker_All_SendRecv(MarkerS)-1;
-      receive_from = abs(config->GetMarker_All_SendRecv(MarkerR))-1;
-      
-      nVertexS = geometry->nVertex[MarkerS];  nVertexR = geometry->nVertex[MarkerR];
-      nBufferS_Vector = nVertexS*nVar;        nBufferR_Vector = nVertexR*nVar;
-      
-      /*--- Allocate Receive and send buffers  ---*/
-      Buffer_Receive_U = new double [nBufferR_Vector];
-      Buffer_Send_U = new double[nBufferS_Vector];
-      
-      /*--- Copy the solution that should be sended ---*/
-      for (iVertex = 0; iVertex < nVertexS; iVertex++) {
-        iPoint = geometry->vertex[MarkerS][iVertex]->GetNode();
-        for (iVar = 0; iVar < nVar; iVar++)
-        Buffer_Send_U[iVar*nVertexS+iVertex] = node[iPoint]->GetSolution(iVar);
-      }
-      
-#ifndef NO_MPI
-      
-      /*--- Send/Receive information using Sendrecv ---*/
-      MPI::COMM_WORLD.Sendrecv(Buffer_Send_U, nBufferS_Vector, MPI::DOUBLE, send_to, 0,
-                               Buffer_Receive_U, nBufferR_Vector, MPI::DOUBLE, receive_from, 0);
-      
-#else
-      
-      /*--- Receive information without MPI ---*/
-      for (iVertex = 0; iVertex < nVertexR; iVertex++) {
-        iPoint = geometry->vertex[MarkerR][iVertex]->GetNode();
-        for (iVar = 0; iVar < nVar; iVar++)
-        Buffer_Receive_U[iVar*nVertexR+iVertex] = Buffer_Send_U[iVar*nVertexR+iVertex];
-      }
-      
-#endif
-      
-      /*--- Deallocate send buffer ---*/
-      delete [] Buffer_Send_U;
-      
-      /*--- Do the coordinate transformation ---*/
-      for (iVertex = 0; iVertex < nVertexR; iVertex++) {
-        
-        /*--- Find point and its type of transformation ---*/
-        iPoint = geometry->vertex[MarkerR][iVertex]->GetNode();
-        
-        /*--- Copy conserved variables before performing transformation. ---*/
-        for (iVar = 0; iVar < nVar; iVar++)
-        Solution[iVar] = Buffer_Receive_U[iVar*nVertexR+iVertex];
-        
-        /*--- Copy transformed conserved variables back into buffer. ---*/
-        for (iVar = 0; iVar < nVar; iVar++)
-        node[iPoint]->SetSolution(iVar, Solution[iVar]);
-        
-      }
-      
-      /*--- Deallocate receive buffer ---*/
-      delete [] Buffer_Receive_U;
-      
-    }
-    
-  }
-  
-  delete [] Solution;
-  
-}
-
-CBaselineSolver::~CBaselineSolver(void) { }

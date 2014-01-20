@@ -59,11 +59,8 @@ void CIntegration::Space_Integration(CGeometry *geometry, CSolver **solver_conta
         case AVG_GRAD: case AVG_GRAD_CORRECTED:
             solver_container[MainSolver]->Viscous_Residual(geometry, solver_container, numerics[VISC_TERM], config, iMesh, iRKStep);
             break;
-        case GALERKIN:
-            solver_container[MainSolver]->Galerkin_Method(geometry, solver_container, numerics[VISC_TERM], config, iMesh);
-            break;
 	}
-    
+
 	/*--- Compute source term residuals ---*/
 	switch (config->GetKind_SourNumScheme()) {
         case PIECEWISE_CONSTANT:
@@ -98,9 +95,6 @@ void CIntegration::Space_Integration(CGeometry *geometry, CSolver **solver_conta
 	/*--- Strong boundary conditions (Navier-Stokes and Dirichlet type BCs) ---*/
 	for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++)
 		switch (config->GetMarker_All_Boundary(iMarker)) {
-      case ISOTHERMAL:
-        solver_container[MainSolver]->BC_Isothermal_Wall(geometry, solver_container, numerics[CONV_BOUND_TERM], numerics[VISC_BOUND_TERM], config, iMarker);
-				break;
       case HEAT_FLUX:
         solver_container[MainSolver]->BC_HeatFlux_Wall(geometry, solver_container, numerics[CONV_BOUND_TERM], numerics[VISC_BOUND_TERM], config, iMarker);
 				break;
@@ -130,11 +124,6 @@ void CIntegration::Time_Integration(CGeometry *geometry, CSolver **solver_contai
 void CIntegration::Convergence_Monitoring(CGeometry *geometry, CConfig *config, unsigned long Iteration, double monitor) {
 
   unsigned short iCounter;
-
-#ifndef NO_MPI
-  int size = MPI::COMM_WORLD.Get_size();
-  int rank = MPI::COMM_WORLD.Get_rank();
-#endif
 
 	bool Already_Converged = Convergence;
 	
@@ -198,56 +187,13 @@ void CIntegration::Convergence_Monitoring(CGeometry *geometry, CConfig *config, 
 	}
 
 	if (Already_Converged) Convergence = true;
-
-  
-  /*--- Apply the same convergence criteria to all the processors ---*/
-#ifndef NO_MPI
-
-  unsigned short *sbuf_conv = NULL, *rbuf_conv = NULL;
-  sbuf_conv = new unsigned short[1]; sbuf_conv[0] = 0;
-  rbuf_conv = new unsigned short[1]; rbuf_conv[0] = 0;
-
-  /*--- Convergence criteria ---*/
-  sbuf_conv[0] = Convergence;
-  MPI::COMM_WORLD.Reduce(sbuf_conv, rbuf_conv, 1, MPI::UNSIGNED_SHORT, MPI::SUM, MASTER_NODE);
-  MPI::COMM_WORLD.Barrier();
-
-  /*-- Compute global convergence criteria in the master node --*/
-  sbuf_conv[0] = 0;
-  if (rank == MASTER_NODE) {
-    if (rbuf_conv[0] == size) sbuf_conv[0] = 1;
-    else sbuf_conv[0] = 0;
-  }
-  
-  MPI::COMM_WORLD.Bcast(sbuf_conv, 1, MPI::UNSIGNED_SHORT, MASTER_NODE);
-
-  if (sbuf_conv[0] == 1) Convergence = true;
-  else Convergence = false;
-  
-  delete [] sbuf_conv;
-  delete [] rbuf_conv;
-
-#endif
   
 	/*--- Stop the simulation in case a nan appears, do not save the solution ---*/
 	if (monitor != monitor) {
 
-#ifdef NO_MPI
     cout << "\n !!! Error: NaNs detected in solution. Now exiting... !!!" << endl;
 		exit(1);
-#else
-    if (rank == MASTER_NODE)
-      cout << "\n !!! Error: NaNs detected in solution. Now exiting... !!!" << endl;
-    MPI::COMM_WORLD.Barrier();
-    MPI::COMM_WORLD.Abort(1);
-#endif
-        
+    
 	}
-  
-#ifndef NO_MPI
-
-  MPI::COMM_WORLD.Barrier();
-
-#endif
   
 }

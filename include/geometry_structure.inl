@@ -176,10 +176,6 @@ inline void CPhysicalGeometry::SetPsuP(CGeometry *geometry) { CGeometry::SetPsuP
 
 inline void CMultiGridGeometry::SetPsuP(void) { CGeometry::SetPsuP(); }
 
-inline long CDomainGeometry::GetGlobal_to_Local_Point(long val_ipoint) { return Global_to_Local_Point[val_ipoint]; }
-
-inline unsigned short CDomainGeometry::GetGlobal_to_Local_Marker(unsigned short val_imarker) { return Global_to_Local_Marker[val_imarker]; }
-
 inline unsigned long CPhysicalGeometry::GetGlobal_nPoint(void) { return Global_nPoint; }
 
 inline unsigned long CPhysicalGeometry::GetGlobal_nPointDomain(void) { return Global_nPointDomain; }

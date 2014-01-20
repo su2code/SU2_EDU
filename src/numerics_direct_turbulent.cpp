@@ -27,7 +27,6 @@ CUpwSca_TurbSA::CUpwSca_TurbSA(unsigned short val_nDim, unsigned short val_nVar,
                                CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
   implicit        = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
-  incompressible  = (config->GetKind_Regime() == INCOMPRESSIBLE);
   
   Velocity_i = new double [nDim];
   Velocity_j = new double [nDim];
@@ -66,7 +65,6 @@ CAvgGrad_TurbSA::CAvgGrad_TurbSA(unsigned short val_nDim, unsigned short val_nVa
   unsigned short iVar;
   
   implicit = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
-  incompressible = (config->GetKind_Regime() == INCOMPRESSIBLE);
   
   sigma = 2./3.;
   
@@ -93,16 +91,9 @@ CAvgGrad_TurbSA::~CAvgGrad_TurbSA(void) {
 
 void CAvgGrad_TurbSA::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
   
-  if (incompressible) {
-    Density_i = V_i[nDim+1];            Density_j = V_j[nDim+1];
-    Laminar_Viscosity_i = V_i[nDim+3];  Laminar_Viscosity_j = V_j[nDim+3];
-    Eddy_Viscosity_i = V_i[nDim+4];     Eddy_Viscosity_j = V_j[nDim+4];
-  }
-  else {
     Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
     Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
     Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
-  }
   
   /*--- Compute mean effective viscosity ---*/
   
@@ -148,7 +139,6 @@ CAvgGradCorrected_TurbSA::CAvgGradCorrected_TurbSA(unsigned short val_nDim, unsi
   unsigned short iVar;
   
   implicit        = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
-  incompressible  = (config->GetKind_Regime() == INCOMPRESSIBLE);
   
   sigma = 2./3.;
   
@@ -177,16 +167,9 @@ CAvgGradCorrected_TurbSA::~CAvgGradCorrected_TurbSA(void) {
 
 void CAvgGradCorrected_TurbSA::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
   
-  if (incompressible) {
-    Density_i = V_i[nDim+1];            Density_j = V_j[nDim+1];
-    Laminar_Viscosity_i = V_i[nDim+3];  Laminar_Viscosity_j = V_j[nDim+3];
-    Eddy_Viscosity_i = V_i[nDim+4];     Eddy_Viscosity_j = V_j[nDim+4];
-  }
-  else {
     Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
     Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
     Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
-  }
   
   /*--- Compute mean effective viscosity ---*/
   
@@ -235,7 +218,6 @@ void CAvgGradCorrected_TurbSA::ComputeResidual(double *val_residual, double **Ja
 CSourcePieceWise_TurbSA::CSourcePieceWise_TurbSA(unsigned short val_nDim, unsigned short val_nVar,
                                                  CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
-  incompressible = (config->GetKind_Regime() == INCOMPRESSIBLE);
   transition = false; // Debugging, -AA
   
   /*--- Spalart-Allmaras closure constants ---*/
@@ -257,14 +239,8 @@ CSourcePieceWise_TurbSA::~CSourcePieceWise_TurbSA(void) {
 
 void CSourcePieceWise_TurbSA::ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config) {
   
-  if (incompressible) {
-    Density_i = V_i[nDim+1];
-    Laminar_Viscosity_i = V_i[nDim+3];
-  }
-  else {
     Density_i = V_i[nDim+2];
     Laminar_Viscosity_i = V_i[nDim+5];
-  }
   
   val_residual[0] = 0.0;
   Production = 0;
@@ -341,7 +317,6 @@ CUpwSca_TurbSST::CUpwSca_TurbSST(unsigned short val_nDim, unsigned short val_nVa
                                  CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
   implicit        = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
-  incompressible  = (config->GetKind_Regime() == INCOMPRESSIBLE);
   
   Velocity_i = new double [nDim];
   Velocity_j = new double [nDim];
@@ -357,14 +332,8 @@ CUpwSca_TurbSST::~CUpwSca_TurbSST(void) {
 
 void CUpwSca_TurbSST::ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config) {
   
-  if (incompressible) {
-    Density_i = V_i[nDim+1];
-    Density_j = V_j[nDim+1];
-  }
-  else {
     Density_i = V_i[nDim+2];
     Density_j = V_j[nDim+2];
-  }
   
   q_ij = 0.0;
     for (iDim = 0; iDim < nDim; iDim++) {
@@ -394,7 +363,6 @@ CAvgGrad_TurbSST::CAvgGrad_TurbSST(unsigned short val_nDim, unsigned short val_n
   unsigned short iVar;
   
   implicit = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
-  incompressible = (config->GetKind_Regime() == INCOMPRESSIBLE);
   
   sigma_k1  = constants[0];
   sigma_om1 = constants[2];
@@ -430,16 +398,9 @@ void CAvgGrad_TurbSST::ComputeResidual(double *val_residual, double **Jacobian_i
   double sigma_kine_i, sigma_kine_j, sigma_omega_i, sigma_omega_j;
   double diff_i_kine, diff_i_omega, diff_j_kine, diff_j_omega;
   
-  if (incompressible) {
-    Density_i = V_i[nDim+1];            Density_j = V_j[nDim+1];
-    Laminar_Viscosity_i = V_i[nDim+3];  Laminar_Viscosity_j = V_j[nDim+3];
-    Eddy_Viscosity_i = V_i[nDim+4];     Eddy_Viscosity_j = V_j[nDim+4];
-  }
-  else {
     Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
     Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
     Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
-  }
   
   /*--- Compute the blended constant for the viscous terms ---*/
   sigma_kine_i  = F1_i*sigma_k1 + (1.0 - F1_i)*sigma_k2;
@@ -497,7 +458,6 @@ CAvgGradCorrected_TurbSST::CAvgGradCorrected_TurbSST(unsigned short val_nDim, un
   unsigned short iVar;
   
   implicit = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
-  incompressible = (config->GetKind_Regime() == INCOMPRESSIBLE);
   
   sigma_k1  = constants[0];
   sigma_om1 = constants[2];
@@ -533,16 +493,9 @@ void CAvgGradCorrected_TurbSST::ComputeResidual(double *val_residual, double **J
   double sigma_kine_i, sigma_kine_j, sigma_omega_i, sigma_omega_j;
   double diff_i_kine, diff_i_omega, diff_j_kine, diff_j_omega;
   
-  if (incompressible) {
-    Density_i = V_i[nDim+1];            Density_j = V_j[nDim+1];
-    Laminar_Viscosity_i = V_i[nDim+3];  Laminar_Viscosity_j = V_j[nDim+3];
-    Eddy_Viscosity_i = V_i[nDim+4];     Eddy_Viscosity_j = V_j[nDim+4];
-  }
-  else {
     Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
     Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
     Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
-  }
   
   /*--- Compute the blended constant for the viscous terms ---*/
   sigma_kine_i  = F1_i*sigma_k1 + (1.0 - F1_i)*sigma_k2;
@@ -600,8 +553,6 @@ void CAvgGradCorrected_TurbSST::ComputeResidual(double *val_residual, double **J
 CSourcePieceWise_TurbSST::CSourcePieceWise_TurbSST(unsigned short val_nDim, unsigned short val_nVar, double *constants,
                                                    CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
-  incompressible = (config->GetKind_Regime() == INCOMPRESSIBLE);
-  
   /*--- Closure constants ---*/
   beta_star     = constants[6];
   sigma_omega_1 = constants[2];
@@ -621,16 +572,9 @@ void CSourcePieceWise_TurbSST::ComputeResidual(double *val_residual, double **va
   double alfa_blended, beta_blended;
   double diverg, pk, pw, zeta;
   
-  if (incompressible) {
-    Density_i = V_i[nDim+1];
-    Laminar_Viscosity_i = V_i[nDim+3];
-    Eddy_Viscosity_i = V_i[nDim+4];
-  }
-  else {
     Density_i = V_i[nDim+2];
     Laminar_Viscosity_i = V_i[nDim+5];
     Eddy_Viscosity_i = V_i[nDim+6];
-  }
   
   val_residual[0] = 0.0;        val_residual[1] = 0.0;
   val_Jacobian_i[0][0] = 0.0;		val_Jacobian_i[0][1] = 0.0;

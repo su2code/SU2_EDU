@@ -25,13 +25,6 @@
 CConfig::CConfig(char case_filename[200], unsigned short val_software, unsigned short verb_level) {
   
 	int rank = MASTER_NODE;
-#ifndef NO_MPI
-#ifdef WINDOWS
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-#else
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
-#endif
   
   /*--- Read the config options  ---*/
   
@@ -361,30 +354,6 @@ void CConfig::SetConfig_Options() {
 	AddListOption("MOVE_MOTION_ORIGIN", nMoveMotion_Origin, MoveMotion_Origin);
 	/* DESCRIPTION:  */
 	AddScalarOption("MOTION_FILENAME", Motion_Filename, string("mesh_motion.dat"));
-	/* DESCRIPTION: Uncoupled Aeroelastic Frequency Plunge. */
-	AddScalarOption("FREQ_PLUNGE_AEROELASTIC", FreqPlungeAeroelastic, 100);
-	/* DESCRIPTION: Uncoupled Aeroelastic Frequency Pitch. */
-	AddScalarOption("FREQ_PITCH_AEROELASTIC", FreqPitchAeroelastic, 100);
-
-  /*--- Options related to wind gust simulations ---*/
-	/* CONFIG_CATEGORY: Wind Gust */
-  
-  /* DESCRIPTION: Apply a wind gust */
-	AddSpecialOption("WIND_GUST", Wind_Gust, SetBoolOption, false);
-  /* DESCRIPTION: Type of gust */
-	AddEnumOption("GUST_TYPE", Gust_Type, Gust_Type_Map, "NONE");
-  /* DESCRIPTION: Gust wavelenght (meters) */
-  AddScalarOption("GUST_WAVELENGTH", Gust_WaveLength, 0.0);
-  /* DESCRIPTION: Number of gust periods */
-  AddScalarOption("GUST_PERIODS", Gust_Periods, 1.0);
-  /* DESCRIPTION: Gust amplitude (m/s) */
-  AddScalarOption("GUST_AMPL", Gust_Ampl, 0.0);
-  /* DESCRIPTION: Time at which to begin the gust (sec) */
-  AddScalarOption("GUST_BEGIN_TIME", Gust_Begin_Time, 0.0);
-  /* DESCRIPTION: Location at which the gust begins (meters) */
-  AddScalarOption("GUST_BEGIN_LOC", Gust_Begin_Loc, 0.0);
-  /* DESCRIPTION: Direction of the gust X or Y dir */
-  AddEnumOption("GUST_DIR", Gust_Dir, Gust_Dir_Map, "Y_DIR");
   
 	/*--- Options related to convergence ---*/
 	/* CONFIG_CATEGORY: Convergence*/
@@ -698,7 +667,6 @@ void CConfig::SetConfig_Options() {
 	AddScalarOption("ARTCOMP_FACTOR", ArtComp_Factor, 1.0);
 	/* DESCRIPTION:  Mach number (non-dimensional, based on the free-stream values) */
 	AddScalarOption("MACH_NUMBER", Mach, 0.0);
-	//	AddScalarOption("MIXTURE_MOLAR_MASS", Mixture_Molar_mass, 28.97);
 	/* DESCRIPTION: Free-stream pressure (101325.0 N/m^2 by default) */
 	AddScalarOption("FREESTREAM_PRESSURE", Pressure_FreeStream, 101325.0);
 	/* DESCRIPTION: Free-stream density (1.2886 Kg/m^3 (air), 998.2 Kg/m^3 (water)) */
@@ -763,28 +731,6 @@ void CConfig::SetConfig_Options() {
   
 	/* DESCRIPTION: Specify chemical model for multi-species simulations */
 	AddEnumOption("GAS_MODEL", Kind_GasModel, GasModel_Map, "ARGON");
-	/* DESCRIPTION:  */
-	AddListOption("GAS_COMPOSITION", nTemp, Gas_Composition);
-  
-	/*--- Options related to free surface simulation ---*/
-	/* CONFIG_CATEGORY: Free surface simulation */
-  
-	/* DESCRIPTION: Ratio of density for two phase problems */
-	AddScalarOption("RATIO_DENSITY", RatioDensity, 0.1);
-	/* DESCRIPTION: Ratio of viscosity for two phase problems */
-	AddScalarOption("RATIO_VISCOSITY", RatioViscosity, 0.1);
-	/* DESCRIPTION: Location of the freesurface (y or z coordinate) */
-	AddScalarOption("FREESURFACE_ZERO", FreeSurface_Zero, 0.0);
-	/* DESCRIPTION: Free surface depth surface (x or y coordinate) */
-	AddScalarOption("FREESURFACE_DEPTH", FreeSurface_Depth, 1.0);
-	/* DESCRIPTION: Thickness of the interface in a free surface problem */
-	AddScalarOption("FREESURFACE_THICKNESS", FreeSurface_Thickness, 0.1);
-	/* DESCRIPTION: Free surface damping coefficient */
-	AddScalarOption("FREESURFACE_DAMPING_COEFF", FreeSurface_Damping_Coeff, 0.0);
-	/* DESCRIPTION: Free surface damping length (times the baseline wave) */
-	AddScalarOption("FREESURFACE_DAMPING_LENGTH", FreeSurface_Damping_Length, 1.0);
-	/* DESCRIPTION: Location of the free surface outlet surface (x or y coordinate) */
-	AddScalarOption("FREESURFACE_OUTLET", FreeSurface_Outlet, 0.0);
   
 	/*--- Options related to the grid deformation ---*/
 	// these options share nDV as their size in the option references; not a good idea
@@ -865,13 +811,6 @@ void CConfig::SetParsing(char case_filename[200]) {
 	vector<string> option_value;
   
 	int rank = MASTER_NODE;
-#ifndef NO_MPI
-#ifdef WINDOWS
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-#else
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
-#endif
   
   /*--- Read the configuration file ---*/
   case_file.open(case_filename, ios::in);
@@ -903,16 +842,7 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
 
   unsigned short iZone;
 
-#ifdef NO_MPI
   int size = SINGLE_NODE;
-#else
-  int size;
-#ifdef WINDOWS
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-#else
-	size = MPI::COMM_WORLD.Get_size();
-#endif
-#endif
 
   /*--- Store the SU2 module that we are executing. ---*/
 	Kind_SU2 = val_software;
@@ -944,14 +874,6 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
   
   /*--- If multiple processors the grid should be always in native .su2 format ---*/
   if ((size > SINGLE_NODE) && ((Kind_SU2 == SU2_CFD) || (Kind_SU2 == SU2_SOL) || (Kind_SU2 == SU2_EDU))) Mesh_FileFormat = SU2;
-
-  /*--- Divide grid if runnning SU2_MDC ---*/
-//  if (Kind_SU2 == SU2_MDC) Divide_Element = true;
-  
-	/*--- Identification of free-surface problem, this problems are always unsteady and incompressible. ---*/
-	if (Kind_Regime == FREESURFACE) {
-		if (Unsteady_Simulation != DT_STEPPING_2ND) Unsteady_Simulation = DT_STEPPING_1ST;
-	}
   
   if (Kind_Solver == POISSON_EQUATION) {
     Unsteady_Simulation = STEADY;
@@ -965,11 +887,7 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
   }
   
 	/*--- Decide whether we should be writing unsteady solution files. ---*/
-	if (Unsteady_Simulation == STEADY ||
-			Unsteady_Simulation == TIME_STEPPING ||
-			Unsteady_Simulation == TIME_SPECTRAL  ||
-			Kind_Regime == FREESURFACE) { Wrt_Unsteady = false; }
-	else { Wrt_Unsteady = true; }
+	Wrt_Unsteady = false;
 
   /*--- Set grid movement kind to NO_MOVEMENT if not specified, which means
    that we also set the Grid_Movement flag to false. We initialize to the 
@@ -1416,8 +1334,6 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
 			(Kind_Turb_Model != NONE))
 		Kind_Solver = RANS;
 
-	if (Kind_Regime == FREESURFACE) GravityForce = true;
-
 	Kappa_1st_Flow = Kappa_Flow[0];
 	Kappa_2nd_Flow = Kappa_Flow[1];
 	Kappa_4th_Flow = Kappa_Flow[2];   
@@ -1619,19 +1535,7 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
 
 void CConfig::SetMarkers(unsigned short val_software) {
 
-#ifdef NO_MPI
 	nDomain = SINGLE_NODE;
-#else
-  /*--- Identify the solvers that work in serial ---*/
-	if ((val_software != SU2_DDC) && (val_software != SU2_MAC))
-#ifdef WINDOWS
-		MPI_Comm_size(MPI_COMM_WORLD, (int*)&nDomain);   // any issue with type conversion here? MC
-#else
-		nDomain = MPI::COMM_WORLD.Get_size();
-#endif		
-	else
-		nDomain = SINGLE_NODE;
-#endif
 
 	/*--- Boundary (marker) treatment ---*/
 	nMarker_All = nMarker_Euler + nMarker_FarField + nMarker_SymWall + nMarker_PerBound + nMarker_NearFieldBound + nMarker_Supersonic_Inlet
@@ -2905,45 +2809,6 @@ CConfig::~CConfig(void)
 	delete [] MG_PostSmooth;
 	delete [] U_FreeStreamND;
 
-	/*--- If allocated, delete arrays for Plasma solver ---*/
-	if (Molar_Mass           != NULL) delete [] Molar_Mass;
-	if (Gas_Composition      != NULL) delete [] Gas_Composition;
-	if (Enthalpy_Formation   != NULL) delete [] Enthalpy_Formation;
-	if (ArrheniusCoefficient != NULL) delete [] ArrheniusCoefficient;
-	if (ArrheniusEta         != NULL) delete [] ArrheniusEta;
-	if (ArrheniusTheta       != NULL) delete [] ArrheniusTheta;
-	if (CharVibTemp          != NULL) delete [] CharVibTemp;
-  if (CharElTemp           != NULL) {
-    for (unsigned short iSpecies = 0; iSpecies < nSpecies; iSpecies++)
-      delete[] CharElTemp[iSpecies];
-    delete [] CharElTemp;
-  }
-  if (degen                != NULL) {
-    for (unsigned short iSpecies = 0; iSpecies < nSpecies; iSpecies++)
-      delete[] degen[iSpecies];
-    delete [] degen;
-  }
-	unsigned short ii, iReaction;
-	if (Reactions            != NULL) {
-		for (iReaction = 0; iReaction < nReactions; iReaction++) {
-			for (ii = 0; ii < 2; ii++) {
-				delete [] Reactions[iReaction][ii];
-			}
-			delete[] Reactions[iReaction];
-		}
-		delete [] Reactions;
-	}
-
-	/*--- Free memory for Aeroelastic problems. ---*/
-	if (Grid_Movement && (Kind_GridMovement[ZONE_0] == AEROELASTIC)) {
-		delete[] Aeroelastic_np1;
-		delete[] Aeroelastic_n;
-		delete[] Aeroelastic_n1;
-        
-        delete[] Aeroelastic_pitch;
-        delete[] Aeroelastic_plunge;
-	}
-
 	/*--- Free memory for unspecified grid motion parameters ---*/
 
   if (Kind_GridMovement != NULL)
@@ -3017,75 +2882,7 @@ CConfig::~CConfig(void)
 		delete [] RefOriginMoment_Z;
 }
 
-void CConfig::SetFileNameDomain(unsigned short val_domain) {
-
-#ifndef NO_MPI
-	int size;
-#ifdef WINDOWS
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-#else
-	size = MPI::COMM_WORLD.Get_size();
-#endif
-
-	string old_name;
-	char buffer[10]; 
-
-	/*--- Standard surface output ---*/
-	old_name = SurfFlowCoeff_FileName;
-	if (size > 1) {
-		sprintf (buffer, "_%d", int(val_domain)); 
-		SurfFlowCoeff_FileName = old_name + buffer;	
-	}
-
-	old_name = SurfAdjCoeff_FileName;
-	if (size > 1) {
-		sprintf (buffer, "_%d", int(val_domain)); 
-		SurfAdjCoeff_FileName = old_name + buffer;
-	}
-
-	old_name = SurfStructure_FileName;
-	if (size > 1) {
-		sprintf (buffer, "_%d", int(val_domain));
-		SurfStructure_FileName = old_name + buffer;
-	}
-  
-	old_name = SurfWave_FileName;
-	if (size > 1) {
-		sprintf (buffer, "_%d", int(val_domain));
-		SurfWave_FileName = old_name + buffer;
-	}
-  
-	old_name = SurfHeat_FileName;
-	if (size > 1) {
-		sprintf (buffer, "_%d", int(val_domain));
-		SurfHeat_FileName = old_name + buffer;
-	}
-  
-	if (size > 1) {
-
-		/*--- Standard flow and adjoint output ---*/
-		sprintf (buffer, "_%d", int(val_domain));
-		old_name = Flow_FileName;
-		Flow_FileName = old_name + buffer;
-
-		sprintf (buffer, "_%d", int(val_domain));
-		old_name = Structure_FileName;
-		Structure_FileName = old_name + buffer;
-
-		sprintf (buffer, "_%d", int(val_domain));
-		old_name = Adj_FileName;
-		Adj_FileName = old_name + buffer;
-
-		/*--- Mesh files ---*/	
-		sprintf (buffer, "_%d.su2", int(val_domain));
-		old_name = Mesh_FileName;
-    unsigned short lastindex = old_name.find_last_of(".");
-    old_name = old_name.substr(0, lastindex);
-		Mesh_FileName = old_name + buffer;
-
-	}
-#endif
-}
+void CConfig::SetFileNameDomain(unsigned short val_domain) { }
 
 string CConfig::GetUnsteady_FileName(string val_filename, int val_iter) {
   
@@ -3205,27 +3002,12 @@ void CConfig::UpdateCFL(unsigned long val_iter) {
 			}
 		}
 
-#ifdef NO_MPI
 		if (change) {
 			cout <<"\n New value of the CFL number: ";
 			for (iCFL = 0; iCFL < nMultiLevel; iCFL++)
 				cout << CFL[iCFL] <<", ";
 			cout << CFL[nMultiLevel] <<".\n"<< endl;
 		}
-#else
-		int rank;
-#ifdef WINDOWS
-		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-#else
-		rank = MPI::COMM_WORLD.Get_rank();
-#endif 
-		if ((change) && (rank == MASTER_NODE)) {
-			cout <<"\n New value of the CFL number: ";
-			for (iCFL = 0; iCFL < nMultiLevel; iCFL++)
-				cout << CFL[iCFL] <<", ";
-			cout << CFL[nMultiLevel] <<".\n"<< endl;
-		}
-#endif
 	}
 }
 
@@ -3332,28 +3114,15 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
 	unsigned short iDim;
 	int rank = MASTER_NODE;
   
-#ifndef NO_MPI
-#ifdef WINDOWS
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-#else
-	rank = MPI::COMM_WORLD.Get_rank();
-#endif
-#endif
-  
 	Velocity_FreeStreamND = new double[val_nDim];
   
 	/*--- Local variables and memory allocation ---*/
 	double Alpha = AoA*PI_NUMBER/180.0;
 	double Beta  = AoS*PI_NUMBER/180.0;
 	double Gamma_Minus_One = Gamma - 1.0;
-  bool compressible = (Kind_Regime == COMPRESSIBLE);
-	bool incompressible = (Kind_Regime == INCOMPRESSIBLE);
-	bool freesurface = (Kind_Regime == FREESURFACE);
 	bool Unsteady = (Unsteady_Simulation != NO);
 	bool turbulent = (Kind_Solver == RANS);
-    
-	if (compressible) {
-    
+  
 		Mach2Vel_FreeStream = sqrt(Gamma*Gas_Constant*Temperature_FreeStream);
     
 		/*--- Compute the Free Stream velocity, using the Mach number ---*/
@@ -3407,45 +3176,6 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
 		Gas_Constant_Ref  = Velocity_Ref*Velocity_Ref/Temperature_Ref;
 		Viscosity_Ref     = Density_Ref*Velocity_Ref*Length_Ref;
 		Froude            = ModVel_FreeStream/sqrt(STANDART_GRAVITY*Length_Ref);
-    
-	}
-  
-	else {
-    
-		/*--- Reference length = 1 (by default)
-     Reference density = liquid density or freestream
-     Reference viscosity = liquid viscosity or freestream
-     Reference velocity = liquid velocity or freestream
-     Reference pressure = Reference density * Reference velocity * Reference velocity
-     Reynolds number based on the liquid or reference viscosity ---*/
-    
-		Pressure_FreeStream = 0.0;
-		Length_Ref = 1.0;
-		Density_Ref = Density_FreeStream;
-		ModVel_FreeStream = 0;
-		for (iDim = 0; iDim < val_nDim; iDim++)
-			ModVel_FreeStream += Velocity_FreeStream[iDim]*Velocity_FreeStream[iDim];
-		ModVel_FreeStream = sqrt(ModVel_FreeStream);
-		Velocity_Ref = ModVel_FreeStream;
-		Pressure_Ref = Density_Ref*(Velocity_Ref*Velocity_Ref);
-    
-		if (Viscous) {
-			Reynolds = Density_Ref*Velocity_Ref*Length_Ref / Viscosity_FreeStream;
-			Viscosity_Ref = Viscosity_FreeStream * Reynolds;
-		}
-    
-		/*--- Compute mach number ---*/
-		Mach = ModVel_FreeStream / sqrt(Bulk_Modulus/Density_FreeStream);
-		if (val_nDim == 2) AoA = atan(Velocity_FreeStream[1]/Velocity_FreeStream[0])*180.0/PI_NUMBER;
-		else AoA = atan(Velocity_FreeStream[2]/Velocity_FreeStream[0])*180.0/PI_NUMBER;
-		if (val_nDim == 2) AoS = 0.0;
-		else AoS = asin(Velocity_FreeStream[1]/ModVel_FreeStream)*180.0/PI_NUMBER;
-    
-		Froude = ModVel_FreeStream/sqrt(STANDART_GRAVITY*Length_Ref);
-    
-		Time_Ref = Length_Ref/Velocity_Ref;
-    
-	}
   
 	/*--- Divide by reference values, to compute the non-dimensional free-stream values ---*/
 	Pressure_FreeStreamND = Pressure_FreeStream/Pressure_Ref;
@@ -3477,7 +3207,6 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
     
 		cout.precision(6);
     
-		if (compressible) {
 			if (Viscous) {
 				cout << "Viscous flow: Computing pressure using the ideal gas law" << endl;
 				cout << "based on the freestream temperature and a density computed" << endl;
@@ -3486,32 +3215,14 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
 				cout << "Inviscid flow: Computing density based on freestream" << endl;
 				cout << "temperature and pressure using the ideal gas law." << endl;
 			}
-		}
-		if (incompressible || freesurface) {
-			cout << "Viscous and Inviscid flow: rho_ref, and vel_ref" << endl;
-			cout << "are based on the freestream values, p_ref = rho_ref*vel_ref^2." << endl;
-			cout << "The freestream value of the pressure is 0." << endl;
-			cout << "Mach number: "<< Mach << ", computed using the Bulk modulus." << endl;
-			cout << "Angle of attack (deg): "<< AoA << ", computed using the the free-stream velocity." << endl;
-			cout << "Side slip angle (deg): "<< AoS << ", computed using the the free-stream velocity." << endl;
-			if (Viscous) cout << "Reynolds number: " << Reynolds << ", computed using free-stream values."<<endl;
-			cout << "Only dimensional computation, the grid should be dimensional." << endl;
-		}
     
 		cout <<"--Input conditions:"<< endl;
 		cout << "Grid conversion factor to meters: " << Conversion_Factor << endl;
     
-		if (compressible) {
 			cout << "Ratio of specific heats: " << Gamma           << endl;
 			cout << "Specific gas constant (J/(kg.K)): "   << Gas_Constant  << endl;
-		}
-		if (incompressible || freesurface) {
-			cout << "Bulk modulus (N/m^2): "						<< Bulk_Modulus    << endl;
-			cout << "Artificial compressibility factor (N/m^2): "						<< ArtComp_Factor    << endl;
-		}
     
 		cout << "Freestream pressure (N/m^2): "          << Pressure_FreeStream    << endl;
-		if (compressible)
 			cout << "Freestream temperature (K): "       << Temperature_FreeStream << endl;
 		cout << "Freestream density (kg/m^3): "					 << Density_FreeStream << endl;
 		if (val_nDim == 2) {
@@ -3524,7 +3235,6 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
     
 		cout << "Freestream velocity magnitude (m/s):"	<< ModVel_FreeStream << endl;
     
-		if (compressible)
 			cout << "Freestream energy (kg.m/s^2): "					 << Energy_FreeStream << endl;
     
 		if (Viscous)
@@ -3538,13 +3248,8 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
 		cout <<"--Reference values:"<< endl;
 		cout << "Reference pressure (N/m^2): "      << Pressure_Ref    << endl;
     
-		if (compressible) {
 			cout << "Reference temperature (K): "   << Temperature_Ref << endl;
 			cout << "Reference energy (kg.m/s^2): "       << Energy_FreeStream/Energy_FreeStreamND     << endl;
-		}
-		if (incompressible || freesurface) {
-			cout << "Reference length (m): 1.0" << endl;
-		}
 		cout << "Reference density (kg/m^3): "       << Density_Ref     << endl;
 		cout << "Reference velocity (m/s): "       << Velocity_Ref     << endl;
     
@@ -3566,10 +3271,9 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
       cout << "Lenght of the baseline wave (non-dimensional): " << 2.0*PI_NUMBER*Froude*Froude << endl;
     }
     
-		if (compressible) {
 			cout << "Specific gas constant (non-dimensional): "   << Gas_Constant << endl;
 			cout << "Freestream temperature (non-dimensional): "  << Temperature_FreeStreamND << endl;
-		}
+    
 		cout << "Freestream pressure (non-dimensional): "     << Pressure_FreeStreamND    << endl;
 		cout << "Freestream density (non-dimensional): "      << Density_FreeStreamND     << endl;
 		if (val_nDim == 2) {
@@ -3586,7 +3290,6 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
 			cout << "Free-stream specific dissipation (non-dimensional): " << omega_Inf << endl;
 		}
     
-		if (compressible)
 			cout << "Freestream energy (non-dimensional): "					 << Energy_FreeStreamND << endl;
     
 		if (Viscous)
@@ -3599,9 +3302,7 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
 		if (Grid_Movement) cout << "Force coefficients computed using MACH_MOTION." << endl;
 		else cout << "Force coefficients computed using freestream values." << endl;
     
-    if (compressible) {
       cout << "Note: Negative pressure, temperature or density is not allowed!" << endl;
-    }
 	}
   
 }
