@@ -118,6 +118,7 @@
 		05394A281821BE6200EA6F95 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				053F6BD8186C98950009AE5B /* SU2_EDU.cpp */,
 				053F6BC4186C98950009AE5B /* config_structure.cpp */,
 				053F6BC5186C98950009AE5B /* definition_structure.cpp */,
 				053F6BC6186C98950009AE5B /* dual_grid_structure.cpp */,
@@ -138,7 +139,6 @@
 				053F6BD5186C98950009AE5B /* solver_direct_mean.cpp */,
 				053F6BD6186C98950009AE5B /* solver_direct_turbulent.cpp */,
 				053F6BD7186C98950009AE5B /* solver_structure.cpp */,
-				053F6BD8186C98950009AE5B /* SU2_EDU.cpp */,
 				053F6BD9186C98950009AE5B /* variable_direct_mean.cpp */,
 				053F6BDA186C98950009AE5B /* variable_direct_turbulent.cpp */,
 				053F6BDB186C98950009AE5B /* variable_structure.cpp */,

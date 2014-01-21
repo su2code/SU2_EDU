@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
   
   nDim  = 2;
   
-  /*--- Definition of the configuration option class. In this constructor, 
+  /*--- Definition of the configuration option class. In this constructor,
    the input configuration file is parsed and all options are read and stored. ---*/
   
   config_container = new CConfig(config_file_name, SU2_EDU, VERB_HIGH);
@@ -313,7 +313,7 @@ int main(int argc, char *argv[]) {
   
   if (rank == MASTER_NODE)
     cout << endl <<"------------------------- Exit Success (SU2_EDU) ------------------------" << endl << endl;
-
+  
   
   return EXIT_SUCCESS;
   

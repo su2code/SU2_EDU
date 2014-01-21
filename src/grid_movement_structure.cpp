@@ -30,32 +30,32 @@ CGridMovement::CGridMovement(void) { }
 CGridMovement::~CGridMovement(void) { }
 
 CVolumetricMovement::CVolumetricMovement(CGeometry *geometry) : CGridMovement() {
-	
-	nDim = geometry->GetnDim();
+  
+  nDim = geometry->GetnDim();
   
 }
 
 CVolumetricMovement::~CVolumetricMovement(void) {
-
+  
 }
 
 
 void CVolumetricMovement::UpdateGridCoord(CGeometry *geometry, CConfig *config) {
   
   unsigned short iDim;
-	unsigned long iPoint, total_index;
-	double new_coord;
+  unsigned long iPoint, total_index;
+  double new_coord;
   
   /*--- Update the grid coordinates using the solution of the linear system
    after grid deformation (LinSysSol contains the x, y, z displacements). ---*/
   
-	for (iPoint = 0; iPoint < nPoint; iPoint++)
-		for (iDim = 0; iDim < nDim; iDim++) {
-			total_index = iPoint*nDim + iDim;
-			new_coord = geometry->node[iPoint]->GetCoord(iDim)+LinSysSol[total_index];
-			if (fabs(new_coord) < EPS*EPS) new_coord = 0.0;
-			geometry->node[iPoint]->SetCoord(iDim, new_coord);
-		}
+  for (iPoint = 0; iPoint < nPoint; iPoint++)
+    for (iDim = 0; iDim < nDim; iDim++) {
+      total_index = iPoint*nDim + iDim;
+      new_coord = geometry->node[iPoint]->GetCoord(iDim)+LinSysSol[total_index];
+      if (fabs(new_coord) < EPS*EPS) new_coord = 0.0;
+      geometry->node[iPoint]->SetCoord(iDim, new_coord);
+    }
   
 }
 
@@ -64,9 +64,9 @@ void CVolumetricMovement::UpdateDualGrid(CGeometry *geometry, CConfig *config) {
   /*--- After moving all nodes, update the dual mesh. Recompute the edges and
    dual mesh control volumes in the domain and on the boundaries. ---*/
   
-	geometry->SetCG();
-	geometry->SetControlVolume(config, UPDATE);
-	geometry->SetBoundControlVolume(config, UPDATE);
+  geometry->SetCG();
+  geometry->SetControlVolume(config, UPDATE);
+  geometry->SetBoundControlVolume(config, UPDATE);
   
 }
 
@@ -83,11 +83,11 @@ void CVolumetricMovement::UpdateMultiGrid(CGeometry **geometry, CConfig *config)
     geometry[iMGlevel]->SetBoundControlVolume(config,geometry[iMGfine],UPDATE);
     geometry[iMGlevel]->SetCoord(geometry[iMGfine]);
   }
- 
+  
 }
 
 void CVolumetricMovement::SetVolume_Deformation(CGeometry *geometry, CConfig *config, bool UpdateGeo) {
-	unsigned long IterLinSol, iGridDef_Iter;
+  unsigned long IterLinSol, iGridDef_Iter;
   double MinVolume, NumError;
   bool Screen_Output = true;
   
@@ -96,7 +96,7 @@ void CVolumetricMovement::SetVolume_Deformation(CGeometry *geometry, CConfig *co
   /*--- Decide if there is going to be a screen output ---*/
   
   Screen_Output = true;
-
+  
   /*--- Initialize the number of spatial dimensions, length of the state
    vector (same as spatial dimensions for grid deformation), and grid nodes. ---*/
   
@@ -152,7 +152,7 @@ void CVolumetricMovement::SetVolume_Deformation(CGeometry *geometry, CConfig *co
     CSysSolve *system             = new CSysSolve();
     
     /*--- Solve the linear system ---*/
-
+    
     IterLinSol = system->FGMRES(LinSysRes, LinSysSol, *mat_vec, *precond, NumError, 250, Screen_Output);
     
     /*--- Deallocate memory needed by the Krylov linear solver ---*/
@@ -190,16 +190,16 @@ void CVolumetricMovement::SetVolume_Deformation(CGeometry *geometry, CConfig *co
 
 double CVolumetricMovement::Check_Grid(CGeometry *geometry) {
   
-	unsigned long iElem, ElemCounter = 0, PointCorners[8];
+  unsigned long iElem, ElemCounter = 0, PointCorners[8];
   double Area, Volume, MaxArea = -1E22, MaxVolume = -1E22, MinArea = 1E22, MinVolume = 1E22, CoordCorners[8][3];
   unsigned short nNodes, iNodes, iDim;
   bool RightVol;
   
   int rank = MASTER_NODE;
   
-	/*--- Load up each triangle and tetrahedron to check for negative volumes. ---*/
+  /*--- Load up each triangle and tetrahedron to check for negative volumes. ---*/
   
-	for (iElem = 0; iElem < geometry->GetnElem(); iElem++) {
+  for (iElem = 0; iElem < geometry->GetnElem(); iElem++) {
     
     if (geometry->elem[iElem]->GetVTK_Type() == TRIANGLE)     nNodes = 3;
     if (geometry->elem[iElem]->GetVTK_Type() == RECTANGLE)    nNodes = 4;
@@ -248,7 +248,7 @@ double CVolumetricMovement::Check_Grid(CGeometry *geometry) {
     
     if (!RightVol) ElemCounter++;
     
-	}
+  }
   
   if ((ElemCounter != 0) && (rank == MASTER_NODE))
     cout <<"There are " << ElemCounter << " elements with negative volume.\n" << endl;
@@ -260,8 +260,8 @@ double CVolumetricMovement::Check_Grid(CGeometry *geometry) {
 
 double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) {
   
-	unsigned short iVar, iDim, nNodes, iNodes;
-	unsigned long Point_0, Point_1, iElem, iEdge, ElemCounter = 0, PointCorners[8];
+  unsigned short iVar, iDim, nNodes, iNodes;
+  unsigned long Point_0, Point_1, iElem, iEdge, ElemCounter = 0, PointCorners[8];
   double *Coord_0, *Coord_1, Length, MinLength = 1E10, **StiffMatrix_Elem, Scale, CoordCorners[8][3];
   double *Edge_Vector = new double [nDim];
   bool RightVol;
@@ -283,28 +283,28 @@ double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) 
   
   /*--- Check the minimum edge length in the entire mesh. ---*/
   
-	for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
+  for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
     
-		/*--- Points in edge and coordinates ---*/
-		Point_0 = geometry->edge[iEdge]->GetNode(0);  Coord_0 = geometry->node[Point_0]->GetCoord();
-		Point_1 = geometry->edge[iEdge]->GetNode(1);  Coord_1 = geometry->node[Point_1]->GetCoord();
+    /*--- Points in edge and coordinates ---*/
+    Point_0 = geometry->edge[iEdge]->GetNode(0);  Coord_0 = geometry->node[Point_0]->GetCoord();
+    Point_1 = geometry->edge[iEdge]->GetNode(1);  Coord_1 = geometry->node[Point_1]->GetCoord();
     
-		/*--- Compute Edge_Vector ---*/
-		Length = 0;
-		for (iDim = 0; iDim < nDim; iDim++) {
-			Edge_Vector[iDim] = Coord_1[iDim] - Coord_0[iDim];
-			Length += Edge_Vector[iDim]*Edge_Vector[iDim];
-		}
-		Length = sqrt(Length);
-		MinLength = min(Length, MinLength);
+    /*--- Compute Edge_Vector ---*/
+    Length = 0;
+    for (iDim = 0; iDim < nDim; iDim++) {
+      Edge_Vector[iDim] = Coord_1[iDim] - Coord_0[iDim];
+      Length += Edge_Vector[iDim]*Edge_Vector[iDim];
+    }
+    Length = sqrt(Length);
+    MinLength = min(Length, MinLength);
     
-	}
+  }
   
   /*--- Compute min volume in the entire mesh. ---*/
   Scale = Check_Grid(geometry);
   
-	/*--- Compute contributions from each element by forming the stiffness matrix (FEA) ---*/
-	for (iElem = 0; iElem < geometry->GetnElem(); iElem++) {
+  /*--- Compute contributions from each element by forming the stiffness matrix (FEA) ---*/
+  for (iElem = 0; iElem < geometry->GetnElem(); iElem++) {
     
     if (geometry->elem[iElem]->GetVTK_Type() == TRIANGLE)     nNodes = 3;
     if (geometry->elem[iElem]->GetVTK_Type() == RECTANGLE)    nNodes = 4;
@@ -322,14 +322,14 @@ double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) 
     
     if (nDim == 2) RightVol = SetFEA_StiffMatrix2D(geometry, StiffMatrix_Elem, CoordCorners, nNodes, Scale);
     if (nDim == 3) RightVol = SetFEA_StiffMatrix3D(geometry, StiffMatrix_Elem, CoordCorners, nNodes, Scale);
-
+    
     AddFEA_StiffMatrix(geometry, StiffMatrix_Elem, PointCorners, nNodes);
     
     /*--- Create a list with the degenerate elements ---*/
-
+    
     if (!RightVol) ElemCounter++;
-      
-	}
+    
+  }
   
   if ((ElemCounter != 0) && (rank == MASTER_NODE))
     cout <<"There are " << ElemCounter << " degenerate elements in the original grid." << endl;
@@ -351,8 +351,8 @@ double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) 
   
   /*--- If there are no degenerate cells, use the minimum volume instead ---*/
   if (ElemCounter == 0) MinLength = Scale;
-      
-	return MinLength;
+  
+  return MinLength;
 }
 
 double CVolumetricMovement::ShapeFunc_Hexa(double Xi, double Eta, double Mu, double CoordCorners[8][3], double DShapeFunction[8][4]) {
@@ -367,7 +367,7 @@ double CVolumetricMovement::ShapeFunc_Hexa(double Xi, double Eta, double Mu, dou
   ss[0] = Xi;
   ss[1] = Eta;
   ss[2] = Mu;
-
+  
   /*--- Shape functions ---*/
   
   for (i = 0; i < 8; i++) {
@@ -381,7 +381,7 @@ double CVolumetricMovement::ShapeFunc_Hexa(double Xi, double Eta, double Mu, dou
   }
   
   /*--- Jacobian transformation ---*/
-   
+  
   for (i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {
       xs[i][j] = 0.0;
@@ -441,9 +441,9 @@ double CVolumetricMovement::ShapeFunc_Tetra(double Xi, double Eta, double Mu, do
   DShapeFunction[1][3] = Eta;
   DShapeFunction[2][3] = Mu;
   DShapeFunction[3][3] = 1.0 - Xi - Eta - Mu;
-
+  
   /*--- dN/d xi, dN/d eta, dN/d mu ---*/
-
+  
   DShapeFunction[0][0] = 1.0;   DShapeFunction[0][1] = 0.0;   DShapeFunction[0][2] = 0.0;
   DShapeFunction[1][0] = 0.0;   DShapeFunction[1][1] = 1.0;   DShapeFunction[1][2] = 0.0;
   DShapeFunction[2][0] = 0.0;   DShapeFunction[2][1] = 0.0;   DShapeFunction[2][2] = 1.0;
@@ -719,14 +719,14 @@ double CVolumetricMovement::ShapeFunc_Rectangle(double Xi, double Eta, double Co
   DShapeFunction[1][3] = 0.25*(1.0+Xi)*(1.0-Eta);
   DShapeFunction[2][3] = 0.25*(1.0+Xi)*(1.0+Eta);
   DShapeFunction[3][3] = 0.25*(1.0-Xi)*(1.0+Eta);
-
+  
   /*--- dN/d xi, dN/d eta, dN/d mu ---*/
   
   DShapeFunction[0][0] = -0.25*(1.0-Eta); DShapeFunction[0][1] = -0.25*(1.0-Xi);
   DShapeFunction[1][0] =  0.25*(1.0-Eta); DShapeFunction[1][1] = -0.25*(1.0+Xi);
   DShapeFunction[2][0] =  0.25*(1.0+Eta); DShapeFunction[2][1] =  0.25*(1.0+Xi);
   DShapeFunction[3][0] = -0.25*(1.0+Eta); DShapeFunction[3][1] =  0.25*(1.0-Xi);
-
+  
   /*--- Jacobian transformation ---*/
   
   for (i = 0; i < 2; i++) {
@@ -840,9 +840,9 @@ double CVolumetricMovement::GetTetra_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume = (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
@@ -867,9 +867,9 @@ double CVolumetricMovement::GetPyram_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume = (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
@@ -884,14 +884,14 @@ double CVolumetricMovement::GetPyram_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume += (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
   return Volume;
-
+  
 }
 
 double CVolumetricMovement::GetWedge_Volume(double CoordCorners[8][3]) {
@@ -911,9 +911,9 @@ double CVolumetricMovement::GetWedge_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume = (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
@@ -928,9 +928,9 @@ double CVolumetricMovement::GetWedge_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume += (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
@@ -945,14 +945,14 @@ double CVolumetricMovement::GetWedge_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume += (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
   return Volume;
-
+  
 }
 
 double CVolumetricMovement::GetHexa_Volume(double CoordCorners[8][3]) {
@@ -972,9 +972,9 @@ double CVolumetricMovement::GetHexa_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume = (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
@@ -989,9 +989,9 @@ double CVolumetricMovement::GetHexa_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume += (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
@@ -1006,9 +1006,9 @@ double CVolumetricMovement::GetHexa_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume += (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
@@ -1023,9 +1023,9 @@ double CVolumetricMovement::GetHexa_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume += (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
@@ -1040,14 +1040,14 @@ double CVolumetricMovement::GetHexa_Volume(double CoordCorners[8][3]) {
     r3[iDim] = Coord_3[iDim] - Coord_0[iDim];
   }
   
-	CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
-	CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
-	CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
+  CrossProduct[0] = (r1[1]*r2[2] - r1[2]*r2[1])*r3[0];
+  CrossProduct[1] = (r1[2]*r2[0] - r1[0]*r2[2])*r3[1];
+  CrossProduct[2] = (r1[0]*r2[1] - r1[1]*r2[0])*r3[2];
   
   Volume += (CrossProduct[0] + CrossProduct[1] + CrossProduct[2])/6.0;
   
   return Volume;
-
+  
 }
 
 bool CVolumetricMovement::SetFEA_StiffMatrix3D(CGeometry *geometry, double **StiffMatrix_Elem, double CoordCorners[8][3], unsigned short nNodes, double scale) {
@@ -1109,14 +1109,14 @@ bool CVolumetricMovement::SetFEA_StiffMatrix3D(CGeometry *geometry, double **Sti
           B_Matrix[5][2+iNode*nVar] = DShapeFunction[iNode][0];
         }
         
-      double E = scale / (iWeight * jWeight * kWeight * Det) ;
-      double Mu = E;
-      double Lambda = -E;
+        double E = scale / (iWeight * jWeight * kWeight * Det) ;
+        double Mu = E;
+        double Lambda = -E;
         
-//        double E = 2E11;
-//        double Nu = 0.30;
-//        double Mu = E / (2.0*(1.0 + Nu));
-//        double Lambda = Nu*E/((1.0+Nu)*(1.0-2.0*Nu));
+        //        double E = 2E11;
+        //        double Nu = 0.30;
+        //        double Mu = E / (2.0*(1.0 + Nu));
+        //        double Lambda = Nu*E/((1.0+Nu)*(1.0-2.0*Nu));
         
         /*--- Compute the D Matrix (for plane strain and 3-D)---*/
         
@@ -1209,10 +1209,10 @@ bool CVolumetricMovement::SetFEA_StiffMatrix2D(CGeometry *geometry, double **Sti
       double Mu = E;
       double Lambda = -E;
       
-//      double E = 2E11;
-//      double Nu = 0.30;
-//      double Mu = E / (2.0*(1.0 + Nu));
-//      double Lambda = Nu*E/((1.0+Nu)*(1.0-2.0*Nu));
+      //      double E = 2E11;
+      //      double Nu = 0.30;
+      //      double Mu = E / (2.0*(1.0 + Nu));
+      //      double Lambda = Nu*E/((1.0+Nu)*(1.0-2.0*Nu));
       
       /*--- Compute the D Matrix (for plane strain and 3-D)---*/
       
@@ -1252,7 +1252,7 @@ bool CVolumetricMovement::SetFEA_StiffMatrix2D(CGeometry *geometry, double **Sti
 void CVolumetricMovement::AddFEA_StiffMatrix(CGeometry *geometry, double **StiffMatrix_Elem, unsigned long PointCorners[8], unsigned short nNodes) {
   unsigned short iVar, jVar, iDim, jDim;
   unsigned short nVar = geometry->GetnDim();
-
+  
   double **StiffMatrix_Node;
   StiffMatrix_Node = new double* [nVar];
   for (iVar = 0; iVar < nVar; iVar++)
@@ -1273,7 +1273,7 @@ void CVolumetricMovement::AddFEA_StiffMatrix(CGeometry *geometry, double **Stiff
           StiffMatrix_Node[iDim][jDim] = StiffMatrix_Elem[(iVar*nVar)+iDim][(jVar*nVar)+jDim];
         }
       }
-
+      
       StiffMatrix.AddBlock(PointCorners[iVar], PointCorners[jVar], StiffMatrix_Node);
       
     }
@@ -1288,10 +1288,10 @@ void CVolumetricMovement::AddFEA_StiffMatrix(CGeometry *geometry, double **Stiff
 }
 
 void CVolumetricMovement::SetBoundaryDisplacements(CGeometry *geometry, CConfig *config) {
-
-	unsigned short iDim, nDim = geometry->GetnDim(), iMarker, axis = 0;
-	unsigned long iPoint, total_index, iVertex;
-	double *VarCoord, MeanCoord[3], VarIncrement = 1.0;
+  
+  unsigned short iDim, nDim = geometry->GetnDim(), iMarker, axis = 0;
+  unsigned long iPoint, total_index, iVertex;
+  double *VarCoord, MeanCoord[3], VarIncrement = 1.0;
   
   /*--- Get the SU2 module. SU2_CFD will use this routine for dynamically
    deforming meshes (MARKER_MOVING), while SU2_MDC will use it for deforming
@@ -1304,87 +1304,87 @@ void CVolumetricMovement::SetBoundaryDisplacements(CGeometry *geometry, CConfig 
    successive small deformations. ---*/
   
   VarIncrement = 1.0/((double)config->GetGridDef_Iter());
-	
-	/*--- As initialization, set to zero displacements of all the surfaces except the symmetry
-	 plane and the receive boundaries. ---*/
-	for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-		if ((config->GetMarker_All_Boundary(iMarker) != SYMMETRY_PLANE)
+  
+  /*--- As initialization, set to zero displacements of all the surfaces except the symmetry
+   plane and the receive boundaries. ---*/
+  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
+    if ((config->GetMarker_All_Boundary(iMarker) != SYMMETRY_PLANE)
         && (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE)) {
-			for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
-				iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
-				for (iDim = 0; iDim < nDim; iDim++) {
-					total_index = iPoint*nDim + iDim;
-					LinSysRes[total_index] = 0.0;
-					LinSysSol[total_index] = 0.0;
+      for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+        iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+        for (iDim = 0; iDim < nDim; iDim++) {
+          total_index = iPoint*nDim + iDim;
+          LinSysRes[total_index] = 0.0;
+          LinSysSol[total_index] = 0.0;
           StiffMatrix.DeleteValsRowi(total_index);
-				}
-			}
+        }
+      }
     }
   }
-	
+  
   /*--- Set to zero displacements of the normal component for the symmetry plane condition ---*/
   
-	for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-		if ((config->GetMarker_All_Boundary(iMarker) == SYMMETRY_PLANE) && (nDim == 3)) {
+  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
+    if ((config->GetMarker_All_Boundary(iMarker) == SYMMETRY_PLANE) && (nDim == 3)) {
       
-			for (iDim = 0; iDim < nDim; iDim++) MeanCoord[iDim] = 0.0;
-			for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
-				iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
-				VarCoord = geometry->node[iPoint]->GetCoord();
-				for (iDim = 0; iDim < nDim; iDim++)
-					MeanCoord[iDim] += VarCoord[iDim]*VarCoord[iDim];
-			}
-			for (iDim = 0; iDim < nDim; iDim++) MeanCoord[iDim] = sqrt(MeanCoord[iDim]);
-			
-			if ((MeanCoord[0] <= MeanCoord[1]) && (MeanCoord[0] <= MeanCoord[2])) axis = 0;
-			if ((MeanCoord[1] <= MeanCoord[0]) && (MeanCoord[1] <= MeanCoord[2])) axis = 1;
-			if ((MeanCoord[2] <= MeanCoord[0]) && (MeanCoord[2] <= MeanCoord[1])) axis = 2;
-						
-			for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
-				iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
-				total_index = iPoint*nDim + axis;
-				LinSysRes[total_index] = 0.0;
-				LinSysSol[total_index] = 0.0;
-				StiffMatrix.DeleteValsRowi(total_index);
-			}
-		}
-	}
+      for (iDim = 0; iDim < nDim; iDim++) MeanCoord[iDim] = 0.0;
+      for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+        iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+        VarCoord = geometry->node[iPoint]->GetCoord();
+        for (iDim = 0; iDim < nDim; iDim++)
+          MeanCoord[iDim] += VarCoord[iDim]*VarCoord[iDim];
+      }
+      for (iDim = 0; iDim < nDim; iDim++) MeanCoord[iDim] = sqrt(MeanCoord[iDim]);
+      
+      if ((MeanCoord[0] <= MeanCoord[1]) && (MeanCoord[0] <= MeanCoord[2])) axis = 0;
+      if ((MeanCoord[1] <= MeanCoord[0]) && (MeanCoord[1] <= MeanCoord[2])) axis = 1;
+      if ((MeanCoord[2] <= MeanCoord[0]) && (MeanCoord[2] <= MeanCoord[1])) axis = 2;
+      
+      for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+        iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+        total_index = iPoint*nDim + axis;
+        LinSysRes[total_index] = 0.0;
+        LinSysSol[total_index] = 0.0;
+        StiffMatrix.DeleteValsRowi(total_index);
+      }
+    }
+  }
   
-	/*--- Set the known displacements, note that some points of the moving surfaces
+  /*--- Set the known displacements, note that some points of the moving surfaces
    could be on on the symmetry plane, we should specify DeleteValsRowi again (just in case) ---*/
   
-	for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-		if (((config->GetMarker_All_Moving(iMarker) == YES) && ((Kind_SU2 == SU2_CFD) || (Kind_SU2 == SU2_EDU))) ||
+  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
+    if (((config->GetMarker_All_Moving(iMarker) == YES) && ((Kind_SU2 == SU2_CFD) || (Kind_SU2 == SU2_EDU))) ||
         ((config->GetMarker_All_DV(iMarker) == YES) && (Kind_SU2 == SU2_MDC))) {
-			for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
-				iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
-				VarCoord = geometry->vertex[iMarker][iVertex]->GetVarCoord();
-				for (iDim = 0; iDim < nDim; iDim++) {
-					total_index = iPoint*nDim + iDim;
-					LinSysRes[total_index] = VarCoord[iDim] * VarIncrement;
-					LinSysSol[total_index] = VarCoord[iDim] * VarIncrement;
+      for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+        iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+        VarCoord = geometry->vertex[iMarker][iVertex]->GetVarCoord();
+        for (iDim = 0; iDim < nDim; iDim++) {
+          total_index = iPoint*nDim + iDim;
+          LinSysRes[total_index] = VarCoord[iDim] * VarIncrement;
+          LinSysSol[total_index] = VarCoord[iDim] * VarIncrement;
           StiffMatrix.DeleteValsRowi(total_index);
-				}
-			}
+        }
+      }
     }
   }
   
   /*--- Don't move the nearfield plane ---*/
   
   for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-		if (config->GetMarker_All_Boundary(iMarker) == NEARFIELD_BOUNDARY) {
-			for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
-				iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
-				for (iDim = 0; iDim < nDim; iDim++) {
-					total_index = iPoint*nDim + iDim;
-					LinSysRes[total_index] = 0.0;
-					LinSysSol[total_index] = 0.0;
+    if (config->GetMarker_All_Boundary(iMarker) == NEARFIELD_BOUNDARY) {
+      for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+        iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+        for (iDim = 0; iDim < nDim; iDim++) {
+          total_index = iPoint*nDim + iDim;
+          LinSysRes[total_index] = 0.0;
+          LinSysSol[total_index] = 0.0;
           StiffMatrix.DeleteValsRowi(total_index);
-				}
-			}
+        }
+      }
     }
   }
-
+  
 }
 
 CSurfaceMovement::CSurfaceMovement(void) : CGridMovement() {
@@ -1394,7 +1394,7 @@ CSurfaceMovement::~CSurfaceMovement(void) {}
 
 void CSurfaceMovement::SetSurface_Deformation(CGeometry *geometry, CConfig *config) {
   unsigned short iDV;
-	string FFDBoxTag;
+  string FFDBoxTag;
   
   /*--- Apply the design variables to the control point position ---*/
   for (iDV = 0; iDV < config->GetnDV(); iDV++) {
@@ -1404,16 +1404,16 @@ void CSurfaceMovement::SetSurface_Deformation(CGeometry *geometry, CConfig *conf
 }
 
 void CSurfaceMovement::CopyBoundary(CGeometry *geometry, CConfig *config) {
-	unsigned short iMarker;
-	unsigned long iVertex, iPoint;
-	double *Coord;
-
-	for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++)
-		for(iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
-			iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
-			Coord = geometry->node[iPoint]->GetCoord();
-			geometry->vertex[iMarker][iVertex]->SetCoord(Coord);
-		}
+  unsigned short iMarker;
+  unsigned long iVertex, iPoint;
+  double *Coord;
+  
+  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++)
+    for(iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+      iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+      Coord = geometry->node[iPoint]->GetCoord();
+      geometry->vertex[iMarker][iVertex]->SetCoord(Coord);
+    }
 }
 
 void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
@@ -1457,76 +1457,76 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
     airfoil_file.open(AirfoilFile.c_str(), ios::in);
     if (airfoil_file.fail()) {
       cout << "File open error! "<< endl;
-    } else { 
+    } else {
       break;
     }
   }
-
+  
   cin.clear(); /*-- Clear the cin buffer (penalty for mixing types of cin calls)--*/
   cin.ignore(INT_MAX,'\n');
-
+  
   /*-- Get coordinate file type --*/
   int dat_file_type = 0;
   string Input = "";
   while(1) {
-
+    
     cout << endl;
     cout << "   [0] Selig" << endl;
     cout << "   [1] Lednicer"  << endl;
     cout << "Select coordinate file type [0]: " ;
     getline(cin, Input);
-
+    
     stringstream myStream(Input);
-
+    
     /*-- Handle default option --*/
     if (Input.empty())
       myStream << "0";
-
+    
     /*-- Check for valid input --*/
     if (myStream >> dat_file_type) {
       if (dat_file_type == 0) {
-          strcpy(AirfoilFormat, "Selig");
-          break;
+        strcpy(AirfoilFormat, "Selig");
+        break;
       } else if(dat_file_type == 1) {
-          strcpy(AirfoilFormat, "Lednicer");
-          break;
+        strcpy(AirfoilFormat, "Lednicer");
+        break;
       }
     }
   }
-
-
-//  /*-- Get airfoil scaling --*/
-//  while(1) {
-//
-//    cout << endl;
-//    cout << "Enter airfoil scaling [1.0]: " ;
-//    getline(cin, Input);
-//
-//    stringstream myStream(Input);
-//
-//    /*-- Handle default option --*/
-//    if (Input.empty())
-//      myStream << "1.0";
-//
-//    /*-- Check for valid input --*/
-//    if (myStream >> AirfoilScale) {
-//        break;
-//    }
-//    
-//  }
-
+  
+  
+  //  /*-- Get airfoil scaling --*/
+  //  while(1) {
+  //
+  //    cout << endl;
+  //    cout << "Enter airfoil scaling [1.0]: " ;
+  //    getline(cin, Input);
+  //
+  //    stringstream myStream(Input);
+  //
+  //    /*-- Handle default option --*/
+  //    if (Input.empty())
+  //      myStream << "1.0";
+  //
+  //    /*-- Check for valid input --*/
+  //    if (myStream >> AirfoilScale) {
+  //        break;
+  //    }
+  //
+  //  }
+  
   /*-- Decide whether or not to close the airfoil --*/
   while(1) {
-
+    
     cout << endl;
     cout << "Close the airfoil (Y/N)? [N]: ";
-
+    
     getline(cin, Input);
-
+    
     /*-- Handle default option --*/
     if (Input.empty())
       Input = "N";
-
+    
     /*-- Check for valid input --*/
     if (Input.compare("Y")==0) {
       strcpy(AirfoilClose, "Yes");
@@ -1534,13 +1534,13 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
     } else if (Input.compare("N")==0) {
       strcpy(AirfoilClose, "No");
       break;
-    } 
+    }
     cout << "Repeating loop" << endl;
-
+    
   }
   
-//  cout << "Surface mesh orientation (clockwise, or anticlockwise): ";
-//  scanf ("%s", MeshOrientation);
+  //  cout << "Surface mesh orientation (clockwise, or anticlockwise): ";
+  //  scanf ("%s", MeshOrientation);
   
   /*--- The first line is the header ---*/
   
@@ -1548,7 +1548,7 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   cout << "File info: " << text_line << endl;
   
   if (strcmp (AirfoilFormat,"Selig") == 0) {
-
+    
     while (getline (airfoil_file, text_line)) {
       istringstream point_line(text_line);
       
@@ -1566,7 +1566,7 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   if (strcmp (AirfoilFormat,"Lednicer") == 0) {
     
     /*--- The second line is the number of points ---*/
-
+    
     getline(airfoil_file, text_line);
     istringstream point_line(text_line);
     double Upper, Lower;
@@ -1574,14 +1574,14 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
     
     nUpper = int(Upper);
     nLower = int(Lower);
-  
+    
     Xcoord.resize(nUpper+nLower-1);
     Ycoord.resize(nUpper+nLower-1);
     
     /*--- White line ---*/
-
+    
     getline (airfoil_file, text_line);
-
+    
     for (iUpper = 0; iUpper < nUpper; iUpper++) {
       getline (airfoil_file, text_line);
       istringstream point_line(text_line);
@@ -1600,7 +1600,7 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
     }
     
     getline (airfoil_file, text_line);
-
+    
     for (iLower = 0; iLower < nLower; iLower++) {
       getline (airfoil_file, text_line);
       istringstream point_line(text_line);
@@ -1617,7 +1617,7 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
       Xcoord[nUpper+iLower-1] = Airfoil_Coord[0];
       Ycoord[nUpper+iLower-1] = Airfoil_Coord[1]*AirfoilScale*factor;
     }
-      
+    
   }
   
   /*--- Check the coordinate (1,0) at the beginning and end of the file ---*/
@@ -1630,23 +1630,23 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   
   /*--- Change the orientation (depend on the input file, and the mesh file) ---*/
   
-//  if (strcmp (MeshOrientation,"clockwise") == 0) {
-    for (iVar = 0; iVar < Xcoord.size(); iVar++) {
-      Xcoord_Aux.push_back(Xcoord[iVar]);
-      Ycoord_Aux.push_back(Ycoord[iVar]);
-    }
-    
-    for (iVar = 0; iVar < Xcoord.size(); iVar++) {
-      Xcoord[iVar] = Xcoord_Aux[Xcoord.size()-iVar-1];
-      Ycoord[iVar] = Ycoord_Aux[Xcoord.size()-iVar-1];
-    }
-//  }
+  //  if (strcmp (MeshOrientation,"clockwise") == 0) {
+  for (iVar = 0; iVar < Xcoord.size(); iVar++) {
+    Xcoord_Aux.push_back(Xcoord[iVar]);
+    Ycoord_Aux.push_back(Ycoord[iVar]);
+  }
+  
+  for (iVar = 0; iVar < Xcoord.size(); iVar++) {
+    Xcoord[iVar] = Xcoord_Aux[Xcoord.size()-iVar-1];
+    Ycoord[iVar] = Ycoord_Aux[Xcoord.size()-iVar-1];
+  }
+  //  }
   
   /*--- Compute the total arch length ---*/
   
   double Arch = 0.0;
   Svalue.push_back(Arch);
-
+  
   for (iVar = 0; iVar < Xcoord.size()-1; iVar++) {
     x_i = Xcoord[iVar];  x_ip1 = Xcoord[iVar+1];
     y_i = Ycoord[iVar];  y_ip1 = Ycoord[iVar+1];
@@ -1660,7 +1660,7 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   /*--- Non dimensionalization ---*/
   
   for (iVar = 0; iVar < Svalue.size(); iVar++) { Svalue[iVar] /= Arch; }
-
+  
   /*--- Close the restart file ---*/
   
   airfoil_file.close();
@@ -1731,10 +1731,10 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
         VarCoord[0] = NewXCoord - Coord[0];
         VarCoord[1] = NewYCoord - Coord[1];
       }
-
+      
       boundary->vertex[iMarker][iVertex]->SetVarCoord(VarCoord);
       
     }
   }
-
+  
 }

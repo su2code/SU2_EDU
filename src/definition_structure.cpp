@@ -268,59 +268,59 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
         break;
         
       case SPACE_CENTERED :
-          /*--- Compressible flow ---*/
-          switch (config->GetKind_Centered_Flow()) {
-            case NO_CENTERED : cout << "No centered scheme." << endl; break;
-            case LAX : numerics_container[MESH_0][FLOW_SOL][CONV_TERM] = new CCentLax_Flow(nDim,nVar_Flow, config); break;
-            case JST : numerics_container[MESH_0][FLOW_SOL][CONV_TERM] = new CCentJST_Flow(nDim,nVar_Flow, config); break;
-            default : cout << "Centered scheme not implemented." << endl; exit(1); break;
-          }
-          
-            /*--- Definition of the numerics on the coarse levels ---*/
-            
-            for (iMGlevel = 1; iMGlevel <= config->GetMGLevels(); iMGlevel++)
-              numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CCentLax_Flow(nDim, nVar_Flow, config);
-          
-          /*--- Definition of the boundary condition method ---*/
-          for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++)
-            numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoe_Flow(nDim, nVar_Flow, config);
-          
+        /*--- Compressible flow ---*/
+        switch (config->GetKind_Centered_Flow()) {
+          case NO_CENTERED : cout << "No centered scheme." << endl; break;
+          case LAX : numerics_container[MESH_0][FLOW_SOL][CONV_TERM] = new CCentLax_Flow(nDim,nVar_Flow, config); break;
+          case JST : numerics_container[MESH_0][FLOW_SOL][CONV_TERM] = new CCentJST_Flow(nDim,nVar_Flow, config); break;
+          default : cout << "Centered scheme not implemented." << endl; exit(1); break;
+        }
+        
+        /*--- Definition of the numerics on the coarse levels ---*/
+        
+        for (iMGlevel = 1; iMGlevel <= config->GetMGLevels(); iMGlevel++)
+          numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CCentLax_Flow(nDim, nVar_Flow, config);
+        
+        /*--- Definition of the boundary condition method ---*/
+        for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++)
+          numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoe_Flow(nDim, nVar_Flow, config);
+        
         break;
       case SPACE_UPWIND :
-          /*--- Compressible flow ---*/
-          switch (config->GetKind_Upwind_Flow()) {
-            case NO_UPWIND : cout << "No upwind scheme." << endl; break;
-            case ROE_1ST : case ROE_2ND :
-              for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwRoe_Flow(nDim, nVar_Flow, config);
-                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoe_Flow(nDim, nVar_Flow, config);
-              }
-              break;
-              
-            case AUSM_1ST : case AUSM_2ND :
-              for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwAUSM_Flow(nDim, nVar_Flow, config);
-                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwAUSM_Flow(nDim, nVar_Flow, config);
-              }
-              break;
-              
-            case ROE_TURKEL_1ST : case ROE_TURKEL_2ND :
-              for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwRoeTurkel_Flow(nDim, nVar_Flow, config);
-                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoeTurkel_Flow(nDim, nVar_Flow, config);
-              }
-              break;
-              
-            case HLLC_1ST : case HLLC_2ND :
-              for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-                numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwHLLC_Flow(nDim, nVar_Flow, config);
-                numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwHLLC_Flow(nDim, nVar_Flow, config);
-              }
-              break;
-              
-            default : cout << "Upwind scheme not implemented." << endl; exit(1); break;
-          }
-          
+        /*--- Compressible flow ---*/
+        switch (config->GetKind_Upwind_Flow()) {
+          case NO_UPWIND : cout << "No upwind scheme." << endl; break;
+          case ROE_1ST : case ROE_2ND :
+            for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
+              numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwRoe_Flow(nDim, nVar_Flow, config);
+              numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoe_Flow(nDim, nVar_Flow, config);
+            }
+            break;
+            
+          case AUSM_1ST : case AUSM_2ND :
+            for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
+              numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwAUSM_Flow(nDim, nVar_Flow, config);
+              numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwAUSM_Flow(nDim, nVar_Flow, config);
+            }
+            break;
+            
+          case ROE_TURKEL_1ST : case ROE_TURKEL_2ND :
+            for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
+              numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwRoeTurkel_Flow(nDim, nVar_Flow, config);
+              numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwRoeTurkel_Flow(nDim, nVar_Flow, config);
+            }
+            break;
+            
+          case HLLC_1ST : case HLLC_2ND :
+            for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
+              numerics_container[iMGlevel][FLOW_SOL][CONV_TERM] = new CUpwHLLC_Flow(nDim, nVar_Flow, config);
+              numerics_container[iMGlevel][FLOW_SOL][CONV_BOUND_TERM] = new CUpwHLLC_Flow(nDim, nVar_Flow, config);
+            }
+            break;
+            
+          default : cout << "Upwind scheme not implemented." << endl; exit(1); break;
+        }
+        
         
         break;
         
@@ -334,24 +334,21 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
       case NONE :
         break;
       case AVG_GRAD :
-          /*--- Compressible flow ---*/
-          for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
-            numerics_container[iMGlevel][FLOW_SOL][VISC_TERM] = new CAvgGrad_Flow(nDim, nVar_Flow, config);
-            numerics_container[iMGlevel][FLOW_SOL][VISC_BOUND_TERM] = new CAvgGrad_Flow(nDim, nVar_Flow, config);
-          }
+        /*--- Compressible flow ---*/
+        for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++) {
+          numerics_container[iMGlevel][FLOW_SOL][VISC_TERM] = new CAvgGrad_Flow(nDim, nVar_Flow, config);
+          numerics_container[iMGlevel][FLOW_SOL][VISC_BOUND_TERM] = new CAvgGrad_Flow(nDim, nVar_Flow, config);
+        }
         break;
       case AVG_GRAD_CORRECTED :
-          /*--- Compressible flow ---*/
-          numerics_container[MESH_0][FLOW_SOL][VISC_TERM] = new CAvgGradCorrected_Flow(nDim, nVar_Flow, config);
-          for (iMGlevel = 1; iMGlevel <= config->GetMGLevels(); iMGlevel++)
-            numerics_container[iMGlevel][FLOW_SOL][VISC_TERM] = new CAvgGrad_Flow(nDim, nVar_Flow, config);
-          
-          /*--- Definition of the boundary condition method ---*/
-          for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++)
-            numerics_container[iMGlevel][FLOW_SOL][VISC_BOUND_TERM] = new CAvgGrad_Flow(nDim, nVar_Flow, config);
-        break;
-      case GALERKIN :
-        cout << "Galerkin viscous scheme not implemented." << endl; exit(1); exit(1);
+        /*--- Compressible flow ---*/
+        numerics_container[MESH_0][FLOW_SOL][VISC_TERM] = new CAvgGradCorrected_Flow(nDim, nVar_Flow, config);
+        for (iMGlevel = 1; iMGlevel <= config->GetMGLevels(); iMGlevel++)
+          numerics_container[iMGlevel][FLOW_SOL][VISC_TERM] = new CAvgGrad_Flow(nDim, nVar_Flow, config);
+        
+        /*--- Definition of the boundary condition method ---*/
+        for (iMGlevel = 0; iMGlevel <= config->GetMGLevels(); iMGlevel++)
+          numerics_container[iMGlevel][FLOW_SOL][VISC_BOUND_TERM] = new CAvgGrad_Flow(nDim, nVar_Flow, config);
         break;
       default :
         cout << "Numerical viscous scheme not recognized." << endl; exit(1); exit(1);
@@ -410,9 +407,6 @@ void Numerics_Preprocessing(CNumerics ****numerics_container,
           else if (menter_sst) numerics_container[iMGlevel][TURB_SOL][VISC_TERM] = new CAvgGradCorrected_TurbSST(nDim, nVar_Turb, constants, config);
         }
         break;
-      case GALERKIN :
-        cout << "Viscous scheme not implemented." << endl;
-        exit(1); break;
       default :
         cout << "Viscous scheme not implemented." << endl; exit(1);
         break;

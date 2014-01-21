@@ -300,7 +300,7 @@ void CTurbSolver::ImplicitEuler_Iteration(CGeometry *geometry, CSolver **solver_
     
     switch (config->GetKind_Turb_Model()) {
         
-      case SA: case ML:
+      case SA:
         
         for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
           node[iPoint]->AddClippedSolution(0, config->GetLinear_Solver_Relax()*LinSysSol[iPoint],

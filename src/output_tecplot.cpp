@@ -29,7 +29,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
   unsigned short Kind_Solver = config->GetKind_Solver();
   
   unsigned long iPoint, iElem, iNode;
-  unsigned long iExtIter = config->GetExtIter();
   unsigned long *LocalIndex = NULL;
   bool *SurfacePoint = NULL;
   
@@ -53,13 +52,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
   }
   
   strcpy (cstr, filename.c_str());
-  
-  
-  /*--- Special cases where a number needs to be appended to the file name. ---*/
-  if ((Kind_Solver == POISSON_EQUATION) && config->GetUnsteady_Simulation()) {
-    sprintf (buffer, "_%d", int(iExtIter));
-    strcat(cstr,buffer);
-  }
   
     sprintf (buffer, ".dat");
   

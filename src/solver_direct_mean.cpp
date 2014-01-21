@@ -555,7 +555,7 @@ void CEulerSolver::SetInitialCondition(CGeometry **geometry, CSolver ***solver_c
   double Area_Children, Area_Parent, *Solution_Fine, *Solution;
   
   bool restart = (config->GetRestart() || config->GetRestart_Flow());
-  bool rans = ((config->GetKind_Solver() == RANS) || (config->GetKind_Solver() == ADJ_RANS));
+  bool rans = (config->GetKind_Solver() == RANS);
   
   /*--- If restart solution, then interpolate the flow solution to
    all the multigrid levels, this is important with the dual time strategy ---*/

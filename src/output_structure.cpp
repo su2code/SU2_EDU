@@ -935,10 +935,9 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
     
     /*--- WARNING: These buffers have hard-coded lengths. Note that you
      may have to adjust them to be larger if adding more entries. ---*/
-    char begin[1000], direct_coeff[1000], adjoint_coeff[1000], flow_resid[1000], adj_flow_resid[1000],
-    turb_resid[1000], trans_resid[1000], levelset_resid[1000], fea_resid[1000], end[1000];
+    char begin[1000], direct_coeff[1000], flow_resid[1000], turb_resid[1000], end[1000];
     double dummy = 0.0;
-    unsigned short iVar, iMarker;
+    unsigned short iVar;
     
     unsigned long LinSolvIter = 0;
     double timeiter = timeused/double(iExtIter+1);
@@ -946,34 +945,12 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
     unsigned short FinestMesh = config->GetFinestMesh();
     unsigned short nDim = geometry[FinestMesh]->GetnDim();
     
-    bool rotating_frame = config->GetRotating_Frame();
-    bool equiv_area = config->GetEquivArea();
-    bool transition = false;
-    bool isothermal = false;
-    for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++)
-    if (config->GetMarker_All_Boundary(iMarker) == ISOTHERMAL) isothermal = true;
-    bool turbulent = ((config->GetKind_Solver() == RANS) || (config->GetKind_Solver() == ADJ_RANS) ||
-                      (config->GetKind_Solver() == FLUID_STRUCTURE_RANS));
-    bool adjoint = config->GetAdjoint();
-    bool fluid_structure = ((config->GetKind_Solver() == FLUID_STRUCTURE_EULER) || (config->GetKind_Solver() == FLUID_STRUCTURE_NAVIER_STOKES) ||
-                            (config->GetKind_Solver() == FLUID_STRUCTURE_RANS));
-    bool wave = (config->GetKind_Solver() == WAVE_EQUATION);
-    bool heat = (config->GetKind_Solver() == HEAT_EQUATION);
-    bool fea = (config->GetKind_Solver() == LINEAR_ELASTICITY);
-    bool TNE2 = ((config->GetKind_Solver() == TNE2_EULER) || (config->GetKind_Solver() == TNE2_NAVIER_STOKES) ||
-                 (config->GetKind_Solver() == ADJ_TNE2_EULER) || (config->GetKind_Solver() == ADJ_TNE2_NAVIER_STOKES));
-    bool flow = (config->GetKind_Regime() == EULER) || (config->GetKind_Regime() == NAVIER_STOKES) ||
-    (config->GetKind_Regime() == RANS) || (config->GetKind_Regime() == ADJ_EULER) ||
-    (config->GetKind_Regime() == ADJ_NAVIER_STOKES) || (config->GetKind_Regime() == ADJ_RANS);
+    bool turbulent = ((config->GetKind_Solver() == RANS));
+    bool flow = (config->GetKind_Regime() == EULER) || (config->GetKind_Regime() == NAVIER_STOKES) || (config->GetKind_Regime() == RANS);
     
     /*--- Initialize variables to store information from all domains (direct solution) ---*/
     double Total_CLift = 0.0, Total_CDrag = 0.0, Total_CSideForce = 0.0, Total_CMx = 0.0, Total_CMy = 0.0, Total_CMz = 0.0, Total_CEff = 0.0,
-    Total_CEquivArea = 0.0, Total_CNearFieldOF = 0.0, Total_CFx = 0.0, Total_CFy = 0.0, Total_CFz = 0.0, Total_CMerit = 0.0,
-    Total_CT = 0.0, Total_CQ = 0.0, Total_CFEA = 0.0, Total_Q = 0.0, Total_MaxQ = 0.0;
-    
-    /*--- Initialize variables to store information from all domains (adjoint solution) ---*/
-    double Total_Sens_Geo = 0.0, Total_Sens_Mach = 0.0, Total_Sens_AoA = 0.0;
-    double Total_Sens_Press = 0.0, Total_Sens_Temp = 0.0;
+    Total_CFx = 0.0, Total_CFy = 0.0, Total_CFz = 0.0;
     
     /*--- Residual arrays ---*/
     double *residual_flow = NULL, *residual_turbulent = NULL, *residual_transition = NULL, *residual_TNE2 = NULL, *residual_levelset = NULL;
@@ -991,26 +968,18 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
     if (turbulent) {
       switch (config->GetKind_Turb_Model()){
         case SA:	nVar_Turb = 1; break;
-        case ML:	nVar_Turb = 1; break;
         case SST: nVar_Turb = 2; break;
       }
     }
-    if (transition) nVar_Trans = 2;
-    if (TNE2) nVar_TNE2 = nDim+2;
-    if (wave) nVar_Wave = 2;
-    if (fea) nVar_FEA = nDim;
-    if (heat) nVar_Heat = 1;
     
     /*--- Adjoint problem variables ---*/
     nVar_AdjFlow = nDim+2;
     if (turbulent) {
       switch (config->GetKind_Turb_Model()){
         case SA:	nVar_AdjTurb = 1; break;
-        case ML:	nVar_AdjTurb = 1; break;
         case SST: nVar_AdjTurb = 2; break;
       }
     }
-    if (TNE2) nVar_AdjTNE2 = nDim+2;
     
     /*--- Allocate memory for the residual ---*/
     residual_flow       = new double[nVar_Flow];
@@ -1040,8 +1009,6 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
     switch (config->GetKind_Solver()) {
         
       case EULER:                   case NAVIER_STOKES:                   case RANS:
-      case FLUID_STRUCTURE_EULER:   case FLUID_STRUCTURE_NAVIER_STOKES:   case FLUID_STRUCTURE_RANS:
-      case ADJ_EULER:               case ADJ_NAVIER_STOKES:               case ADJ_RANS:
         
         /*--- Flow solution coefficients ---*/
         Total_CLift       = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CLift();
@@ -1067,12 +1034,6 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
           residual_turbulent[iVar] = solver_container[FinestMesh][TURB_SOL]->GetRes_RMS(iVar);
         }
         
-        /*--- Transition residual ---*/
-        
-        if (transition) {
-          for (iVar = 0; iVar < nVar_Trans; iVar++)
-          residual_transition[iVar] = solver_container[FinestMesh][TRANS_SOL]->GetRes_RMS(iVar);
-        }
         
         /*--- Iterations of the linear solver ---*/
         
@@ -1113,25 +1074,11 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
         switch (config->GetKind_Solver()) {
             
           case EULER : case NAVIER_STOKES: case RANS:
-          case FLUID_STRUCTURE_EULER: case FLUID_STRUCTURE_NAVIER_STOKES: case FLUID_STRUCTURE_RANS:
-          case ADJ_EULER: case ADJ_NAVIER_STOKES: case ADJ_RANS:
             
             /*--- Direct coefficients ---*/
             sprintf (direct_coeff, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f",
                      Total_CLift, Total_CDrag, Total_CSideForce, Total_CMx, Total_CMy, Total_CMz, Total_CFx, Total_CFy,
                      Total_CFz, Total_CEff);
-            if (isothermal)
-            sprintf (direct_coeff, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f", Total_CLift, Total_CDrag, Total_CSideForce, Total_CMx, Total_CMy,
-                     Total_CMz, Total_CFx, Total_CFy, Total_CFz, Total_CEff, Total_Q, Total_MaxQ);
-            if (equiv_area)
-            sprintf (direct_coeff, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f", Total_CLift, Total_CDrag, Total_CSideForce, Total_CMx, Total_CMy,
-                     Total_CMz, Total_CFx, Total_CFy, Total_CFz, Total_CEff, Total_CEquivArea, Total_CNearFieldOF);
-            if (rotating_frame)
-            sprintf (direct_coeff, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f", Total_CLift, Total_CDrag, Total_CSideForce, Total_CMx,
-                     Total_CMy, Total_CMz, Total_CFx, Total_CFy, Total_CFz, Total_CEff, Total_CMerit, Total_CT, Total_CQ);
-            if (fluid_structure)
-            sprintf (direct_coeff, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f", Total_CLift, Total_CDrag, Total_CSideForce, Total_CMx, Total_CMy, Total_CMz,
-                     Total_CFx, Total_CFy, Total_CFz, Total_CEff, Total_CFEA);
             
             /*--- Flow residual ---*/
             if (nDim == 2) {
@@ -1149,32 +1096,6 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
               }
             }
             
-            /*--- Transition residual ---*/
-            if (transition){
-              sprintf (trans_resid, ", %12.10f, %12.10f", log10(residual_transition[0]), log10(residual_transition[1]));
-            }
-            
-            /*--- Fluid structure residual ---*/
-            if (fluid_structure) {
-              if (nDim == 2) sprintf (levelset_resid, ", %12.10f, %12.10f, 0.0", log10 (residual_fea[0]), log10 (residual_fea[1]));
-              else sprintf (levelset_resid, ", %12.10f, %12.10f, %12.10f", log10 (residual_fea[0]), log10 (residual_fea[1]), log10 (residual_fea[2]));
-            }
-            
-            if (adjoint) {
-              
-              /*--- Adjoint coefficients ---*/
-              sprintf (adjoint_coeff, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, 0.0", Total_Sens_Geo, Total_Sens_Mach, Total_Sens_AoA, Total_Sens_Press, Total_Sens_Temp);
-              
-              /*--- Adjoint flow residuals ---*/
-              if (nDim == 2) {
-                sprintf (adj_flow_resid, ", %12.10f, %12.10f, %12.10f, %12.10f, 0.0", log10 (residual_adjflow[0]),log10 (residual_adjflow[1]),log10 (residual_adjflow[2]),log10 (residual_adjflow[3]) );
-              }
-              else {
-                sprintf (adj_flow_resid, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f", log10 (residual_adjflow[0]),log10 (residual_adjflow[1]),log10 (residual_adjflow[2]),log10 (residual_adjflow[3]), log10 (residual_adjflow[4]) );
-              }
-              
-            }
-            
             break;
             
         }
@@ -1186,14 +1107,8 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
         if (!Unsteady) {
           switch (config->GetKind_Solver()) {
             case EULER :                  case NAVIER_STOKES:
-            case FLUID_STRUCTURE_EULER :  case FLUID_STRUCTURE_NAVIER_STOKES:
               cout << endl << " Min Delta Time: " << solver_container[FinestMesh][FLOW_SOL]->GetMin_Delta_Time()<<
               ". Max Delta Time: " << solver_container[FinestMesh][FLOW_SOL]->GetMax_Delta_Time() << ".";
-              break;
-              
-            case TNE2_EULER: case TNE2_NAVIER_STOKES:
-            case ADJ_TNE2_EULER: case ADJ_TNE2_NAVIER_STOKES:
-              cout << endl << " Min Delta Time: " << solver_container[MESH_0][TNE2_SOL]->GetMin_Delta_Time()<< ". Max Delta Time: " << solver_container[MESH_0][TNE2_SOL]->GetMax_Delta_Time() << ".";
               break;
           }
         }
@@ -1210,7 +1125,6 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
         
         switch (config->GetKind_Solver()) {
           case EULER :                  case NAVIER_STOKES:
-          case FLUID_STRUCTURE_EULER :  case FLUID_STRUCTURE_NAVIER_STOKES:
             
             /*--- Visualize the maximum residual ---*/
             cout << endl << " Maximum residual: " << log10(solver_container[FinestMesh][FLOW_SOL]->GetRes_Max(0))
@@ -1223,7 +1137,7 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
             
             break;
             
-          case RANS : case FLUID_STRUCTURE_RANS:
+          case RANS :
             
             /*--- Visualize the maximum residual ---*/
             cout << endl << " Maximum residual: " << log10(solver_container[FinestMesh][FLOW_SOL]->GetRes_Max(0))
@@ -1235,13 +1149,10 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
             
             switch (config->GetKind_Turb_Model()){
               case SA:	cout << "       Res[nu]"; break;
-              case ML:	cout << "       Res[nu]"; break;
               case SST:	cout << "     Res[kine]" << "     Res[omega]"; break;
             }
             
-            if (transition) { cout << "      Res[Int]" << "       Res[Re]"; }
-            if (rotating_frame && nDim == 3 ) cout << "   CThrust(Total)" << "   CTorque(Total)" << endl;
-            else cout << "   CLift(Total)"   << "   CDrag(Total)"   << endl;
+            cout << "   CLift(Total)"   << "   CDrag(Total)"   << endl;
             break;
             
             
@@ -1264,11 +1175,9 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
       
       switch (config->GetKind_Solver()) {
         case EULER : case NAVIER_STOKES:
-        case FLUID_STRUCTURE_EULER: case FLUID_STRUCTURE_NAVIER_STOKES:
           
           if (!DualTime_Iteration) {
             ConvHist_file[0] << begin << direct_coeff << flow_resid;
-            if (fluid_structure) ConvHist_file[0] << fea_resid;
             ConvHist_file[0] << end;
             ConvHist_file[0].flush();
           }
@@ -1276,23 +1185,10 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
           cout.precision(6);
           cout.setf(ios::fixed,ios::floatfield);
           cout.width(13); cout << log10(residual_flow[0]);
-          if (!fluid_structure && !equiv_area) {
               if (nDim == 2 ) { cout.width(14); cout << log10(residual_flow[3]); }
               else { cout.width(14); cout << log10(residual_flow[4]); }
-          }
-          else if (fluid_structure) { cout.width(14); cout << log10(residual_fea[0]); }
           
-          if (rotating_frame && nDim == 3 ) {
-            cout.setf(ios::scientific,ios::floatfield);
-            cout.width(15); cout << Total_CT;
-            cout.width(15); cout << Total_CQ;
-            cout.unsetf(ios_base::floatfield);
-          }
-          else if (equiv_area) { cout.width(15); cout << Total_CLift; cout.width(15); cout << Total_CDrag; cout.width(15);
-            cout.precision(4);
-            cout.setf(ios::scientific,ios::floatfield);
-            cout << Total_CNearFieldOF; }
-          else { cout.width(15); cout << min(1000.0,max(-1000.0, Total_CLift)); cout.width(15); cout << min(1000.0,max(-1000.0, Total_CDrag)); }
+          cout.width(15); cout << min(1000.0,max(-1000.0, Total_CLift)); cout.width(15); cout << min(1000.0,max(-1000.0, Total_CDrag));
           cout << endl;
           
           break;
@@ -1316,15 +1212,8 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
               cout.width(15); cout << log10(residual_turbulent[1]); break;
           }
           
-          if (transition) { cout.width(14); cout << log10(residual_transition[0]); cout.width(14); cout << log10(residual_transition[1]); }
           
-          if (rotating_frame  && nDim == 3 ) {
-            cout.setf(ios::scientific,ios::floatfield);
-            cout.width(15); cout << Total_CT; cout.width(15);
-            cout << Total_CQ;
-            cout.unsetf(ios_base::floatfield);
-          }
-          else { cout.width(15); cout << min(1000.0,max(-1000.0, Total_CLift)); cout.width(15); cout << min(1000.0,max(-1000.0, Total_CDrag)); }
+          cout.width(15); cout << min(1000.0,max(-1000.0, Total_CLift)); cout.width(15); cout << min(1000.0,max(-1000.0, Total_CDrag));
           cout << endl;
           
           break;

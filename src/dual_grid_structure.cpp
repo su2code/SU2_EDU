@@ -255,7 +255,7 @@ void CPoint::SetBoundary(unsigned short val_nmarker) {
 
 CEdge::CEdge(unsigned long val_iPoint, unsigned long val_jPoint,
              unsigned short val_ndim) : CDualGrid(val_ndim) {
-
+  
   /*--- Pointer initialization ---*/
   
   Coord_CG = NULL;
@@ -396,7 +396,7 @@ void CEdge::SetNodes_Coord(double *val_coord_Edge_CG, double *val_coord_Elem_CG,
 }
 
 CVertex::CVertex(unsigned long val_point, unsigned short val_nDim) : CDualGrid(val_nDim) {
-
+  
   /*--- Pointer initialization ---*/
   
   Nodes  = NULL;
