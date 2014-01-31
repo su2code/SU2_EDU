@@ -131,7 +131,7 @@ void CVolumetricMovement::SetVolume_Deformation(CGeometry *geometry, CConfig *co
     
     /*--- Compute the tolerance of the linear solver using MinLength ---*/
     
-    NumError = MinVolume * 0.1;
+    NumError = MinVolume * 0.01;
     
     /*--- Set the boundary displacements (as prescribed by the design variable
      perturbations controlling the surface shape) as a Dirichlet BC. ---*/
@@ -153,7 +153,7 @@ void CVolumetricMovement::SetVolume_Deformation(CGeometry *geometry, CConfig *co
     
     /*--- Solve the linear system ---*/
     
-    IterLinSol = system->FGMRES(LinSysRes, LinSysSol, *mat_vec, *precond, NumError, 250, Screen_Output);
+    IterLinSol = system->FGMRES(LinSysRes, LinSysSol, *mat_vec, *precond, NumError, 1000, Screen_Output);
     
     /*--- Deallocate memory needed by the Krylov linear solver ---*/
     
