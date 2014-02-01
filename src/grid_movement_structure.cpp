@@ -91,8 +91,6 @@ void CVolumetricMovement::SetVolume_Deformation(CGeometry *geometry, CConfig *co
   double MinVolume, NumError;
   bool Screen_Output = true;
   
-  int rank = MASTER_NODE;
-  
   /*--- Decide if there is going to be a screen output ---*/
   
   Screen_Output = true;
@@ -172,7 +170,7 @@ void CVolumetricMovement::SetVolume_Deformation(CGeometry *geometry, CConfig *co
     
     MinVolume = Check_Grid(geometry);
     
-    if ((rank == MASTER_NODE) && Screen_Output) {
+    if (Screen_Output) {
       cout << " Non-linear iter.: " << iGridDef_Iter+1 << "/" << config->GetGridDef_Iter()
       << ". Linear iter.: " << IterLinSol << ". Min vol.: " << MinVolume
       << ". Error: " << NumError << "." <<endl;
@@ -194,8 +192,6 @@ double CVolumetricMovement::Check_Grid(CGeometry *geometry) {
   double Area, Volume, MaxArea = -1E22, MaxVolume = -1E22, MinArea = 1E22, MinVolume = 1E22, CoordCorners[8][3];
   unsigned short nNodes, iNodes, iDim;
   bool RightVol;
-  
-  int rank = MASTER_NODE;
   
   /*--- Load up each triangle and tetrahedron to check for negative volumes. ---*/
   
@@ -250,7 +246,7 @@ double CVolumetricMovement::Check_Grid(CGeometry *geometry) {
     
   }
   
-  if ((ElemCounter != 0) && (rank == MASTER_NODE))
+  if (ElemCounter != 0)
     cout <<"There are " << ElemCounter << " elements with negative volume.\n" << endl;
   
   if (nDim == 2) return MinArea;
@@ -265,9 +261,7 @@ double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) 
   double *Coord_0, *Coord_1, Length, MinLength = 1E10, **StiffMatrix_Elem, Scale, CoordCorners[8][3];
   double *Edge_Vector = new double [nDim];
   bool RightVol;
-  
-  int rank = MASTER_NODE;
-  
+    
   /*--- Allocate maximum size (rectangle and hexahedron) ---*/
   
   if (nDim == 2) {
@@ -331,7 +325,7 @@ double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) 
     
   }
   
-  if ((ElemCounter != 0) && (rank == MASTER_NODE))
+  if (ElemCounter != 0)
     cout <<"There are " << ElemCounter << " degenerate elements in the original grid." << endl;
   
   /*--- Deallocate memory and exit ---*/
@@ -1297,8 +1291,6 @@ void CVolumetricMovement::SetBoundaryDisplacements(CGeometry *geometry, CConfig 
    deforming meshes (MARKER_MOVING), while SU2_MDC will use it for deforming
    meshes after imposing design variable surface deformations (DV_MARKER). ---*/
   
-  unsigned short Kind_SU2 = config->GetKind_SU2();
-  
   /*--- If requested (no by default) impose the surface deflections in
    increments and solve the grid deformation equations iteratively with
    successive small deformations. ---*/
@@ -1354,8 +1346,7 @@ void CVolumetricMovement::SetBoundaryDisplacements(CGeometry *geometry, CConfig 
    could be on on the symmetry plane, we should specify DeleteValsRowi again (just in case) ---*/
   
   for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-    if (((config->GetMarker_All_Moving(iMarker) == YES) && ((Kind_SU2 == SU2_CFD) || (Kind_SU2 == SU2_EDU))) ||
-        ((config->GetMarker_All_DV(iMarker) == YES) && (Kind_SU2 == SU2_MDC))) {
+    if (config->GetMarker_All_Moving(iMarker) == YES) {
       for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
         iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
         VarCoord = geometry->vertex[iMarker][iVertex]->GetVarCoord();
@@ -1439,8 +1430,6 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   /*--- Get the SU2 module. SU2_CFD will use this routine for dynamically
    deforming meshes (MARKER_MOVING), while SU2_MDC will use it for deforming
    meshes after imposing design variable surface deformations (DV_MARKER). ---*/
-  
-  unsigned short Kind_SU2 = config->GetKind_SU2();
   
   /*--- Read the coordinates. Two main formats:
    - Selig are in an x,y format starting from trailing edge, along the upper surface to the leading
@@ -1685,8 +1674,7 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   
   double TotalArch = 0.0;
   for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-    if (((config->GetMarker_All_Moving(iMarker) == YES) && ((Kind_SU2 == SU2_CFD) || (Kind_SU2 == SU2_EDU))) ||
-        ((config->GetMarker_All_DV(iMarker) == YES) && (Kind_SU2 == SU2_MDC))) {
+    if (config->GetMarker_All_Moving(iMarker) == YES) {
       for (iVertex = 0; iVertex < boundary->nVertex[iMarker]-1; iVertex++) {
         Coord_i = boundary->vertex[iMarker][iVertex]->GetCoord();
         Coord_ip1 = boundary->vertex[iMarker][iVertex+1]->GetCoord();
@@ -1709,8 +1697,7 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
     Arch = 0.0;
     for (iVertex = 0; iVertex < boundary->nVertex[iMarker]; iVertex++) {
       VarCoord[0] = 0.0; VarCoord[1] = 0.0; VarCoord[2] = 0.0;
-      if (((config->GetMarker_All_Moving(iMarker) == YES) && ((Kind_SU2 == SU2_CFD) || (Kind_SU2 == SU2_EDU))) ||
-          ((config->GetMarker_All_DV(iMarker) == YES) && (Kind_SU2 == SU2_MDC))) {
+      if (config->GetMarker_All_Moving(iMarker) == YES) {
         Point = boundary->vertex[iMarker][iVertex]->GetNode();
         Coord = boundary->vertex[iMarker][iVertex]->GetCoord();
         

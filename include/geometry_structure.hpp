@@ -493,12 +493,6 @@ public:
 	 * \param[in] val_mesh_out_filename - Name of the output file.
 	 */
 	virtual void SetMeshFile(CConfig *config, string val_mesh_out_filename, string val_mesh_in_filename);
-
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeSurf_Curvature(CConfig *config);
   
   /*!
 	 * \brief A virtual member.
@@ -758,15 +752,6 @@ public:
 	 * \param[in] val_format - Format of the file with the grid information.
 	 */
 	void Read_SU2_Format(CConfig *config, string val_mesh_filename);
-  
-  /*!
-	 * \brief Reads the geometry of the grid and adjust the boundary
-	 *        conditions with the configuration file.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_mesh_filename - Name of the file with the grid information.
-	 * \param[in] val_format - Format of the file with the grid information.
-	 */
-	void Read_NETCDF_Format(CConfig *config, string val_mesh_filename);
 
 	/*! 
 	 * \brief Find repeated nodes between two elements to identify the common face.
@@ -910,18 +895,6 @@ public:
 	 * \param[in] val_mesh_out_filename - Name of the output file.
 	 */
 	void SetMeshFile(CConfig *config, string val_mesh_out_filename, string val_mesh_in_filename);
-
-	/*! 
-	 * \brief Compute some parameters about the grid quality.
-	 * \param[out] statistics - Information about the grid quality, statistics[0] = (r/R)_min, statistics[1] = (r/R)_ave.		 
-	 */	
-	void GetQualityStatistics(double *statistics);
-
-	/*!
-	 * \brief Find and store all vertices on a sharp corner in the geometry.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void ComputeSurf_Curvature(CConfig *config);
 
 	/*! 
 	 * \brief Find and store the closest neighbor to a vertex.

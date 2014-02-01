@@ -25,9 +25,6 @@
 CEulerSolver::CEulerSolver(void) : CSolver() {
   
   /*--- Array initialization ---*/
-  Velocity_Inlet = NULL;
-  Velocity_Outlet = NULL;
-  Velocity_Back = NULL;
   CDrag_Inv = NULL;
   CLift_Inv = NULL;
   CSideForce_Inv = NULL;
@@ -48,31 +45,19 @@ CEulerSolver::CEulerSolver(void) : CSolver() {
   Surface_CMy = NULL;
   Surface_CMz = NULL;
   CEff_Inv = NULL;
-  CMerit_Inv = NULL;
-  CT_Inv = NULL;
-  CQ_Inv = NULL;
-  CEquivArea_Inv = NULL;
-  CNearFieldOF_Inv = NULL;
   ForceInviscid = NULL;
   MomentInviscid = NULL;
-  FanFace_MassFlow = NULL;
-  FanFace_Pressure = NULL;
-  FanFace_Mach = NULL;
-  FanFace_Area = NULL;
-  Exhaust_MassFlow = NULL;
-  Exhaust_Area = NULL;
   p1_Und_Lapl = NULL;
   p2_Und_Lapl = NULL;
   Precon_Mat_inv = NULL;
   CPressure = NULL;
   CHeatTransfer = NULL;
   YPlus = NULL;
-  point1_Airfoil = NULL;
-  point2_Airfoil = NULL;
   Primitive = NULL;
   Primitive_i = NULL;
   Primitive_j = NULL;
   CharacPrimVar = NULL;
+  
 }
 
 CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh) : CSolver() {
@@ -85,12 +70,7 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
   double Gas_Constant = config->GetGas_ConstantND();
   roe_turkel = false;
   
-  int rank = MASTER_NODE;
-  
   /*--- Array initialization ---*/
-  Velocity_Inlet = NULL;
-  Velocity_Outlet = NULL;
-  Velocity_Back = NULL;
   CDrag_Inv = NULL;
   CLift_Inv = NULL;
   CSideForce_Inv = NULL;
@@ -111,27 +91,14 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
   Surface_CMy = NULL;
   Surface_CMz = NULL;
   CEff_Inv = NULL;
-  CMerit_Inv = NULL;
-  CT_Inv = NULL;
-  CQ_Inv = NULL;
-  CEquivArea_Inv = NULL;
-  CNearFieldOF_Inv = NULL;
   ForceInviscid = NULL;
   MomentInviscid = NULL;
-  FanFace_MassFlow = NULL;
-  Exhaust_MassFlow = NULL;
-  Exhaust_Area = NULL;
-  FanFace_Pressure = NULL;
-  FanFace_Mach = NULL;
-  FanFace_Area = NULL;
   p1_Und_Lapl = NULL;
   p2_Und_Lapl = NULL;
   Precon_Mat_inv = NULL;
   CPressure = NULL;
   CHeatTransfer = NULL;
   YPlus = NULL;
-  point1_Airfoil = NULL;
-  point2_Airfoil = NULL;
   Primitive = NULL;
   Primitive_i = NULL;
   Primitive_j = NULL;
@@ -151,7 +118,6 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
   nMarker      = config->GetnMarker_All();
   nPoint       = geometry->GetnPoint();
   nPointDomain = geometry->GetnPointDomain();
-  nSection     = 0;
   
   /*--- Allocate the node variables ---*/
   node = new CVariable*[nPoint];
@@ -214,16 +180,15 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
     }
     
     /*--- Initialization of the structure for the global Jacobian ---*/
-    if (rank == MASTER_NODE) cout << "Initialize jacobian structure (Euler). MG level: " << iMesh <<"." << endl;
+    cout << "Initialize jacobian structure (Euler). MG level: " << iMesh <<"." << endl;
     Jacobian.Initialize(nPoint, nPointDomain, nVar, nVar, true, geometry);
     
     if (config->GetKind_Linear_Solver_Prec() == LINELET) {
       nLineLets = Jacobian.BuildLineletPreconditioner(geometry, config);
-      if (rank == MASTER_NODE) cout << "Compute linelet structure. " << nLineLets << " elements in each line (average)." << endl;
+      cout << "Compute linelet structure. " << nLineLets << " elements in each line (average)." << endl;
     }
     
   } else {
-    if (rank == MASTER_NODE)
     cout << "Explicit scheme. No jacobian structure (Euler). MG level: " << iMesh <<"." << endl;
   }
   
@@ -239,6 +204,7 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
     cvector = new double* [nPrimVarGrad];
     for (iVar = 0; iVar < nPrimVarGrad; iVar++)
     cvector[iVar] = new double [nDim];
+    
   }
   
   /*--- Store the value of the characteristic primitive variables at the boundaries ---*/
@@ -286,25 +252,11 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
   Surface_CMy      = new double[config->GetnMarker_Monitoring()];
   Surface_CMz      = new double[config->GetnMarker_Monitoring()];
   
-  /*--- Supersonic coefficients ---*/
-  CEquivArea_Inv   = new double[nMarker];
-  CNearFieldOF_Inv = new double[nMarker];
-  
-  /*--- Nacelle simulation ---*/
-  FanFace_MassFlow  = new double[nMarker];
-  Exhaust_MassFlow  = new double[nMarker];
-  Exhaust_Area      = new double[nMarker];
-  FanFace_Pressure  = new double[nMarker];
-  FanFace_Mach      = new double[nMarker];
-  FanFace_Area      = new double[nMarker];
-  
   /*--- Init total coefficients ---*/
   Total_CDrag = 0.0;  Total_CLift = 0.0;      Total_CSideForce = 0.0;
   Total_CMx = 0.0;    Total_CMy = 0.0;        Total_CMz = 0.0;
-  Total_CEff = 0.0;   Total_CEquivArea = 0.0; Total_CNearFieldOF = 0.0;
+  Total_CEff = 0.0;
   Total_CFx = 0.0;    Total_CFy = 0.0;        Total_CFz = 0.0;
-  Total_CT = 0.0;     Total_CQ = 0.0;         Total_CMerit = 0.0;
-  Total_Maxq = 0.0;
   
   /*--- Read farfield conditions ---*/
   Density_Inf  = config->GetDensity_FreeStreamND();
@@ -312,27 +264,6 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
   Velocity_Inf = config->GetVelocity_FreeStreamND();
   Energy_Inf   = config->GetEnergy_FreeStreamND();
   Mach_Inf     = config->GetMach_FreeStreamND();
-  
-  /*--- Initializate fan face pressure, fan face mach number, and mass flow rate ---*/
-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
-    FanFace_MassFlow[iMarker] = 0.0;
-    Exhaust_MassFlow[iMarker] = 0.0;
-    FanFace_Mach[iMarker] = Mach_Inf;
-    FanFace_Pressure[iMarker] = Pressure_Inf;
-    FanFace_Area[iMarker] = 0.0;
-    Exhaust_Area[iMarker] = 0.0;
-  }
-  
-  /*--- Inlet/Outlet boundary conditions, using infinity values ---*/
-  Density_Inlet  = Density_Inf;		Density_Outlet  = Density_Inf;
-  Pressure_Inlet = Pressure_Inf;	Pressure_Outlet = Pressure_Inf;
-  Energy_Inlet   = Energy_Inf;	  Energy_Outlet   = Energy_Inf;
-  Mach_Inlet     = Mach_Inf;			Mach_Outlet     = Mach_Inf;
-  Velocity_Inlet = new double [nDim]; Velocity_Outlet = new double [nDim];
-  for (iDim = 0; iDim < nDim; iDim++) {
-    Velocity_Inlet[iDim]  = Velocity_Inf[iDim];
-    Velocity_Outlet[iDim] = Velocity_Inf[iDim];
-  }
   
   /*--- Check for a restart and set up the variables at each node
    appropriately. Coarse multigrid levels will be intitially set to
@@ -431,7 +362,7 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
 
   counter_global = counter_local;
 
-  if ((rank == MASTER_NODE) && (counter_global != 0))
+  if ((counter_global != 0))
   cout << "Warning. The original solution contains "<< counter_global << " points that are not physical." << endl;
   
   /*--- Define solver parameters needed for execution of destructor ---*/
@@ -447,12 +378,9 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
 }
 
 CEulerSolver::~CEulerSolver(void) {
-  unsigned short iVar, iMarker, iSection;
+  unsigned short iVar, iMarker;
   
   /*--- Array deallocation ---*/
-  if (Velocity_Inlet != NULL)    delete [] Velocity_Inlet;
-  if (Velocity_Outlet != NULL)   delete [] Velocity_Outlet;
-  if (Velocity_Back != NULL)     delete [] Velocity_Back;
   if (CDrag_Inv != NULL)         delete [] CDrag_Inv;
   if (CLift_Inv != NULL)         delete [] CLift_Inv;
   if (CSideForce_Inv != NULL)    delete [] CSideForce_Inv;
@@ -473,19 +401,8 @@ CEulerSolver::~CEulerSolver(void) {
   if (Surface_CMy != NULL)      delete [] Surface_CMy;
   if (Surface_CMz != NULL)      delete [] Surface_CMz;
   if (CEff_Inv != NULL)          delete [] CEff_Inv;
-  if (CMerit_Inv != NULL)        delete [] CMerit_Inv;
-  if (CT_Inv != NULL)            delete [] CT_Inv;
-  if (CQ_Inv != NULL)            delete [] CQ_Inv;
-  if (CEquivArea_Inv != NULL)    delete [] CEquivArea_Inv;
-  if (CNearFieldOF_Inv != NULL)  delete [] CNearFieldOF_Inv;
   if (ForceInviscid != NULL)     delete [] ForceInviscid;
   if (MomentInviscid != NULL)    delete [] MomentInviscid;
-  if (FanFace_MassFlow != NULL)  delete [] FanFace_MassFlow;
-  if (Exhaust_MassFlow != NULL)  delete [] Exhaust_MassFlow;
-  if (Exhaust_Area != NULL)      delete [] Exhaust_Area;
-  if (FanFace_Pressure != NULL)  delete [] FanFace_Pressure;
-  if (FanFace_Mach != NULL)      delete [] FanFace_Mach;
-  if (FanFace_Area != NULL)      delete [] FanFace_Area;
   if (p1_Und_Lapl != NULL)       delete [] p1_Und_Lapl;
   if (p2_Und_Lapl != NULL)       delete [] p2_Und_Lapl;
   if (Primitive != NULL)        delete [] Primitive;
@@ -525,26 +442,6 @@ CEulerSolver::~CEulerSolver(void) {
       delete YPlus[iMarker];
     }
     delete [] YPlus;
-  }
-  
-  if (point1_Airfoil != NULL) {
-    for (iMarker = 0; iMarker < nMarker; iMarker++) {
-      for (iSection = 0; iSection < nSection; iSection++) {
-        point1_Airfoil[iMarker][iSection].clear();
-      }
-      delete [] point1_Airfoil[iMarker];
-    }
-    delete [] point1_Airfoil;
-  }
-  
-  if (point2_Airfoil != NULL) {
-    for (iMarker = 0; iMarker < nMarker; iMarker++) {
-      for (iSection = 0; iSection < nSection; iSection++) {
-        point2_Airfoil[iMarker][iSection].clear();
-      }
-      delete [] point2_Airfoil[iMarker];
-    }
-    delete [] point2_Airfoil;
   }
   
 }
@@ -1154,7 +1051,6 @@ void CEulerSolver::Inviscid_Forces(CGeometry *geometry, CConfig *config) {
   Total_CDrag = 0.0;  Total_CLift = 0.0;    Total_CSideForce = 0.0;   Total_CEff = 0.0;
   Total_CMx = 0.0;    Total_CMy = 0.0;      Total_CMz = 0.0;
   Total_CFx = 0.0;    Total_CFy = 0.0;      Total_CFz = 0.0;
-  Total_Q = 0.0;  Total_Maxq = 0.0;
   
   AllBound_CDrag_Inv = 0.0;   AllBound_CLift_Inv = 0.0; AllBound_CSideForce_Inv = 0.0;   AllBound_CEff_Inv = 0.0;
   AllBound_CMx_Inv = 0.0;     AllBound_CMy_Inv = 0.0;   AllBound_CMz_Inv = 0.0;
@@ -2421,9 +2317,6 @@ CNSSolver::CNSSolver(void) : CEulerSolver() {
   Surface_CMx_Visc = NULL;
   Surface_CMy_Visc = NULL;
   Surface_CMz_Visc = NULL;
-  CMerit_Visc = NULL;
-  CT_Visc = NULL;
-  CQ_Visc = NULL;
   ForceViscous = NULL;
   MomentViscous = NULL;
   CSkinFriction = NULL;
@@ -2456,14 +2349,10 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
   Surface_CMx_Visc = NULL;
   Surface_CMy_Visc = NULL;
   Surface_CMz_Visc = NULL;
-  Q_Visc = NULL;
-  Maxq_Visc = NULL;
   ForceViscous = NULL;
   MomentViscous = NULL;
   CSkinFriction = NULL;
-  
-  int rank = MASTER_NODE;
-  
+    
   /*--- Set the gamma value ---*/
   Gamma = config->GetGamma();
   Gamma_Minus_One = Gamma - 1.0;
@@ -2537,16 +2426,15 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
       Jacobian_j[iVar] = new double [nVar];
     }
     /*--- Initialization of the structure of the whole Jacobian ---*/
-    if (rank == MASTER_NODE) cout << "Initialize jacobian structure (Navier-Stokes). MG level: " << iMesh <<"." << endl;
+    cout << "Initialize jacobian structure (Navier-Stokes). MG level: " << iMesh <<"." << endl;
     Jacobian.Initialize(nPoint, nPointDomain, nVar, nVar, true, geometry);
     
     if (config->GetKind_Linear_Solver_Prec() == LINELET) {
       nLineLets = Jacobian.BuildLineletPreconditioner(geometry, config);
-      if (rank == MASTER_NODE) cout << "Compute linelet structure. " << nLineLets << " elements in each line (average)." << endl;
+      cout << "Compute linelet structure. " << nLineLets << " elements in each line (average)." << endl;
     }
     
   } else {
-    if (rank == MASTER_NODE)
     cout << "Explicit scheme. No jacobian structure (Navier-Stokes). MG level: " << iMesh <<"." << endl;
   }
   
@@ -2637,30 +2525,11 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
   Surface_CMy      = new double[config->GetnMarker_Monitoring()];
   Surface_CMz      = new double[config->GetnMarker_Monitoring()];
   
-  /*--- Rotational coefficients ---*/
-  CMerit_Inv = new double[nMarker];
-  CT_Inv     = new double[nMarker];
-  CQ_Inv     = new double[nMarker];
-  
-  /*--- Supersonic coefficients ---*/
-  CEquivArea_Inv   = new double[nMarker];
-  CNearFieldOF_Inv = new double[nMarker];
-  
-  /*--- Nacelle simulation ---*/
-  FanFace_MassFlow  = new double[nMarker];
-  Exhaust_MassFlow  = new double[nMarker];
-  Exhaust_Area      = new double[nMarker];
-  FanFace_Pressure  = new double[nMarker];
-  FanFace_Mach      = new double[nMarker];
-  FanFace_Area      = new double[nMarker];
-  
   /*--- Init total coefficients ---*/
   Total_CDrag = 0.0;	Total_CLift      = 0.0;  Total_CSideForce   = 0.0;
   Total_CMx   = 0.0;	Total_CMy        = 0.0;  Total_CMz          = 0.0;
-  Total_CEff  = 0.0;	Total_CEquivArea = 0.0;  Total_CNearFieldOF = 0.0;
+  Total_CEff  = 0.0;
   Total_CFx   = 0.0;	Total_CFy        = 0.0;  Total_CFz          = 0.0;
-  Total_CT    = 0.0;	Total_CQ         = 0.0;  Total_CMerit       = 0.0;
-  Total_Maxq  = 0.0;  Total_Q          = 0.0;
   
   ForceViscous    = new double[3];
   MomentViscous   = new double[3];
@@ -2674,11 +2543,6 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
   CFx_Visc        = new double[nMarker];
   CFy_Visc        = new double[nMarker];
   CFz_Visc        = new double[nMarker];
-  CMerit_Visc     = new double[nMarker];
-  CT_Visc         = new double[nMarker];
-  CQ_Visc         = new double[nMarker];
-  Q_Visc          = new double[nMarker];
-  Maxq_Visc       = new double[nMarker];
   
   Surface_CLift_Visc = new double[config->GetnMarker_Monitoring()];
   Surface_CDrag_Visc = new double[config->GetnMarker_Monitoring()];
@@ -2695,27 +2559,7 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
   Mach_Inf      = config->GetMach_FreeStreamND();
   Prandtl_Lam   = config->GetPrandtl_Lam();
   Prandtl_Turb  = config->GetPrandtl_Turb();
-  
-  /*--- Initializate Fan Face Pressure ---*/
-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
-    FanFace_MassFlow[iMarker] = 0.0;
-    Exhaust_MassFlow[iMarker] = 0.0;
-    Exhaust_Area[iMarker] = 0.0;
-    FanFace_Pressure[iMarker] = Pressure_Inf;
-    FanFace_Mach[iMarker] = Mach_Inf;
-  }
-  
-  /*--- Inlet/Outlet boundary conditions, using free-stream values ---*/
-  Density_Inlet  = Density_Inf;		Density_Outlet  = Density_Inf;
-  Pressure_Inlet = Pressure_Inf;	Pressure_Outlet = Pressure_Inf;
-  Energy_Inlet   = Energy_Inf;		Energy_Outlet   = Energy_Inf;
-  Mach_Inlet     = Mach_Inf;			Mach_Outlet     = Mach_Inf;
-  Velocity_Inlet = new double [nDim]; Velocity_Outlet = new double [nDim];
-  for (iDim = 0; iDim < nDim; iDim++) {
-    Velocity_Inlet[iDim]  = Velocity_Inf[iDim];
-    Velocity_Outlet[iDim] = Velocity_Inf[iDim];
-  }
-  
+    
   /*--- Check for a restart and set up the variables at each node
    appropriately. Coarse multigrid levels will be intitially set to
    the farfield values bc the solver will immediately interpolate
@@ -2813,7 +2657,7 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
   
   counter_global = counter_local;
 
-  if ((rank == MASTER_NODE) && (counter_global != 0))
+  if (counter_global != 0)
   cout << "Warning. The original solution contains "<< counter_global << " points that are not physical." << endl;
   
   
@@ -2847,8 +2691,6 @@ CNSSolver::~CNSSolver(void) {
   if (CFy_Visc != NULL)        delete [] CFy_Visc;
   if (CFz_Visc != NULL)        delete [] CFz_Visc;
   if (CEff_Visc != NULL)       delete [] CEff_Visc;
-  if (Q_Visc != NULL)          delete [] Q_Visc;
-  if (Maxq_Visc != NULL)       delete [] Maxq_Visc;
   if (ForceViscous != NULL)    delete [] ForceViscous;
   if (MomentViscous != NULL)   delete [] MomentViscous;
   
@@ -3092,7 +2934,6 @@ void CNSSolver::Viscous_Forces(CGeometry *geometry, CConfig *config) {
   AllBound_CDrag_Visc = 0.0;  AllBound_CLift_Visc = 0.0;  AllBound_CSideForce_Visc = 0.0;  AllBound_CEff_Visc = 0.0;
   AllBound_CMx_Visc = 0.0;    AllBound_CMy_Visc = 0.0;    AllBound_CMz_Visc = 0.0;
   AllBound_CFx_Visc = 0.0;    AllBound_CFy_Visc = 0.0;    AllBound_CFz_Visc = 0.0;
-  AllBound_Q_Visc = 0.0;      AllBound_Maxq_Visc = 0.0;
   
   for (iMarker_Monitoring = 0; iMarker_Monitoring < config->GetnMarker_Monitoring(); iMarker_Monitoring++) {
     Surface_CLift_Visc[iMarker_Monitoring] = 0.0;
@@ -3123,7 +2964,6 @@ void CNSSolver::Viscous_Forces(CGeometry *geometry, CConfig *config) {
       CDrag_Visc[iMarker] = 0.0;  CLift_Visc[iMarker] = 0.0; CSideForce_Visc[iMarker] = 0.0;  CEff_Visc[iMarker] = 0.0;
       CMx_Visc[iMarker] = 0.0;    CMy_Visc[iMarker] = 0.0;   CMz_Visc[iMarker] = 0.0;
       CFx_Visc[iMarker] = 0.0;    CFy_Visc[iMarker] = 0.0;   CFz_Visc[iMarker] = 0.0;
-      Q_Visc[iMarker] = 0.0;      Maxq_Visc[iMarker] = 0.0;
       
       for (iDim = 0; iDim < nDim; iDim++) ForceViscous[iDim] = 0.0;
       MomentViscous[0] = 0.0; MomentViscous[1] = 0.0; MomentViscous[2] = 0.0;
@@ -3194,11 +3034,7 @@ void CNSSolver::Viscous_Forces(CGeometry *geometry, CConfig *config) {
         GradTemperature += Grad_PrimVar[0][iDim]*(-Normal[iDim]);
         
         CHeatTransfer[iMarker][iVertex] = (Cp * Viscosity/PRANDTL)*GradTemperature/(0.5*RefDensity*RefVel2);
-        Q_Visc[iMarker] += CHeatTransfer[iMarker][iVertex];
-        
-        if ((CHeatTransfer[iMarker][iVertex]/Area) > Maxq_Visc[iMarker])
-        Maxq_Visc[iMarker] = CHeatTransfer[iMarker][iVertex]/Area;
-        
+                
         /*--- Note that y+, and heat are computed at the
          halo cells (for visualization purposes), but not the forces ---*/
         
@@ -3257,8 +3093,6 @@ void CNSSolver::Viscous_Forces(CGeometry *geometry, CConfig *config) {
         AllBound_CFx_Visc         += CFx_Visc[iMarker];
         AllBound_CFy_Visc         += CFy_Visc[iMarker];
         AllBound_CFz_Visc         += CFz_Visc[iMarker];
-        AllBound_Q_Visc           += Q_Visc[iMarker];
-        if (Maxq_Visc[iMarker] > AllBound_Maxq_Visc) AllBound_Maxq_Visc = Maxq_Visc[iMarker];
         
         /*--- Compute the coefficients per surface ---*/
         for (iMarker_Monitoring = 0; iMarker_Monitoring < config->GetnMarker_Monitoring(); iMarker_Monitoring++) {
@@ -3292,8 +3126,6 @@ void CNSSolver::Viscous_Forces(CGeometry *geometry, CConfig *config) {
   Total_CFx         += AllBound_CFx_Visc;
   Total_CFy         += AllBound_CFy_Visc;
   Total_CFz         += AllBound_CFz_Visc;
-  Total_Q           += Total_CT / (Total_CQ + EPS);
-  Total_Maxq        = AllBound_Maxq_Visc;
   
   /*--- Update the total coefficients per surface (note that all the nodes have the same value)---*/
   for (iMarker_Monitoring = 0; iMarker_Monitoring < config->GetnMarker_Monitoring(); iMarker_Monitoring++) {

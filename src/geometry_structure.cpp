@@ -401,30 +401,15 @@ CPhysicalGeometry::CPhysicalGeometry(CConfig *config) : CGeometry() {
   unsigned short iNode_Surface, iMarker;
   unsigned long Point_Surface, iElem_Surface;
   double Conversion_Factor = 1.0;
-  int rank = MASTER_NODE;
   nZone = 1;
   
   string val_mesh_filename = config->GetMesh_FileName();
-  unsigned short val_format = config->GetMesh_FileFormat();
   
   /*--- Initialize counters for local/global points & elements ---*/
   
-  if (rank == MASTER_NODE)
-    cout << endl <<"---------------------- Read grid file information -----------------------" << endl;
+  cout << endl <<"---------------------- Read grid file information -----------------------" << endl;
   
-  switch (val_format) {
-    case SU2:
-      Read_SU2_Format(config, val_mesh_filename);
-      break;
-    case NETCDF_ASCII:
-      Read_NETCDF_Format(config, val_mesh_filename);
-      break;
-    default:
-      cout << "geometry_structure.cpp" << endl;
-      cout << "Unrecognized mesh format specified!!" << endl;
-      exit(1);
-      break;
-  }
+  Read_SU2_Format(config, val_mesh_filename);
   
   if (config->GetKind_SU2() == SU2_CFD) Conversion_Factor = config->GetConversion_Factor();
   else Conversion_Factor = 1.0;
@@ -465,9 +450,8 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
   unsigned short VTK_Type, iMarker, iChar, iCount = 0;
   unsigned long iElem_Bound = 0, iPoint = 0, ielem_div = 0, ielem = 0, *Local2Global = NULL, vnodes_edge[2], vnodes_triangle[3], vnodes_quad[4], vnodes_tetra[4], vnodes_hexa[8], vnodes_wedge[6], vnodes_pyramid[5], dummyLong, GlobalIndex, iElem;
   char cstr[200];
-  double Coord_2D[2], Coord_3D[3], Conversion_Factor = 1.0, dummyDouble;
+  double Coord_2D[2], Coord_3D[3], Conversion_Factor = 1.0;
   string::size_type position;
-  int rank = MASTER_NODE, size = SINGLE_NODE;
   bool domain_flag = false;
   
   /*--- Initialize counters for local/global points & elements ---*/
@@ -525,11 +509,7 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
         for (iPoint = 0; iPoint < nPoint_; iPoint ++) {
           getline(mesh_file, text_line);
           istringstream point_line(text_line);
-          if (size == 1) { Local2Global[iPoint] = iPoint; }
-          else {
-            point_line >> dummyDouble; point_line >> dummyDouble; if (nDim_ == 3) point_line >> dummyDouble;
-            point_line >> dummyLong; point_line >> Local2Global[iPoint];
-          }
+          Local2Global[iPoint] = iPoint;
         }
         
       }
@@ -550,10 +530,8 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
     if (position != string::npos) {
       if (domain_flag == false) {
         text_line.erase (0,6); nDim = atoi(text_line.c_str());
-        if (rank == MASTER_NODE) {
-          if (nDim == 2) cout << "Two dimensional problem." << endl;
-          if (nDim == 3) cout << "Three dimensional problem." << endl;
-        }
+        if (nDim == 2) cout << "Two dimensional problem." << endl;
+        if (nDim == 3) cout << "Three dimensional problem." << endl;
         domain_flag = true;
       } else {
         break;
@@ -567,10 +545,7 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
       
       Global_nElem = nElem;
       
-      if ((rank == MASTER_NODE) && (size > SINGLE_NODE) && (config->GetKind_SU2() != SU2_DDC))
-        cout << Global_nElem << " interior elements including halo cells. " << endl;
-      else if (rank == MASTER_NODE)
-        cout << Global_nElem << " interior elements. " << endl;
+      cout << Global_nElem << " interior elements. " << endl;
       
       /*--- Allocate space for elements ---*/
       if (!config->GetDivide_Element()) elem = new CPrimalGrid*[nElem];
@@ -932,20 +907,18 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
       Global_nelem_pyramid  = nelem_pyramid;
       
       /*--- Print information about the elements to the console ---*/
-      if (rank == MASTER_NODE) {
-        if (Global_nelem_triangle > 0)
-          cout << Global_nelem_triangle << " triangles." << endl;
-        if (Global_nelem_quad > 0)
-          cout << Global_nelem_quad << " quadrilaterals." << endl;
-        if (Global_nelem_tetra > 0)
-          cout << Global_nelem_tetra << " tetrahedra." << endl;
-        if (Global_nelem_hexa > 0)
-          cout << Global_nelem_hexa << " hexahedra." << endl;
-        if (Global_nelem_wedge > 0)
-          cout << Global_nelem_wedge << " prisms." << endl;
-        if (Global_nelem_pyramid > 0)
-          cout << Global_nelem_pyramid << " pyramids." << endl;
-      }
+      if (Global_nelem_triangle > 0)
+        cout << Global_nelem_triangle << " triangles." << endl;
+      if (Global_nelem_quad > 0)
+        cout << Global_nelem_quad << " quadrilaterals." << endl;
+      if (Global_nelem_tetra > 0)
+        cout << Global_nelem_tetra << " tetrahedra." << endl;
+      if (Global_nelem_hexa > 0)
+        cout << Global_nelem_hexa << " hexahedra." << endl;
+      if (Global_nelem_wedge > 0)
+        cout << Global_nelem_wedge << " prisms." << endl;
+      if (Global_nelem_pyramid > 0)
+        cout << Global_nelem_pyramid << " pyramids." << endl;
     }
     
     /*--- Read number of points ---*/
@@ -968,7 +941,6 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
         Global_nPoint = nPoint;
         Global_nPointDomain = nPointDomain;
         
-        if (rank == MASTER_NODE)
           cout << Global_nPointDomain << " points, and " << Global_nPoint-Global_nPointDomain << " ghost points." << endl;
       }
       else if (iCount == 1) {
@@ -976,7 +948,7 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
         nPointDomain = nPoint;
         Global_nPointDomain = nPoint;
         Global_nPoint = nPoint;
-        if (rank == MASTER_NODE) cout << nPoint << " points." << endl;
+        cout << nPoint << " points." << endl;
       }
       else {
         cout << "NPOIN improperly specified!!" << endl;
@@ -1016,7 +988,7 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
     position = text_line.find ("NMARK=",0);
     if (position != string::npos) {
       text_line.erase (0,6); nMarker = atoi(text_line.c_str());
-      if (size == 1) cout << nMarker << " surface markers." << endl;
+      cout << nMarker << " surface markers." << endl;
       config->SetnMarker_All(nMarker);
       bound = new CPrimalGrid**[nMarker];
       nElem_Bound = new unsigned long [nMarker];
@@ -1040,9 +1012,7 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
         if (Marker_Tag != "SEND_RECEIVE") {
           getline (mesh_file,text_line);
           text_line.erase (0,13); nElem_Bound[iMarker] = atoi(text_line.c_str());
-          if (size == 1)
-            cout << nElem_Bound[iMarker]  << " boundary elements in index "<< iMarker <<" (Marker = " <<Marker_Tag<< ")." << endl;
-          
+          cout << nElem_Bound[iMarker]  << " boundary elements in index "<< iMarker <<" (Marker = " <<Marker_Tag<< ")." << endl;
           
           /*--- Allocate space for elements ---*/
           if (!config->GetDivide_Element()) bound[iMarker] = new CPrimalGrid* [nElem_Bound[iMarker]];
@@ -1164,348 +1134,6 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
   
   if (config->GetDivide_Element()) {
     if (Local2Global != NULL) delete [] Local2Global;
-  }
-  
-}
-
-void CPhysicalGeometry::Read_NETCDF_Format(CConfig *config, string val_mesh_filename) {
-  
-  /*--- Local variables and initialization ---*/
-  string text_line, Marker_Tag;
-  ifstream mesh_file;
-  unsigned short VTK_Type, iMarker;
-  unsigned long ielem = 0,
-  vnodes_triangle[3], vnodes_quad[4], vnodes_tetra[4], vnodes_hexa[8], vnodes_wedge[6];
-  char cstr[200];
-  string::size_type position;
-  nZone = 1;
-  
-  /*--- Initialize counters for local/global points & elements ---*/
-  
-  FinestMGLevel = true;
-  Global_nPoint = 0; Global_nPointDomain = 0; Global_nElem = 0;
-  nelem_edge     = 0; Global_nelem_edge     = 0;
-  nelem_triangle = 0; Global_nelem_triangle = 0;
-  nelem_quad     = 0; Global_nelem_quad     = 0;
-  nelem_tetra    = 0; Global_nelem_tetra    = 0;
-  nelem_hexa     = 0; Global_nelem_hexa     = 0;
-  nelem_wedge    = 0; Global_nelem_wedge    = 0;
-  nelem_pyramid  = 0; Global_nelem_pyramid  = 0;
-  
-  /*--- Throw error if not in serial mode. ---*/
-  
-  unsigned short Marker_Index, marker, icommas, iDim;
-  unsigned long nmarker, ielem_triangle, ielem_hexa, ncoord, iSurfElem, ielem_wedge,
-  ielem_quad, *marker_list, **surf_elem, ielem_surface, *surf_marker, nSurfElem;
-  double coord;
-  string::size_type position_;
-  bool stop, add;
-  
-  ielem_surface = 0; nSurfElem = 0;
-  surf_marker = NULL;
-  surf_elem = NULL;
-  
-  
-  nDim = 3; cout << "Three dimensional problem." << endl;
-  
-  /*--- Open grid file ---*/
-  strcpy (cstr, val_mesh_filename.c_str());
-  mesh_file.open(cstr, ios::in);
-  if (mesh_file.fail()) {
-    cout << "There is no geometry file (CPhysicalGeometry)!!" << endl;
-    exit(1);
-  }
-  
-  while (getline (mesh_file, text_line)) {
-    
-    position = text_line.find ("no_of_elements = ",0);
-    if (position != string::npos) {
-      text_line.erase (0,17); nElem = atoi(text_line.c_str());
-      cout << nElem << " inner elements to store." << endl;
-      elem = new CPrimalGrid*[nElem]; }
-    
-    position = text_line.find ("no_of_surfaceelements = ",0);
-    if (position != string::npos) {
-      text_line.erase (0,24); nSurfElem = atoi(text_line.c_str());
-      cout << nSurfElem << " surface elements to store." << endl;
-      surf_elem = new unsigned long* [nSurfElem];
-      for (ielem_surface = 0; ielem_surface < nSurfElem; ielem_surface++)
-        surf_elem[ielem_surface] = new unsigned long [5];
-      ielem_surface = 0;
-    }
-    
-    position = text_line.find ("no_of_points = ",0);
-    if (position != string::npos) {
-      text_line.erase (0,15); nPoint = atoi(text_line.c_str()); nPointDomain = nPoint;
-      cout << nPoint << " points to store." << endl;
-      node = new CPoint*[nPoint]; }
-    
-    position = text_line.find ("no_of_tetraeders = ",0);
-    if (position != string::npos) {
-      text_line.erase (0,19); nelem_tetra = atoi(text_line.c_str());
-      cout << nelem_tetra << " tetraeders elements to store." << endl; }
-    
-    position = text_line.find ("no_of_prisms = ",0);
-    if (position != string::npos) {
-      text_line.erase (0,15); nelem_wedge = atoi(text_line.c_str());
-      cout << nelem_wedge << " prims elements to store." << endl; }
-    
-    position = text_line.find ("no_of_hexaeders = ",0);
-    if (position != string::npos) {
-      text_line.erase (0,18); nelem_hexa = atoi(text_line.c_str());
-      cout << nelem_hexa << " hexaeders elements to store." << endl; }
-    
-    position = text_line.find ("no_of_surfacetriangles = ",0);
-    if (position != string::npos) {
-      text_line.erase (0,25); nelem_triangle = atoi(text_line.c_str());
-      cout << nelem_triangle << " surface triangle elements to store." << endl; }
-    
-    position = text_line.find ("no_of_surfacequadrilaterals = ",0);
-    if (position != string::npos) {
-      text_line.erase (0,30); nelem_quad = atoi(text_line.c_str());
-      cout << nelem_quad << " surface quadrilaterals elements to store." << endl; }
-    
-    position = text_line.find ("points_of_tetraeders =",0);
-    if (position != string::npos) {
-      for (unsigned long ielem_tetra = 0; ielem_tetra < nelem_tetra; ielem_tetra++) {
-        getline(mesh_file,text_line);
-        for (unsigned short icommas = 0; icommas < 15; icommas++) {
-          position_ = text_line.find( ",", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-          position_ = text_line.find( ";", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-        }
-        istringstream elem_line(text_line);
-        VTK_Type = TETRAHEDRON;
-        elem_line >> vnodes_tetra[0]; elem_line >> vnodes_tetra[1]; elem_line >> vnodes_tetra[2]; elem_line >> vnodes_tetra[3];
-        elem[ielem] = new CTetrahedron(vnodes_tetra[0],vnodes_tetra[1],vnodes_tetra[2],vnodes_tetra[3]);
-        ielem++;
-      }
-      cout << "finish tetrahedron element reading" << endl;
-    }
-    
-    position = text_line.find ("points_of_prisms =",0);
-    if (position != string::npos) {
-      for (ielem_wedge = 0; ielem_wedge < nelem_wedge; ielem_wedge++) {
-        getline(mesh_file,text_line);
-        for (icommas = 0; icommas < 15; icommas++) {
-          position_ = text_line.find( ",", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-          position_ = text_line.find( ";", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-        }
-        istringstream elem_line(text_line);
-        VTK_Type = WEDGE;
-        elem_line >> vnodes_wedge[0]; elem_line >> vnodes_wedge[1]; elem_line >> vnodes_wedge[2]; elem_line >> vnodes_wedge[3]; elem_line >> vnodes_wedge[4]; elem_line >> vnodes_wedge[5];
-        elem[ielem] = new CWedge(vnodes_wedge[0],vnodes_wedge[1],vnodes_wedge[2],vnodes_wedge[3],vnodes_wedge[4],vnodes_wedge[5]);
-        ielem++;
-      }
-      cout << "finish prims element reading" << endl;
-    }
-    
-    position = text_line.find ("points_of_hexaeders =",0);
-    if (position != string::npos) {
-      for (ielem_hexa = 0; ielem_hexa < nelem_hexa; ielem_hexa++) {
-        getline(mesh_file,text_line);
-        for (icommas = 0; icommas < 15; icommas++) {
-          position_ = text_line.find( ",", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-          position_ = text_line.find( ";", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-        }
-        istringstream elem_line(text_line);
-        VTK_Type = HEXAHEDRON;
-        elem_line >> vnodes_hexa[0]; elem_line >> vnodes_hexa[1]; elem_line >> vnodes_hexa[2]; elem_line >> vnodes_hexa[3];
-        elem_line >> vnodes_hexa[4]; elem_line >> vnodes_hexa[5]; elem_line >> vnodes_hexa[6]; elem_line >> vnodes_hexa[7];
-        elem[ielem] = new CHexahedron(vnodes_hexa[0],vnodes_hexa[1],vnodes_hexa[2],vnodes_hexa[3],vnodes_hexa[4],vnodes_hexa[5],vnodes_hexa[6],vnodes_hexa[7]);
-        ielem++;
-      }
-      cout << "finish hexaeders element reading" << endl;
-    }
-    
-    position = text_line.find ("points_of_surfacetriangles =",0);
-    if (position != string::npos) {
-      for (ielem_triangle = 0; ielem_triangle < nelem_triangle; ielem_triangle++) {
-        getline(mesh_file,text_line);
-        for (icommas = 0; icommas < 15; icommas++) {
-          position_ = text_line.find( ",", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-          position_ = text_line.find( ";", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-        }
-        istringstream elem_line(text_line);
-        elem_line >> vnodes_triangle[0]; elem_line >> vnodes_triangle[1]; elem_line >> vnodes_triangle[2];
-        surf_elem[ielem_surface][0]= 3;
-        surf_elem[ielem_surface][1]= vnodes_triangle[0];
-        surf_elem[ielem_surface][2]= vnodes_triangle[1];
-        surf_elem[ielem_surface][3]= vnodes_triangle[2];
-        ielem_surface++;
-      }
-      cout << "finish surface triangles element reading" << endl;
-    }
-    
-    position = text_line.find ("points_of_surfacequadrilaterals =",0);
-    if (position != string::npos) {
-      for (ielem_quad = 0; ielem_quad < nelem_quad; ielem_quad++) {
-        getline(mesh_file,text_line);
-        for (icommas = 0; icommas < 15; icommas++) {
-          position_ = text_line.find( ",", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-          position_ = text_line.find( ";", 0 ); if(position_!=string::npos) text_line.erase (position_,1);
-        }
-        istringstream elem_line(text_line);
-        elem_line >> vnodes_quad[0]; elem_line >> vnodes_quad[1]; elem_line >> vnodes_quad[2]; elem_line >> vnodes_quad[3];
-        surf_elem[ielem_surface][0]= 4;
-        surf_elem[ielem_surface][1]= vnodes_quad[0];
-        surf_elem[ielem_surface][2]= vnodes_quad[1];
-        surf_elem[ielem_surface][3]= vnodes_quad[2];
-        surf_elem[ielem_surface][4]= vnodes_quad[3];
-        ielem_surface++;
-      }
-      cout << "finish surface quadrilaterals element reading" << endl;
-    }
-    
-    position = text_line.find ("boundarymarker_of_surfaces =",0);
-    if (position != string::npos) {
-      nmarker=0;
-      stop = false;
-      surf_marker = new unsigned long [nelem_triangle + nelem_quad];
-      
-      text_line.erase (0,29);
-      for (icommas = 0; icommas < 50; icommas++) {
-        position_ = text_line.find( ",", 0 );
-        if(position_!=string::npos) text_line.erase (position_,1);
-      }
-      
-      stringstream  point_line(text_line);
-      while (point_line >> marker,!point_line.eof()) {
-        surf_marker[nmarker] = marker;
-        nmarker++; }
-      
-      while (!stop) {
-        getline(mesh_file,text_line);
-        for (icommas = 0; icommas < 50; icommas++) {
-          position_ = text_line.find( ",", 0 );
-          if(position_!=string::npos) text_line.erase (position_,1);
-          position_ = text_line.find( ";", 0 );
-          if(position_!=string::npos) text_line.erase (position_,1);
-        }
-        stringstream  point_line(text_line);
-        while (point_line>> marker,!point_line.eof()) {
-          surf_marker[nmarker] = marker;
-          if (nmarker == nSurfElem-1) {stop = true; break;}
-          nmarker++;
-        }
-      }
-    }
-    
-    for (iDim = 0; iDim < nDim; iDim++) {
-      ncoord = 0; stop = false;
-      if (iDim == 0) position = text_line.find ("points_xc = ",0);
-      if (iDim == 1) position = text_line.find ("points_yc = ",0);
-      if (iDim == 2) position = text_line.find ("points_zc = ",0);
-      
-      if (position != string::npos) {
-        text_line.erase (0,12);
-        for (icommas = 0; icommas < 50; icommas++) {
-          position_ = text_line.find( ",", 0 );
-          if(position_!=string::npos) text_line.erase (position_,1);
-        }
-        stringstream  point_line(text_line);
-        while (point_line>> coord,!point_line.eof()) {
-          if (iDim==0) node[ncoord] = new CPoint(coord, 0.0, 0.0, ncoord, config);
-          if (iDim==1) node[ncoord]->SetCoord(1, coord);
-          if (iDim==2) node[ncoord]->SetCoord(2, coord);
-          ncoord++; }
-        while (!stop) {
-          getline(mesh_file,text_line);
-          for (icommas = 0; icommas < 50; icommas++) {
-            position_ = text_line.find( ",", 0 );
-            if(position_!=string::npos) text_line.erase (position_,1);
-            position_ = text_line.find( ";", 0 );
-            if(position_!=string::npos) text_line.erase (position_,1);
-          }
-          stringstream  point_line(text_line);
-          while (point_line>> coord,!point_line.eof()) {
-            if (iDim==0) node[ncoord] = new CPoint(coord, 0.0, 0.0, ncoord, config);
-            if (iDim==1) node[ncoord]->SetCoord(1, coord);
-            if (iDim==2) node[ncoord]->SetCoord(2, coord);
-            if (ncoord == nPoint-1) {stop = true; break;}
-            ncoord++;
-          }
-        }
-        if (iDim==0) cout << "finish point xc reading" << endl;
-        if (iDim==1) cout << "finish point yc reading" << endl;
-        if (iDim==2) cout << "finish point zc reading" << endl;
-      }
-    }
-  }
-  
-  
-  /*--- Create a list with all the markers ---*/
-  marker_list = new unsigned long [MAX_NUMBER_MARKER];
-  marker_list[0] = surf_marker[0]; nMarker = 1;
-  for (iSurfElem = 0; iSurfElem < nSurfElem; iSurfElem++) {
-    add = true;
-    for (iMarker = 0; iMarker < nMarker; iMarker++)
-      if (marker_list[iMarker] == surf_marker[iSurfElem]) {
-        add = false; break; }
-    if (add) {
-      marker_list[nMarker] = surf_marker[iSurfElem];
-      nMarker++;
-    }
-  }
-  
-  nElem_Bound = new unsigned long [nMarker];
-  
-  /*--- Compute the number of element per marker ---*/
-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
-    nElem_Bound[iMarker] = 0;
-    for (iSurfElem = 0; iSurfElem < nSurfElem; iSurfElem++)
-      if (surf_marker[iSurfElem] == marker_list[iMarker])
-        nElem_Bound[iMarker]++;
-  }
-  
-  
-  /*--- Realate the marker index with the position in the array of markers ---*/
-  unsigned short *Index_to_Marker;
-  Index_to_Marker = new unsigned short [MAX_INDEX_VALUE];
-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
-    Marker_Index = marker_list[iMarker];
-    Index_to_Marker[Marker_Index] = iMarker;
-  }
-  
-  bound = new CPrimalGrid**[nMarker];
-  
-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
-    Marker_Index = marker_list[iMarker];
-    bound[iMarker] = new CPrimalGrid* [nElem_Bound[iMarker]];
-    ielem_triangle = 0; ielem_quad = 0;
-    for (iSurfElem = 0; iSurfElem < nSurfElem; iSurfElem++)
-      if (surf_marker[iSurfElem] == Marker_Index) {
-        if (surf_elem[iSurfElem][0] == 3) {
-          vnodes_triangle[0] = surf_elem[iSurfElem][1]; vnodes_triangle[1] = surf_elem[iSurfElem][2]; vnodes_triangle[2] = surf_elem[iSurfElem][3];
-          bound[iMarker][ielem_triangle+ielem_quad] = new CTriangle(vnodes_triangle[0],vnodes_triangle[1],vnodes_triangle[2],3);
-          ielem_triangle ++;
-        }
-        if (surf_elem[iSurfElem][0] == 4) {
-          vnodes_quad[0] = surf_elem[iSurfElem][1]; vnodes_quad[1] = surf_elem[iSurfElem][2]; vnodes_quad[2] = surf_elem[iSurfElem][3]; vnodes_quad[3] = surf_elem[iSurfElem][4];
-          bound[iMarker][ielem_triangle+ielem_quad] = new CRectangle(vnodes_quad[0],vnodes_quad[1],vnodes_quad[2],vnodes_quad[3],3);
-          ielem_quad ++;
-        }
-      }
-  }
-  
-  
-  
-  /*--- Update config information storing the boundary information in the right place ---*/
-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
-    
-    stringstream out;
-    out << marker_list[iMarker];
-    Marker_Tag = out.str();
-    
-    Tag_to_Marker = new string [MAX_INDEX_VALUE];
-    Tag_to_Marker[config->GetMarker_Config_Tag(Marker_Tag)] = Marker_Tag;
-    config->SetMarker_All_Tag(iMarker, Marker_Tag);
-    config->SetMarker_All_Boundary(iMarker, config->GetMarker_Config_Boundary(Marker_Tag));
-    config->SetMarker_All_Monitoring(iMarker, config->GetMarker_Config_Monitoring(Marker_Tag));
-    config->SetMarker_All_Designing(iMarker, config->GetMarker_Config_Designing(Marker_Tag));
-    config->SetMarker_All_Plotting(iMarker, config->GetMarker_Config_Plotting(Marker_Tag));
-    config->SetMarker_All_DV(iMarker, config->GetMarker_Config_DV(Marker_Tag));
-    config->SetMarker_All_Moving(iMarker, config->GetMarker_Config_Moving(Marker_Tag));
-    config->SetMarker_All_SendRecv(iMarker, NONE);
   }
   
 }
@@ -1859,10 +1487,7 @@ void CPhysicalGeometry::ComputeWall_Distance(CConfig *config) {
   unsigned short iDim, iMarker;
   unsigned long iPoint, iVertex, nVertex_SolidWall;
   
-  int rank = MASTER_NODE;
-  
-  if (rank == MASTER_NODE)
-    cout << "Computing wall distances." << endl;
+  cout << "Computing wall distances." << endl;
   
   /*--- Compute the total number of nodes on no-slip boundaries ---*/
   
@@ -1922,7 +1547,6 @@ void CPhysicalGeometry::ComputeReference_Area(CConfig *config) {
   unsigned short iMarker, Boundary, Monitoring;
   unsigned long iVertex, iPoint;
   double *Normal, PositiveZArea;
-  int rank = MASTER_NODE;
   
   PositiveZArea = 0.0;
   for (iMarker = 0; iMarker < nMarker; iMarker++) {
@@ -1930,8 +1554,7 @@ void CPhysicalGeometry::ComputeReference_Area(CConfig *config) {
     Monitoring = config->GetMarker_All_Monitoring(iMarker);
     
     if (((Boundary == EULER_WALL) || (Boundary == HEAT_FLUX) ||
-         (Boundary == ISOTHERMAL) || (Boundary == LOAD_BOUNDARY) ||
-         (Boundary == DISPLACEMENT_BOUNDARY)) && (Monitoring == YES))
+         (Boundary == ISOTHERMAL)) && (Monitoring == YES))
       for(iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
         iPoint = vertex[iMarker][iVertex]->GetNode();
         if (node[iPoint]->GetDomain()) {
@@ -1944,10 +1567,8 @@ void CPhysicalGeometry::ComputeReference_Area(CConfig *config) {
   if (config->GetRefAreaCoeff() == 0.0)
     config->SetRefAreaCoeff(PositiveZArea);
   
-  if (rank == MASTER_NODE) {
-    if (nDim == 2) cout << "Area projection in the y-plane = "<< PositiveZArea << "." << endl;
-    else cout << "Area projection in the z-plane = "<< PositiveZArea << "." << endl;
-  }
+  if (nDim == 2) cout << "Area projection in the y-plane = "<< PositiveZArea << "." << endl;
+  else cout << "Area projection in the z-plane = "<< PositiveZArea << "." << endl;
   
 }
 
@@ -2582,17 +2203,9 @@ void CPhysicalGeometry::SetControlVolume(CConfig *config, unsigned short action)
     if (Area == 0.0) for (iDim = 0; iDim < nDim; iDim++) NormalFace[iDim] = EPS*EPS;
   }
   
-  //	/*--- Set the volume for the iterations n and n-1 (dual time stteping with grid movement) ---*/
-  //	if (config->GetUnsteady_Simulation() != NO) {
-  //		for (iPoint = 0; iPoint < nPoint; iPoint++) {
-  //			node[iPoint]->SetVolume_n();
-  //			node[iPoint]->SetVolume_nM1();
-  //		}
-  //	}
-  
   DomainVolume = my_DomainVolume;
   
-  if ((rank == MASTER_NODE) && (action == ALLOCATE)) {
+  if (action == ALLOCATE) {
     if (nDim == 2) cout <<"Area of the computational grid: "<< DomainVolume <<"."<<endl;
     if (nDim == 3) cout <<"Volume of the computational grid: "<< DomainVolume <<"."<<endl;
   }
@@ -3274,413 +2887,6 @@ void CPhysicalGeometry::SetBoundSTL (CConfig *config, char mesh_filename[200]) {
   STL_File.close();
 }
 
-void CPhysicalGeometry::GetQualityStatistics(double *statistics) {
-  unsigned long jPoint, Point_2, Point_3, iElem;
-  double *Coord_j, *Coord_2, *Coord_3;
-  unsigned short iDim;
-  
-  statistics[0] = 1e06;
-  statistics[1] = 0;
-  
-  /*--- Loop interior edges ---*/
-  for (iElem = 0; iElem < this->GetnElem(); iElem++) {
-    
-    if ((this->GetnDim() == 2) && (elem[iElem]->GetVTK_Type() == TRIANGLE)) {
-      
-      jPoint = elem[iElem]->GetNode(0); Coord_j = node[jPoint]->GetCoord();
-      Point_2 = elem[iElem]->GetNode(1); Coord_2 = node[Point_2]->GetCoord();
-      Point_3 = elem[iElem]->GetNode(2); Coord_3 = node[Point_3]->GetCoord();
-      
-      /*--- Compute sides of the triangle ---*/
-      double a = 0, b = 0, c = 0;
-      for (iDim = 0; iDim < nDim; iDim++) {
-        a += (Coord_2[iDim]-Coord_j[iDim])*(Coord_2[iDim]-Coord_j[iDim]);
-        b += (Coord_3[iDim]-Coord_j[iDim])*(Coord_3[iDim]-Coord_j[iDim]);
-        c += (Coord_3[iDim]-Coord_2[iDim])*(Coord_3[iDim]-Coord_2[iDim]);
-      }
-      a = sqrt(a); b = sqrt(b); c = sqrt(c);
-      
-      /*--- Compute semiperimeter (s) and area ---*/
-      double s = 0.5*(a + b + c);
-      double Area = sqrt(s*(s-a)*(s-b)*(s-c));
-      
-      /*--- Compute radius of the circumcircle (R) and of the incircle (r) ---*/
-      double R = (a*b*c) / (4.0*Area);
-      double r = Area / s;
-      double roR = r / R;
-      
-      /*--- Update statistics ---*/
-      if (roR < statistics[0])
-        statistics[0] = roR;
-      statistics[1] += roR;
-      
-    }
-  }
-  statistics[1] /= this->GetnElem();
-  
-}
-
-void CPhysicalGeometry::ComputeSurf_Curvature(CConfig *config) {
-  unsigned short iMarker, iNeigh_Point, iDim, iNode, iNeighbor_Nodes, Neighbor_Node;
-  unsigned long Neighbor_Point, iVertex, iPoint, jPoint,iElem_Bound, iEdge, nLocalVertex, nGlobalVertex , MaxLocalVertex , *Buffer_Send_nVertex, *Buffer_Receive_nVertex, nBuffer, TotalnPointDomain;
-  int iProcessor, nProcessor;
-  vector<unsigned long> Point_NeighborList, Elem_NeighborList, Point_Triangle, Point_Edge, Point_Critical;
-  vector<unsigned long>::iterator it;
-  double U[3], V[3], W[3], Length_U, Length_V, Length_W, CosValue, Angle_Value, *K, *Angle_Defect, *Area_Vertex, *Angle_Alpha, *Angle_Beta, **NormalMeanK, MeanK, GaussK, MaxPrinK, MinPrinK, cot_alpha, cot_beta, delta, X1, X2, X3, Y1, Y2, Y3, radius, *Buffer_Send_Coord, *Buffer_Receive_Coord, *Coord, Dist, MinDist, MaxK, MinK, SigmaK;
-  bool *Check_Edge;
-  int rank;
-  
-  rank = MASTER_NODE;
-  
-  /*--- Allocate surface curvature ---*/
-  K = new double [nPoint];
-  
-  
-  if (nDim == 2) {
-    
-    /*--- Loop over all the markers ---*/
-    for (iMarker = 0; iMarker < nMarker; iMarker++) {
-      
-      if (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE) {
-        
-        /*--- Loop through all marker vertices again, this time also
-         finding the neighbors of each node.---*/
-        for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
-          iPoint  = vertex[iMarker][iVertex]->GetNode();
-          
-          if (node[iPoint]->GetDomain()) {
-            
-            /*--- Loop through neighbors. In 2-D, there should be 2 nodes on either
-             side of this vertex that lie on the same surface. ---*/
-            Point_Edge.clear();
-            
-            for (iNeigh_Point = 0; iNeigh_Point < node[iPoint]->GetnPoint(); iNeigh_Point++) {
-              Neighbor_Point = node[iPoint]->GetPoint(iNeigh_Point);
-              
-              /*--- Check if this neighbor lies on the surface. If so,
-               add to the list of neighbors. ---*/
-              if (node[Neighbor_Point]->GetPhysicalBoundary()) {
-                Point_Edge.push_back(Neighbor_Point);
-              }
-              
-            }
-            
-            if (Point_Edge.size() == 2) {
-              
-              /*--- Compute the curvature using three points ---*/
-              X1 = node[iPoint]->GetCoord(0);
-              X2 = node[Point_Edge[0]]->GetCoord(0);
-              X3 = node[Point_Edge[1]]->GetCoord(0);
-              Y1 = node[iPoint]->GetCoord(1);
-              Y2 = node[Point_Edge[0]]->GetCoord(1);
-              Y3 = node[Point_Edge[1]]->GetCoord(1);
-              
-              radius = sqrt(((X2-X1)*(X2-X1) + (Y2-Y1)*(Y2-Y1))*
-                            ((X2-X3)*(X2-X3) + (Y2-Y3)*(Y2-Y3))*
-                            ((X3-X1)*(X3-X1) + (Y3-Y1)*(Y3-Y1)))/
-              (2.0*fabs(X1*Y2+X2*Y3+X3*Y1-X1*Y3-X2*Y1-X3*Y2));
-              
-              K[iPoint] = 1.0/radius;
-              
-            }
-            
-          }
-          
-        }
-        
-      }
-      
-    }
-    
-  }
-  
-  else {
-    
-    Angle_Defect = new double [nPoint];
-    Area_Vertex = new double [nPoint];
-    for (iPoint = 0; iPoint < nPoint; iPoint++) {
-      Angle_Defect[iPoint] = 2*PI_NUMBER;
-      Area_Vertex[iPoint] = 0.0;
-    }
-    
-    Angle_Alpha = new double [nEdge];
-    Angle_Beta = new double [nEdge];
-    Check_Edge = new bool [nEdge];
-    for (iEdge = 0; iEdge < nEdge; iEdge++) {
-      Angle_Alpha[iEdge] = 0.0;
-      Angle_Beta[iEdge] = 0.0;
-      Check_Edge[iEdge] = true;
-    }
-    
-    NormalMeanK = new double *[nPoint];
-    for (iPoint = 0; iPoint < nPoint; iPoint++) {
-      NormalMeanK[iPoint] = new double [nDim];
-      for (iDim = 0; iDim < nDim; iDim++) {
-        NormalMeanK[iPoint][iDim] = 0.0;
-      }
-    }
-    
-    /*--- Loop over all the markers ---*/
-    for (iMarker = 0; iMarker < nMarker; iMarker++) {
-      
-      if (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE) {
-        
-        /*--- Loop over all the boundary elements ---*/
-        for (iElem_Bound = 0; iElem_Bound < nElem_Bound[iMarker]; iElem_Bound++) {
-          
-          /*--- Only triangles ---*/
-          if (bound[iMarker][iElem_Bound]->GetVTK_Type() == TRIANGLE) {
-            
-            /*--- Loop over all the nodes of the boundary element ---*/
-            for(iNode = 0; iNode < bound[iMarker][iElem_Bound]->GetnNodes(); iNode++) {
-              
-              iPoint = bound[iMarker][iElem_Bound]->GetNode(iNode);
-              
-              Point_Triangle.clear();
-              
-              for(iNeighbor_Nodes = 0; iNeighbor_Nodes < bound[iMarker][iElem_Bound]->GetnNeighbor_Nodes(iNode); iNeighbor_Nodes++) {
-                Neighbor_Node = bound[iMarker][iElem_Bound]->GetNeighbor_Nodes(iNode, iNeighbor_Nodes);
-                Neighbor_Point = bound[iMarker][iElem_Bound]->GetNode(Neighbor_Node);
-                Point_Triangle.push_back(Neighbor_Point);
-              }
-              
-              iEdge = FindEdge(Point_Triangle[0], Point_Triangle[1]);
-              
-              for (iDim = 0; iDim < nDim; iDim++) {
-                U[iDim] = node[Point_Triangle[0]]->GetCoord(iDim) - node[iPoint]->GetCoord(iDim);
-                V[iDim] = node[Point_Triangle[1]]->GetCoord(iDim) - node[iPoint]->GetCoord(iDim);
-              }
-              
-              W[0] = 0.5*(U[1]*V[2]-U[2]*V[1]); W[1] = -0.5*(U[0]*V[2]-U[2]*V[0]); W[2] = 0.5*(U[0]*V[1]-U[1]*V[0]);
-              
-              Length_U = 0.0, Length_V = 0.0, Length_W = 0.0, CosValue = 0.0;
-              for (iDim = 0; iDim < nDim; iDim++) { Length_U += U[iDim]*U[iDim]; Length_V += V[iDim]*V[iDim]; Length_W += W[iDim]*W[iDim]; }
-              Length_U = sqrt(Length_U); Length_V = sqrt(Length_V); Length_W = sqrt(Length_W);
-              for (iDim = 0; iDim < nDim; iDim++) { U[iDim] /= Length_U; V[iDim] /= Length_V; CosValue += U[iDim]*V[iDim]; }
-              if (CosValue >= 1.0) CosValue = 1.0;
-              if (CosValue <= -1.0) CosValue = -1.0;
-              
-              Angle_Value = acos(CosValue);
-              Area_Vertex[iPoint] += Length_W;
-              Angle_Defect[iPoint] -= Angle_Value;
-              if (Angle_Alpha[iEdge] == 0.0) Angle_Alpha[iEdge] = Angle_Value;
-              else Angle_Beta[iEdge] = Angle_Value;
-              
-            }
-          }
-        }
-      }
-    }
-    
-    /*--- Compute mean curvature ---*/
-    for (iMarker = 0; iMarker < nMarker; iMarker++) {
-      if (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE) {
-        for (iElem_Bound = 0; iElem_Bound < nElem_Bound[iMarker]; iElem_Bound++) {
-          if (bound[iMarker][iElem_Bound]->GetVTK_Type() == TRIANGLE) {
-            for(iNode = 0; iNode < bound[iMarker][iElem_Bound]->GetnNodes(); iNode++) {
-              iPoint = bound[iMarker][iElem_Bound]->GetNode(iNode);
-              
-              for(iNeighbor_Nodes = 0; iNeighbor_Nodes < bound[iMarker][iElem_Bound]->GetnNeighbor_Nodes(iNode); iNeighbor_Nodes++) {
-                Neighbor_Node = bound[iMarker][iElem_Bound]->GetNeighbor_Nodes(iNode, iNeighbor_Nodes);
-                jPoint = bound[iMarker][iElem_Bound]->GetNode(Neighbor_Node);
-                
-                iEdge = FindEdge(iPoint, jPoint);
-                
-                if (Check_Edge[iEdge]) {
-                  
-                  Check_Edge[iEdge] = false;
-                  
-                  cot_alpha = 1.0/tan(Angle_Alpha[iEdge]);
-                  cot_beta = 1.0/tan(Angle_Beta[iEdge]);
-                  
-                  /*--- iPoint, and jPoint ---*/
-                  for (iDim = 0; iDim < nDim; iDim++) {
-                    NormalMeanK[iPoint][iDim] += 3.0 * (cot_alpha + cot_beta) * (node[iPoint]->GetCoord(iDim) - node[jPoint]->GetCoord(iDim)) / Area_Vertex[iPoint];
-                    NormalMeanK[jPoint][iDim] += 3.0 * (cot_alpha + cot_beta) * (node[jPoint]->GetCoord(iDim) - node[iPoint]->GetCoord(iDim)) / Area_Vertex[jPoint];
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    /*--- Compute Gauss, mean, max and min principal curvature,
-     and set the list of critical points ---*/
-    
-    for (iMarker = 0; iMarker < nMarker; iMarker++) {
-      if (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE) {
-        for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
-          iPoint  = vertex[iMarker][iVertex]->GetNode();
-          
-          if (node[iPoint]->GetDomain()) {
-            
-            if (Area_Vertex[iPoint] != 0.0) GaussK = 3.0*Angle_Defect[iPoint]/Area_Vertex[iPoint];
-            else GaussK = 0.0;
-            
-            MeanK = 0.0;
-            for (iDim = 0; iDim < nDim; iDim++)
-              MeanK += NormalMeanK[iPoint][iDim]*NormalMeanK[iPoint][iDim];
-            MeanK = sqrt(MeanK);
-            
-            delta = max((MeanK*MeanK - GaussK), 0.0);
-            
-            MaxPrinK = MeanK + sqrt(delta);
-            MinPrinK = MeanK - sqrt(delta);
-            
-            /*--- Store the curvature value ---*/
-            K[iPoint] = MaxPrinK;
-            
-          }
-          
-        }
-      }
-    }
-    
-    delete [] Angle_Defect;
-    delete [] Area_Vertex;
-    delete [] Angle_Alpha;
-    delete [] Angle_Beta;
-    delete [] Check_Edge;
-    
-    for (iPoint = 0; iPoint < nPoint; iPoint++)
-      delete NormalMeanK[iPoint];
-    delete [] NormalMeanK;
-    
-  }
-  
-  /*--- Sharp edge detection is based in the statistical
-   distribution of the curvature ---*/
-  
-  MaxK = K[0]; MinK = K[0]; MeanK = 0.0; TotalnPointDomain = 0;
-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
-    if (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE) {
-      for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
-        iPoint  = vertex[iMarker][iVertex]->GetNode();
-        if (node[iPoint]->GetDomain()) {
-          MaxK = max(MaxK, fabs(K[iPoint]));
-          MinK = min(MinK, fabs(K[iPoint]));
-          MeanK += fabs(K[iPoint]);
-          TotalnPointDomain++;
-        }
-      }
-    }
-  }
-  
-  /*--- Compute the mean ---*/
-  MeanK /= double(TotalnPointDomain);
-  
-  /*--- Compute the standard deviation ---*/
-  SigmaK = 0.0;
-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
-    if (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE) {
-      for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
-        iPoint  = vertex[iMarker][iVertex]->GetNode();
-        if (node[iPoint]->GetDomain()) {
-          SigmaK += (fabs(K[iPoint]) - MeanK) * (fabs(K[iPoint]) - MeanK);
-        }
-      }
-    }
-  }
-  
-  SigmaK = sqrt(SigmaK/double(TotalnPointDomain));
-  
-  if (rank == MASTER_NODE)
-    cout << "Max K: " << MaxK << ". Mean K: " << MeanK << ". Standard deviation K: " << SigmaK << "." <<endl;
-  
-  Point_Critical.clear();
-  
-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
-    if (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE) {
-      for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
-        iPoint  = vertex[iMarker][iVertex]->GetNode();
-        if (node[iPoint]->GetDomain()) {
-          if (fabs(K[iPoint]) > MeanK + config->GetRefSharpEdges()*SigmaK) {
-            Point_Critical.push_back(iPoint);
-          }
-        }
-      }
-    }
-  }
-  
-  /*--- Variables and buffers needed for MPI ---*/
-  
-  nProcessor = 1;
-  
-  nLocalVertex = 0, nGlobalVertex = 0, MaxLocalVertex = 0;
-  Buffer_Send_nVertex    = new unsigned long [1];
-  Buffer_Receive_nVertex = new unsigned long [nProcessor];
-  
-  /*--- Count the total number of critical edge nodes. ---*/
-  nLocalVertex = Point_Critical.size();
-  Buffer_Send_nVertex[0] = nLocalVertex;
-  
-  MaxLocalVertex = nLocalVertex;
-  nGlobalVertex = nLocalVertex;
-  Buffer_Receive_nVertex[0] = nLocalVertex;
-  
-  /*--- Create and initialize to zero some buffers to hold the coordinates
-   of the boundary nodes that are communicated from each partition (all-to-all). ---*/
-  
-  Buffer_Send_Coord     = new double [MaxLocalVertex*nDim];
-  Buffer_Receive_Coord  = new double [nProcessor*MaxLocalVertex*nDim];
-  nBuffer               = MaxLocalVertex*nDim;
-  
-  for (iVertex = 0; iVertex < MaxLocalVertex; iVertex++) {
-    for (iDim = 0; iDim < nDim; iDim++) {
-      Buffer_Send_Coord[iVertex*nDim+iDim] = 0.0;
-    }
-  }
-  
-  /*--- Retrieve and store the coordinates of the sharp edges boundary nodes on
-   the local partition and broadcast them to all partitions. ---*/
-  
-  for (iVertex = 0; iVertex < Point_Critical.size(); iVertex++) {
-    iPoint = Point_Critical[iVertex];
-    for (iDim = 0; iDim < nDim; iDim++)
-      Buffer_Send_Coord[iVertex*nDim+iDim] = node[iPoint]->GetCoord(iDim);
-  }
-  
-  for (iVertex = 0; iVertex < Point_Critical.size(); iVertex++) {
-    for (iDim = 0; iDim < nDim; iDim++) {
-      Buffer_Receive_Coord[iVertex*nDim+iDim] = Buffer_Send_Coord[iVertex*nDim+iDim];
-    }
-  }
-  
-  /*--- Loop over all interior mesh nodes on the local partition and compute
-   the distances to each of the no-slip boundary nodes in the entire mesh.
-   Store the minimum distance to the wall for each interior mesh node. ---*/
-  
-  for (iPoint = 0; iPoint < GetnPoint(); iPoint++) {
-    Coord = node[iPoint]->GetCoord();
-    
-    MinDist = 1E20;
-    for (iProcessor = 0; iProcessor < nProcessor; iProcessor++) {
-      for (iVertex = 0; iVertex < Buffer_Receive_nVertex[iProcessor]; iVertex++) {
-        Dist = 0.0;
-        for (iDim = 0; iDim < nDim; iDim++) {
-          Dist += (Coord[iDim]-Buffer_Receive_Coord[(iProcessor*MaxLocalVertex+iVertex)*nDim+iDim])*
-          (Coord[iDim]-Buffer_Receive_Coord[(iProcessor*MaxLocalVertex+iVertex)*nDim+iDim]);
-        }
-        Dist = sqrt(Dist);
-        if (Dist < MinDist) MinDist = Dist;
-      }
-    }
-    node[iPoint]->SetSharpEdge_Distance(MinDist);
-  }
-  
-  /*--- Deallocate Max curvature ---*/
-  delete[] K;
-  
-  /*--- Deallocate the buffers needed for the MPI communication. ---*/
-  delete[] Buffer_Send_Coord;
-  delete[] Buffer_Receive_Coord;
-  delete[] Buffer_Send_nVertex;
-  delete[] Buffer_Receive_nVertex;
-  
-}
-
 void CPhysicalGeometry::FindNormal_Neighbor(CConfig *config) {
   double cos_max, scalar_prod, norm_vect, norm_Normal, cos_alpha, diff_coord, *Normal;
   unsigned long Point_Normal, jPoint;
@@ -4333,193 +3539,7 @@ CMultiGridGeometry::CMultiGridGeometry(CGeometry **geometry, CConfig *config_con
   Global_nPointCoarse = Local_nPointCoarse;
   Global_nPointFine = Local_nPointFine;
   
-  if (rank == MASTER_NODE) cout << "CVs of the MG level: " << Global_nPointCoarse << ". Agglom. rate 1/" << double(Global_nPointFine)/double(Global_nPointCoarse) <<". MG level: "<< iMesh <<"."<< endl;
-  
-  
-  
-  
-  
-  
-  //
-  //  /*--- Dealing with MPI parallelization, the objective is that the received nodes must be agglomerated
-  //   in the same way as the donor nodes. ---*/
-  //
-  //  nPointDomain = Index_CoarseCV;
-  //
-  //  short Send_Recv;
-  //
-  //  /*--- Send the node agglomeration information of the donor
-  //   (parent and children), Sending only occurs with MPI ---*/
-  //
-  //#ifndef NO_MPI
-  //
-  //  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-  //
-  //    Marker_Boundary = config->GetMarker_All_Boundary(iMarker);
-  //    Send_Recv = config->GetMarker_All_SendRecv(iMarker);
-  //
-  //    if ((Marker_Boundary == SEND_RECEIVE) && (Send_Recv > 0)) {
-  //
-  //      unsigned long nBuffer = fine_grid->nVertex[iMarker];
-  //
-  //      unsigned long *Buffer_Send_Parent = new unsigned long[nBuffer];
-  //      unsigned long *Buffer_Send_Children = new unsigned long[nBuffer];
-  //
-  //      for (iVertex = 0; iVertex < fine_grid->nVertex[iMarker]; iVertex++) {
-  //        iPoint = fine_grid->vertex[iMarker][iVertex]->GetNode();
-  //        Buffer_Send_Children[iVertex] = iPoint;
-  //        Buffer_Send_Parent[iVertex] = fine_grid->node[iPoint]->GetParent_CV();
-  //      }
-  //
-  //      int send_to = Send_Recv - 1;
-  //#ifdef WINDOWS
-  //      MPI_Bsend(Buffer_Send_Children, nBuffer, MPI_UNSIGNED_LONG, send_to, 1, MPI_COMM_WORLD);
-  //      MPI_Bsend(Buffer_Send_Parent, nBuffer, MPI_UNSIGNED_LONG, send_to, 0, MPI_COMM_WORLD);
-  //#else
-  //      MPI::COMM_WORLD.Bsend(Buffer_Send_Children, nBuffer, MPI::UNSIGNED_LONG, send_to, 1);
-  //      MPI::COMM_WORLD.Bsend(Buffer_Send_Parent, nBuffer, MPI::UNSIGNED_LONG, send_to, 0);
-  //#endif
-  //      delete[] Buffer_Send_Parent;
-  //      delete[] Buffer_Send_Children;
-  //
-  //    }
-  //  }
-  //
-  //#endif
-  //
-  //  /*--- Receive the donor agglomeration (parent and children) ---*/
-  //  for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
-  //    Marker_Boundary = config->GetMarker_All_Boundary(iMarker);
-  //    Send_Recv = config->GetMarker_All_SendRecv(iMarker);
-  //
-  //    if ((Marker_Boundary == SEND_RECEIVE) && (Send_Recv < 0)) {
-  //
-  //      int receive_from = abs(Send_Recv)-1;
-  //      unsigned long nBuffer = fine_grid->nVertex[iMarker];
-  //
-  //      unsigned long *Buffer_Receive_Parent = new unsigned long [nBuffer];
-  //      unsigned long *Buffer_Receive_Children = new unsigned long [nBuffer];
-  //
-  //#ifndef NO_MPI
-  //#ifdef WINDOWS
-  //      MPI_Status status;
-  //      MPI_Recv(Buffer_Receive_Children, nBuffer, MPI_UNSIGNED_LONG, receive_from, 1, MPI_COMM_WORLD, &status);
-  //      MPI_Recv(Buffer_Receive_Parent, nBuffer, MPI_UNSIGNED_LONG, receive_from, 0, MPI_COMM_WORLD, &status);
-  //#else
-  //      MPI::COMM_WORLD.Recv(Buffer_Receive_Children, nBuffer, MPI::UNSIGNED_LONG, receive_from, 1);
-  //      MPI::COMM_WORLD.Recv(Buffer_Receive_Parent, nBuffer, MPI::UNSIGNED_LONG, receive_from, 0);
-  //#endif
-  //#else
-  //      /*--- Retrieve the donor information from the matching marker ---*/
-  //      unsigned short donorZone   = 0;
-  //      unsigned short donorMarker = 1;
-  //      unsigned long  donorPoint;
-  //
-  //      /*--- Get the information from the donor directly. This is a serial
-  //       computation with access to all nodes. Note that there is an
-  //       implicit ordering in the list. ---*/
-  //      for (iVertex = 0; iVertex < fine_grid->nVertex[iMarker]; iVertex++) {
-  //
-  //        /*--- For now, search for donor marker for every receive point. Probably
-  //         a more efficient way to do this in the future. ---*/
-  //        for (unsigned short iMark = 0; iMark < config_container[donorZone]->GetnMarker_All(); iMark++){
-  //          if (config_container[donorZone]->GetMarker_All_SendRecv(iMark)-1 == receive_from) donorMarker = iMark;
-  //        }
-  //
-  //        donorPoint = geometry[donorZone][iMesh-1]->vertex[donorMarker][iVertex]->GetNode();
-  //        Buffer_Receive_Children[iVertex] = donorPoint;
-  //        Buffer_Receive_Parent[iVertex] = geometry[donorZone][iMesh-1]->node[donorPoint]->GetParent_CV();
-  //      }
-  //
-  //#endif
-  //
-  //      /*--- Create a list of the parent nodes without repeated parents ---*/
-  //      vector<unsigned long>::iterator it;
-  //      vector<unsigned long> Aux_Parent;
-  //
-  //      for (iVertex = 0; iVertex < fine_grid->nVertex[iMarker]; iVertex++)
-  //        Aux_Parent.push_back (Buffer_Receive_Parent[iVertex]);
-  //
-  //      sort(Aux_Parent.begin(), Aux_Parent.end());
-  //      it = unique(Aux_Parent.begin(), Aux_Parent.end());
-  //      Aux_Parent.resize(it - Aux_Parent.begin());
-  //
-  //      unsigned long *Parent_Remote = new unsigned long[fine_grid->nVertex[iMarker]];
-  //      unsigned long *Children_Remote = new unsigned long[fine_grid->nVertex[iMarker]];
-  //      unsigned long *Parent_Local = new unsigned long[fine_grid->nVertex[iMarker]];
-  //      unsigned long *Children_Local = new unsigned long[fine_grid->nVertex[iMarker]];
-  //
-  //      /*--- Create the local vector and remote for the parents and the children ---*/
-  //      for (iVertex = 0; iVertex < fine_grid->nVertex[iMarker]; iVertex++) {
-  //        Parent_Remote[iVertex] = Buffer_Receive_Parent[iVertex];
-  //
-  //        /*--- We use the same sorting as in the donor domain ---*/
-  //        for (jVertex = 0; jVertex < Aux_Parent.size(); jVertex++) {
-  //          if (Parent_Remote[iVertex] == Aux_Parent[jVertex]) {
-  //            Parent_Local[iVertex] = jVertex + Index_CoarseCV;
-  //            break;
-  //          }
-  //        }
-  //
-  //        Children_Remote[iVertex] = Buffer_Receive_Children[iVertex];
-  //        Children_Local[iVertex] = fine_grid->vertex[iMarker][iVertex]->GetNode();
-  //
-  //      }
-  //
-  //      Index_CoarseCV += Aux_Parent.size();
-  //
-  //      unsigned short *nChildren_ = new unsigned short [Index_CoarseCV];
-  //      for (unsigned long iParent = 0; iParent < Index_CoarseCV; iParent++)
-  //        nChildren_[iParent] = 0;
-  //
-  //      /*--- Create the final structure ---*/
-  //      for (iVertex = 0; iVertex < fine_grid->nVertex[iMarker]; iVertex++) {
-  //        /*--- Be careful, it is possible that a node change the agglomeration configuration, the priority
-  //         is always, when receive the information ---*/
-  //        fine_grid->node[Children_Local[iVertex]]->SetParent_CV(Parent_Local[iVertex]);
-  //        node[Parent_Local[iVertex]]->SetChildren_CV(nChildren_[Parent_Local[iVertex]],Children_Local[iVertex]);
-  //        nChildren_[Parent_Local[iVertex]]++;
-  //        node[Parent_Local[iVertex]]->SetnChildren_CV(nChildren_[Parent_Local[iVertex]]);
-  //        node[Parent_Local[iVertex]]->SetDomain(false);
-  //      }
-  //
-  //      delete[] nChildren_;
-  //      delete[] Buffer_Receive_Parent;
-  //      delete[] Buffer_Receive_Children;
-  //      delete[] Parent_Remote;
-  //      delete[] Children_Remote;
-  //      delete[] Parent_Local;
-  //      delete[] Children_Local;
-  //    }
-  //  }
-  //
-  //  nPoint = Index_CoarseCV;
-  //
-  //#ifdef NO_MPI
-  //  cout << "CVs of the MG level: " << nPoint << ". Agglom. rate 1/" << double(fine_grid->GetnPoint())/double(nPoint) <<". MG level: "<< iMesh <<"."<< endl;
-  //#else
-  //
-  //
-  //
-  //#ifdef WINDOWS
-  //  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  //#else
-  //  rank = MPI::COMM_WORLD.Get_rank();
-  //#endif
-  //
-  //  Local_nPointCoarse = nPoint;
-  //  Local_nPointFine = fine_grid->GetnPoint();
-  //
-  //#ifdef WINDOWS
-  //  MPI_Allreduce(&Local_nPointCoarse, &Global_nPointCoarse, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
-  //  MPI_Allreduce(&Local_nPointFine, &Global_nPointFine, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
-  //#else
-  //  MPI::COMM_WORLD.Allreduce(&Local_nPointCoarse, &Global_nPointCoarse, 1, MPI::UNSIGNED_LONG, MPI::SUM);
-  //  MPI::COMM_WORLD.Allreduce(&Local_nPointFine, &Global_nPointFine, 1, MPI::UNSIGNED_LONG, MPI::SUM);
-  //#endif
-  //
-  //  if (rank == MASTER_NODE) cout << "CVs of the MG level: " << Global_nPointCoarse << ". Agglom. rate 1/" << double(Global_nPointFine)/double(Global_nPointCoarse) <<". MG level: "<< iMesh <<"."<< endl;
-  //#endif
+  cout << "CVs of the MG level: " << Global_nPointCoarse << ". Agglom. rate 1/" << double(Global_nPointFine)/double(Global_nPointCoarse) <<". MG level: "<< iMesh <<"."<< endl;
   
 }
 

@@ -386,20 +386,6 @@ public:
 	 * \param[in] val_limiter - Value of the limiter for the index <i>val_var</i>.
 	 */
 	void SetLimiter(unsigned short val_var, double val_limiter);
-  
-  /*!
-	 * \brief Set the value of the limiter.
-	 * \param[in] val_var - Index of the variable.
-	 * \param[in] val_limiter - Value of the limiter for the index <i>val_var</i>.
-	 */
-	virtual void SetLimiterPrimitive(unsigned short val_species, unsigned short val_var, double val_limiter);
-  
-  /*!
-	 * \brief Set the value of the limiter.
-	 * \param[in] val_var - Index of the variable.
-	 * \param[in] val_limiter - Value of the limiter for the index <i>val_var</i>.
-	 */
-  virtual double GetLimiterPrimitive(unsigned short val_species, unsigned short val_var);
 	
 	/*!
 	 * \brief Set the value of the max solution.
@@ -479,24 +465,10 @@ public:
 	void SetMax_Lambda_Inv(double val_max_lambda);
   
 	/*!
-	 * \brief Set the value of the maximum eigenvalue for the inviscid terms of the PDE.
-	 * \param[in] val_max_lambda - Value of the maximum eigenvalue for the inviscid terms of the PDE.
-	 * \param[in] val_species - Value of the species index to set the maximum eigenvalue.
-	 */
-	virtual void SetMax_Lambda_Inv(double val_max_lambda, unsigned short val_species);
-  
-	/*!
 	 * \brief Set the value of the maximum eigenvalue for the viscous terms of the PDE.
 	 * \param[in] val_max_lambda - Value of the maximum eigenvalue for the viscous terms of the PDE.
 	 */
 	void SetMax_Lambda_Visc(double val_max_lambda);
-  
-	/*!
-	 * \brief Set the value of the maximum eigenvalue for the viscous terms of the PDE.
-	 * \param[in] val_max_lambda - Value of the maximum eigenvalue for the viscous terms of the PDE.
-	 * \param[in] val_species - Index of the species to set the maximum eigenvalue of the viscous terms.
-	 */
-	virtual void SetMax_Lambda_Visc(double val_max_lambda, unsigned short val_species);
   
 	/*!
 	 * \brief Add a value to the maximum eigenvalue.
@@ -621,13 +593,6 @@ public:
 	 */
 	virtual double GetDensity(void);
   
-  /*!
-	 * \brief A virtual member.
-   * \param[in] val_Species - Index of species s.
-	 * \return Value of the mass fraction of species s.
-	 */
-	virtual double GetMassFraction(unsigned short val_Species);
-  
 	/*!
 	 * \brief A virtual member.
 	 * \return Value of the flow energy.
@@ -639,12 +604,6 @@ public:
 	 * \return Value of the eddy viscosity.
 	 */
 	virtual double GetEddyViscosity(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \return Value of the eddy viscosity.
-	 */
-	virtual double GetEddyViscosityInc(void);
   
 	/*!
 	 * \brief A virtual member.
@@ -658,18 +617,6 @@ public:
 	 */
 	virtual double GetPressure(void);
   
-  /*!
-	 * \brief A virtual member.
-	 * \return Value of the flow pressure.
-	 */
-	virtual double GetPressureInc(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the linearized pressure.
-	 */
-	virtual double GetDeltaPressure(void);
-  
 	/*!
 	 * \brief A virtual member.
 	 * \param[in] val_vector - Direction of projection.
@@ -679,23 +626,9 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \param[in] val_vector - Direction of projection.
-	 * \param[in] val_species - Index of the desired species.
-	 * \return Value of the projected velocity.
-	 */
-	virtual double GetProjVel(double *val_vector, unsigned short val_species);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \return Value of the sound speed.
 	 */
 	virtual double GetSoundSpeed(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \return Value of the distance for the freesurface flows.
-	 */
-	virtual double GetDistance(void);
   
 	/*!
 	 * \brief A virtual member.
@@ -718,45 +651,9 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \return Norm 2 of the velocity vector of Fluid val_species.
-	 */
-	virtual double GetVelocity2(unsigned short val_species);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \return The laminar viscosity of the flow.
 	 */
 	virtual double GetLaminarViscosity(void);
-  
-  /*!
-   * \brief A virtual member.
-   * \return Value of the species diffusion coefficient.
-   */
-  virtual double* GetDiffusionCoeff(void);
-  
-  /*!
-   * \brief A virtual member.
-   * \return Value of the thermal conductivity (translational/rotational)
-   */
-  virtual double GetThermalConductivity(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Sets separation intermittency
-	 */
-	virtual void SetGammaSep(double gamma_sep);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Sets separation intermittency
-	 */
-	virtual void SetGammaEff(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Returns intermittency
-	 */
-	virtual double GetIntermittency();
   
 	/*!
 	 * \brief A virtual member.
@@ -786,12 +683,7 @@ public:
 	 * \brief A virtual member.
 	 */
 	virtual bool SetPrimVar_Compressible(CConfig *config);
-  
-  /*!
-	 * \brief A virtual member.
-	 */
-	virtual bool SetPrimVar_Compressible(double SharpEdge_Distance, bool check, CConfig *config);
-  
+    
 	/*!
 	 * \brief A virtual member.
 	 */
@@ -816,32 +708,6 @@ public:
 	 * \brief A virtual member.
 	 */
 	virtual double *GetPrimVar(void);
-	
-	/*!
-	 * \brief A virtual member.
-	 */
-	virtual void SetDensityInc(double val_density);
-  
-  /*!
-	 * \brief A virtual member.
-	 */
-	virtual void SetPressureInc(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 */
-	virtual void SetVelocityInc(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 */
-	virtual void SetBetaInc2(double val_betainc2);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_phi - Value of the adjoint velocity.
-	 */
-	virtual void SetPhi_Old(double *val_phi);
   
 	/*!
 	 * \brief A virtual member.
@@ -866,62 +732,9 @@ public:
 	virtual void SetPressure(void);
   
   /*!
-   * \brief Calculates vib.-el. energy per mass, \f$e^{vib-el}_s\f$, for input species (not including KE)
-   */
-  virtual double CalcEve(double *V, CConfig *config, unsigned short val_Species);
-  
-  /*!
-   * \brief Calculates enthalpy per mass, \f$h_s\f$, for input species (not including KE)
-   */
-  virtual double CalcHs(double *V, CConfig *config, unsigned short val_Species);
-  
-  /*!
-   * \brief Calculates enthalpy per mass, \f$Cv_s\f$, for input species (not including KE)
-   */
-  virtual double CalcCvve(double val_Tve, CConfig *config, unsigned short val_Species);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] config - Configuration settings
-	 */
-	virtual void CalcdPdU(double *V, CConfig *config, double *dPdU);
-  
-  /*!
-   * \brief Set partial derivative of temperature w.r.t. density \f$\frac{\partial P}{\partial \rho_s}\f$
-   */
-  virtual void CalcdTdU(double *V, CConfig *config, double *dTdU);
-  
-  /*!
-   * \brief Set partial derivative of temperature w.r.t. density \f$\frac{\partial P}{\partial \rho_s}\f$
-   */
-  virtual void CalcdTvedU(double *V, CConfig *config, double *dTdU);
-  
-  /*!
-	 * \brief A virtual member.
-	 */
-	virtual double *GetdPdU(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 */
-	virtual double *GetdTdU(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 */
-	virtual double *GetdTvedU(void);
-  
-  /*!
 	 * \brief A virtual member.
 	 */
 	virtual bool SetDensity(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_velocity - Value of the velocity.
-	 * \param[in] Gamma - Ratio of Specific heats
-	 */
-	virtual void SetDeltaPressure(double *val_velocity, double Gamma);
   
 	/*!
 	 * \brief A virtual member.
@@ -963,62 +776,11 @@ public:
 	 * \param[in] config - Configuration parameters.
 	 */
 	virtual void SetPrimVar(CConfig *config, double *Coord);
-	
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] Temperature_Wall - Value of the Temperature at the wall
-	 */
-	virtual void SetWallTemperature(double Temperature_Wall);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] Temperature_Wall - Value of the Temperature at the wall
-	 */
-	virtual void SetWallTemperature(double* Temperature_Wall);
-  
-	/*!
-	 * \brief Set the thermal coefficient.
-	 * \param[in] config - Configuration parameters.
-	 */
-	virtual void SetThermalCoeff(CConfig *config);
   
 	/*!
 	 * \brief A virtual member.
 	 */
 	virtual void SetVelocity(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 */
-  virtual void SetStress(unsigned short iVar, unsigned short jVar, double val_stress);
-  
-	/*!
-	 * \brief A virtual member.
-   
-	 */
-  virtual double **GetStress(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 */
-  virtual void SetVonMises_Stress(double val_stress);
-  
-	/*!
-	 * \brief A virtual member.
-   
-	 */
-  virtual double GetVonMises_Stress(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 */
-  virtual void SetFlow_Pressure(double val_pressure);
-  
-	/*!
-	 * \brief A virtual member.
-   
-	 */
-  virtual double GetFlow_Pressure(void);
   
 	/*!
 	 * \brief A virtual member.
@@ -1030,12 +792,6 @@ public:
 	 * \param[in] val_velocity - Pointer to the velocity.
 	 */
 	virtual void SetVelocity_Old(double *val_velocity);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_velocity - Pointer to the velocity.
-	 */
-	virtual void SetVelocityInc_Old(double *val_velocity);
   
 	/*!
 	 * \brief A virtual member.
@@ -1052,16 +808,6 @@ public:
 	 * \brief A virtual member.
 	 */
 	virtual void SetStrainMag(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 */
-	virtual void SetVelSolutionOldDVector(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 */
-	virtual void SetVelSolutionDVector(void);
   
 	/*!
 	 * \brief A virtual member.
@@ -1162,100 +908,6 @@ public:
 	 * \param[in] val_muT
 	 */
 	virtual void SetmuT(double val_muT);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_difflevelset - Value of the diff level set (value-target).
-	 */
-	virtual void SetDiffLevelSet(double val_difflevelset);
-  
-	/*!
-	 * \brief A virtual member.
-	 */
-	virtual double GetDiffLevelSet(void);
-  
-	/*!
-	 * \brief Set the Eddy Viscosity Sensitivity of the problem.
-	 * \param[in] val_EddyViscSens - Eddy Viscosity Sensitivity.
-	 */
-	virtual void SetEddyViscSens(double *val_EddyViscSens, unsigned short numTotalVar);
-  
-	/*!
-	 * \brief Get the Eddy Viscosity Sensitivity of the problem.
-	 * \return Pointer to the Eddy Viscosity Sensitivity.
-	 */
-	virtual double *GetEddyViscSens(void);
-  
-  /*!
-   * \brief A virtual member.  Retrieves index of species densities in the TNE2 solver.
-   */
-  virtual unsigned short GetRhosIndex(void);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  virtual unsigned short GetRhoIndex(void);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  virtual unsigned short GetPIndex(void);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  virtual unsigned short GetTIndex(void);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  virtual unsigned short GetTveIndex(void);
-  
-  /*!
-	 * \brief Retrieves the value of the velocity index in the primitive variable vector.
-	 * \param[in] iRho*u
-	 */
-  virtual unsigned short GetVelIndex(void);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  virtual unsigned short GetHIndex(void);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  virtual unsigned short GetAIndex(void);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  virtual unsigned short GetRhoCvtrIndex(void);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  virtual unsigned short GetRhoCvveIndex(void);
-  
-  /*!
-	 * \brief A virtual member. Set the direct solution for the adjoint solver.
-	 * \param[in] val_solution_direct - Value of the direct solution.
-	 */
-	virtual void SetSolution_Direct(double *val_solution_direct);
-  
-	/*!
-	 * \brief A virtual member. Get the direct solution for the adjoint solver.
-	 * \return Pointer to the direct solution vector.
-	 */
-	virtual double *GetSolution_Direct(void);
   
 };
 
@@ -1445,24 +1097,12 @@ public:
 	 * \return Value of the flow pressure.
 	 */
 	double GetPressure(void);
-  
-  /*!
-	 * \brief Get the flow pressure.
-	 * \return Value of the flow pressure.
-	 */
-	double GetPressureInc(void);
-  
+
 	/*!
 	 * \brief Get the speed of the sound.
 	 * \return Value of speed of the sound.
 	 */
 	double GetSoundSpeed(void);
-  
-  /*!
-	 * \brief Get the value of distance for the freesurface flows
-	 * \return Value of beta squared.
-	 */
-	double GetDistance(void);
   
 	/*!
 	 * \brief Get the enthalpy of the flow.
@@ -1513,12 +1153,6 @@ public:
 	 * \param[in] val_velocity - Pointer to the velocity.
 	 */
 	void SetVelocity_Old(double *val_velocity);
-  
-  /*!
-	 * \brief Set the velocity vector from the old solution.
-	 * \param[in] val_velocity - Pointer to the velocity.
-	 */
-	void SetVelocityInc_Old(double *val_velocity);
   
 	/*!
 	 * \brief Get the value of the preconditioner Beta.
@@ -1614,17 +1248,6 @@ public:
 	 * \return The eddy viscosity of the flow.
 	 */
 	double GetEddyViscosity(void);
-  
-  /*!
-	 * \brief Get the eddy viscosity of the flow.
-	 * \return The eddy viscosity of the flow.
-	 */
-	double GetEddyViscosityInc(void);
-  
-	/*!
-	 * \brief Set the temperature at the wall
-	 */
-	void SetWallTemperature(double temperature_wall);
   
 	/*!
 	 * \brief Get the value of the vorticity.

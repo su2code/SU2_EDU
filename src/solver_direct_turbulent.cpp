@@ -342,8 +342,6 @@ CTurbSASolver::CTurbSASolver(CGeometry *geometry, CConfig *config, unsigned shor
   
   bool restart = (config->GetRestart() || config->GetRestart_Flow());
   
-  int rank = MASTER_NODE;
-  
   Gamma = config->GetGamma();
   Gamma_Minus_One = Gamma - 1.0;
   
@@ -384,12 +382,12 @@ CTurbSASolver::CTurbSASolver(CGeometry *geometry, CConfig *config, unsigned shor
     }
     
     /*--- Initialization of the structure of the whole Jacobian ---*/
-    if (rank == MASTER_NODE) cout << "Initialize jacobian structure (SA model)." << endl;
+    cout << "Initialize jacobian structure (SA model)." << endl;
     Jacobian.Initialize(nPoint, nPointDomain, nVar, nVar, true, geometry);
     
     if (config->GetKind_Linear_Solver_Prec() == LINELET) {
       nLineLets = Jacobian.BuildLineletPreconditioner(geometry, config);
-      if (rank == MASTER_NODE) cout << "Compute linelet structure. " << nLineLets << " elements in each line (average)." << endl;
+      cout << "Compute linelet structure. " << nLineLets << " elements in each line (average)." << endl;
     }
     
     LinSysSol.Initialize(nPoint, nPointDomain, nVar, 0.0);
@@ -594,8 +592,6 @@ void CTurbSASolver::Postprocessing(CGeometry *geometry, CSolver **solver_contain
 void CTurbSASolver::Source_Residual(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CNumerics *second_numerics,
                                     CConfig *config, unsigned short iMesh) {
   unsigned long iPoint;
-  unsigned short iDim;
-  unsigned short jDim;
   
   for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
     
@@ -624,60 +620,13 @@ void CTurbSASolver::Source_Residual(CGeometry *geometry, CSolver **solver_contai
     
     numerics->ComputeResidual(Residual, Jacobian_i, NULL, config);
     
-    unsigned long idx = 0;
-    unsigned long base = 0;
-    if (config->GetExtraOutput()) {
-      base = iPoint* (unsigned long) nOutputVariables;
-      OutputVariables[base + idx] = numerics->GetProduction()/numerics->Volume;
-      OutputHeadingNames[idx] = "Production";
-      idx++;
-      OutputVariables[base + idx] = numerics->GetDestruction()/numerics->Volume;
-      OutputHeadingNames[idx] = "Destruction";
-      idx++;
-      OutputVariables[base + idx] = numerics->GetCrossProduction()/numerics->Volume;
-      OutputHeadingNames[idx] = "CrossProduction";
-      idx++;
-      OutputVariables[base+ idx] = numerics->Laminar_Viscosity_i/numerics->Density_i;
-      OutputHeadingNames[idx] = "KinematicViscosity";
-      idx++;
-      OutputVariables[iPoint* (unsigned long) nOutputVariables + idx] = numerics->TurbVar_i[0];
-      OutputHeadingNames[idx] = "NuTilde";
-      idx++;
-      OutputVariables[iPoint* (unsigned long) nOutputVariables + idx] = numerics->dist_i;
-      OutputHeadingNames[idx] = "WallDist";
-      idx++;
-      for (iDim = 0; iDim<nDim;iDim++){
-        OutputVariables[iPoint* (unsigned long) nOutputVariables + idx] = numerics->TurbVar_Grad_i[0][iDim];
-        stringstream intstr;
-        intstr << iDim;
-        OutputHeadingNames[idx] = "DNuTildeDX_" + intstr.str();
-        idx++;
-      }
-      for (iDim = 0; iDim<nDim; iDim++){
-        for (jDim = 0; jDim<nDim; jDim++){
-          OutputVariables[iPoint* (unsigned long) nOutputVariables + idx] = numerics->PrimVar_Grad_i[iDim + 1][jDim];
-          stringstream intstr;
-          intstr << "DU_" << iDim << "DX_"<< jDim;
-          OutputHeadingNames[idx] = intstr.str();
-          idx++;
-        }
-      }
-      OutputVariables[iPoint* (unsigned long) nOutputVariables + idx] = numerics->GetProduction()/numerics->Volume - numerics->GetDestruction()/numerics->Volume + numerics->GetCrossProduction()/numerics->Volume;
-      OutputHeadingNames[idx] = "FullSource";
-      idx++;
-    }
-    
     /*--- Subtract residual and the jacobian ---*/
+    
     LinSysRes.SubtractBlock(iPoint, Residual);
     
     Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
     
   }
-  
-}
-
-void CTurbSASolver::Source_Template(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
-                                    CConfig *config, unsigned short iMesh) {
   
 }
 
@@ -952,9 +901,7 @@ CTurbSSTSolver::CTurbSSTSolver(CGeometry *geometry, CConfig *config, unsigned sh
   string text_line;
   
   bool restart = (config->GetRestart() || config->GetRestart_Flow());
-  
-  int rank = MASTER_NODE;
-  
+    
   /*--- Array initialization ---*/
   constants = NULL;
   
@@ -998,12 +945,12 @@ CTurbSSTSolver::CTurbSSTSolver(CGeometry *geometry, CConfig *config, unsigned sh
     }
     
     /*--- Initialization of the structure of the whole Jacobian ---*/
-    if (rank == MASTER_NODE) cout << "Initialize jacobian structure (SST model)." << endl;
+    cout << "Initialize jacobian structure (SST model)." << endl;
     Jacobian.Initialize(nPoint, nPointDomain, nVar, nVar, true, geometry);
     
     if (config->GetKind_Linear_Solver_Prec() == LINELET) {
       nLineLets = Jacobian.BuildLineletPreconditioner(geometry, config);
-      if (rank == MASTER_NODE) cout << "Compute linelet structure. " << nLineLets << " elements in each line (average)." << endl;
+      cout << "Compute linelet structure. " << nLineLets << " elements in each line (average)." << endl;
     }
     
     LinSysSol.Initialize(nPoint, nPointDomain, nVar, 0.0);
@@ -1252,11 +1199,6 @@ void CTurbSSTSolver::Source_Residual(CGeometry *geometry, CSolver **solver_conta
     Jacobian.SubtractBlock(iPoint,iPoint,Jacobian_i);
     
   }
-  
-}
-
-void CTurbSSTSolver::Source_Template(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
-                                     CConfig *config, unsigned short iMesh) {
   
 }
 

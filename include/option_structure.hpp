@@ -1169,18 +1169,14 @@ public:
    * \param[in] value - a set of strings used to define the option
    */
   void SetValue(const vector<string> & value) {
-    
-    int rank = MASTER_NODE;
-    
+        
     typename map<string,Tenum>::const_iterator it;
     if (ref_dim_ == NULL) {
       // this is a scalar enum option
       it = Tmap_->find(StringToUpperCase(value[0]));
       if (it == Tmap_->end()) {
-        if (rank == MASTER_NODE) {
           cerr << "ERROR: Cannot find value " << value[0] << " in given map." << endl;
           cerr << "Please check the name of the variable in the config file." << endl;
-        }
         exit(1);
       }
       *(*ref_) = it->second;
@@ -1191,10 +1187,8 @@ public:
       for (unsigned short i = 0; i < *ref_dim_; i++) {
         it = Tmap_->find(StringToUpperCase(value[i]));
         if (it == Tmap_->end()) {
-          if (rank == MASTER_NODE) {
             cerr << "ERROR: Cannot find value " << value[i] << " in given map." << endl;
             cerr << "Please check the name of the variable in the config file." << endl;
-          }
           exit(1);
         }
         (*ref_)[i] = it->second;

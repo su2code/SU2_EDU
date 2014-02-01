@@ -24,8 +24,6 @@
 
 CConfig::CConfig(char case_filename[200], unsigned short val_software, unsigned short verb_level) {
   
-  int rank = MASTER_NODE;
-  
   /*--- Read the config options  ---*/
   
   SetConfig_Options();
@@ -44,7 +42,7 @@ CConfig::CConfig(char case_filename[200], unsigned short val_software, unsigned 
   
   /*--- Configuration file console output ---*/
   
-  if ((rank == MASTER_NODE) && (verb_level == VERB_HIGH))
+  if (verb_level == VERB_HIGH)
     SetOutput(val_software);
   
 }
@@ -722,9 +720,7 @@ void CConfig::SetParsing(char case_filename[200]) {
   string text_line, option_name;
   ifstream case_file;
   vector<string> option_value;
-  
-  int rank = MASTER_NODE;
-  
+    
   /*--- Read the configuration file ---*/
   case_file.open(case_filename, ios::in);
   
@@ -741,7 +737,7 @@ void CConfig::SetParsing(char case_filename[200]) {
       if (it != param.end()) {
         param[option_name]->SetValue(option_value);
       } else {
-        if ( !GetPython_Option(option_name) && (rank == MASTER_NODE) )
+        if (!GetPython_Option(option_name))
           cout << "WARNING: unrecognized option in the config. file: " << option_name << "." << endl;
       }
     }
@@ -754,9 +750,7 @@ void CConfig::SetParsing(char case_filename[200]) {
 void CConfig::SetPostprocessing(unsigned short val_software) {
   
   unsigned short iZone;
-  
-  int size = SINGLE_NODE;
-  
+    
   /*--- Store the SU2 module that we are executing. ---*/
   Kind_SU2 = val_software;
   
@@ -770,14 +764,12 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
   
   /*--- Set default values for the grid based in the Reynolds number for SU2_EDU ---*/
   
-  if (Kind_SU2 == SU2_EDU) {
     if (Kind_Solver == EULER) Mesh_FileName = "naca0012_inviscid.su2";
     else {
       if (Reynolds < 1E5) Mesh_FileName = "naca0012_re1e5.su2";
       if ((Reynolds >= 1E5) && (Reynolds <= 1E7)) Mesh_FileName = "naca0012_re1e6.su2";
       if (Reynolds > 1E7) Mesh_FileName = "naca0012_re1e7.su2";
     }
-  }
   
   /*--- Don't do any deformation if there is no Design variable information ---*/
   if (Design_Variable == NULL) {
@@ -786,7 +778,7 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
   }
   
   /*--- If multiple processors the grid should be always in native .su2 format ---*/
-  if ((size > SINGLE_NODE) && ((Kind_SU2 == SU2_CFD) || (Kind_SU2 == SU2_SOL) || (Kind_SU2 == SU2_EDU))) Mesh_FileFormat = SU2;
+  Mesh_FileFormat = SU2;
   
   /*--- Decide whether we should be writing unsteady solution files. ---*/
   Wrt_Unsteady = false;
@@ -807,8 +799,7 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
   /*--- If we're solving a purely steady problem with no prescribed grid
    movement (both rotating frame and moving walls can be steady), make sure that
    there is no grid motion ---*/
-  if ((Kind_SU2 == SU2_CFD || Kind_SU2 == SU2_SOL || Kind_SU2 == SU2_EDU) &&
-      (Unsteady_Simulation == STEADY) &&
+  if ((Unsteady_Simulation == STEADY) &&
       ((Kind_GridMovement[ZONE_0] != MOVING_WALL) &&
        (Kind_GridMovement[ZONE_0] != ROTATING_FRAME)))
     Grid_Movement = false;
@@ -1370,7 +1361,7 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
     RK_Alpha_Step = new double[1]; RK_Alpha_Step[0] = 1.0;
   }
   
-  if (((Kind_SU2 == SU2_CFD) || (Kind_SU2 == SU2_EDU)) && (Kind_Solver == NO_SOLVER)) {
+  if (Kind_Solver == NO_SOLVER) {
     cout << "You must define a solver type!!" << endl;
     exit(1);
   }

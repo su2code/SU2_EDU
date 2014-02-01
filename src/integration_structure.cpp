@@ -105,19 +105,8 @@ void CIntegration::Space_Integration(CGeometry *geometry, CSolver **solver_conta
 void CIntegration::Time_Integration(CGeometry *geometry, CSolver **solver_container, CConfig *config, unsigned short iRKStep,
                                     unsigned short RunTime_EqSystem, unsigned long Iteration) {
 	unsigned short MainSolver = config->GetContainerPosition(RunTime_EqSystem);
-    
-  /*--- Perform the time integration ---*/
-  switch (config->GetKind_TimeIntScheme()) {
-    case (RUNGE_KUTTA_EXPLICIT):
-      solver_container[MainSolver]->ExplicitRK_Iteration(geometry, solver_container, config, iRKStep);
-      break;
-    case (EULER_EXPLICIT):
-      solver_container[MainSolver]->ExplicitEuler_Iteration(geometry, solver_container, config);
-      break;
-    case (EULER_IMPLICIT):
-      solver_container[MainSolver]->ImplicitEuler_Iteration(geometry, solver_container, config);
-      break;
-  }
+  
+  solver_container[MainSolver]->ImplicitEuler_Iteration(geometry, solver_container, config);
   
 }
 

@@ -25,56 +25,49 @@
 void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   
   unsigned short iMGlevel;
-  
-  int rank = MASTER_NODE;
-  
+    
   /*--- Compute elements surrounding points, points surrounding points,
    and elements surrounding elements ---*/
   
-  if (rank == MASTER_NODE) cout << "Setting point connectivity." << endl;
+  cout << "Setting point connectivity." << endl;
   geometry[MESH_0]->SetEsuP();
   geometry[MESH_0]->SetPsuP();
   
-  if (rank == MASTER_NODE) cout << "Recomputing point connectivity." << endl;
+  cout << "Recomputing point connectivity." << endl;
   geometry[MESH_0]->SetEsuP();
   geometry[MESH_0]->SetPsuP();
   
-  if (rank == MASTER_NODE) cout << "Setting element connectivity." << endl;
+  cout << "Setting element connectivity." << endl;
   
   geometry[MESH_0]->SetEsuE();
   
   /*--- Check the orientation before computing geometrical quantities ---*/
   
-  if (rank == MASTER_NODE) cout << "Checking the numerical grid orientation." << endl;
+  cout << "Checking the numerical grid orientation." << endl;
   geometry[MESH_0]->SetBoundVolume();
   geometry[MESH_0]->Check_Orientation(config);
   
   /*--- Create the edge structure ---*/
   
-  if (rank == MASTER_NODE) cout << "Identifying edges and vertices." << endl;
+  cout << "Identifying edges and vertices." << endl;
   geometry[MESH_0]->SetEdges();
   geometry[MESH_0]->SetVertex(config);
   
   /*--- Compute cell center of gravity ---*/
   
-  if (rank == MASTER_NODE) cout << "Computing centers of gravity." << endl;
+  cout << "Computing centers of gravity." << endl;
   geometry[MESH_0]->SetCG();
   
   /*--- Create the control volume structures ---*/
   
-  if (rank == MASTER_NODE) cout << "Setting the control volume structure." << endl;
+  cout << "Setting the control volume structure." << endl;
   geometry[MESH_0]->SetControlVolume(config, ALLOCATE);
   geometry[MESH_0]->SetBoundControlVolume(config, ALLOCATE);
   
   /*--- Identify closest normal neighbor ---*/
   
-  if (rank == MASTER_NODE) cout << "Searching for the closest normal neighbors to the surfaces." << endl;
+  cout << "Searching for the closest normal neighbors to the surfaces." << endl;
   geometry[MESH_0]->FindNormal_Neighbor(config);
-  
-  /*--- Compute the surface curvature ---*/
-  
-  if (rank == MASTER_NODE) cout << "Compute the surface curvature." << endl;
-  geometry[MESH_0]->ComputeSurf_Curvature(config);
   
   /*--- Computation of wall distances for turbulence modeling ---*/
   
@@ -88,7 +81,7 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   geometry[MESH_0]->ComputeReference_Area(config);
   
   
-  if ((config->GetMGLevels() != 0) && (rank == MASTER_NODE))
+  if (config->GetMGLevels() != 0)
     cout << "Setting the multigrid structure." <<endl;
   
   /*--- Loop over all the new grid ---*/

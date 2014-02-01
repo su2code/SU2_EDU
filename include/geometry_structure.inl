@@ -157,8 +157,6 @@ inline void CGeometry::SetMeshFile(CGeometry *geometry, CConfig *config, string 
 inline void CGeometry::SetMeshFile(CConfig *config, string val_mesh_out_filename, string val_mesh_in_filename) { }
 
 inline void CGeometry::SetBoundTecPlot(CConfig *config, char mesh_filename[200]) { }
-
-inline void CGeometry::ComputeSurf_Curvature(CConfig *config) { }
                                        
 inline double CGeometry::Compute_MaxThickness(double *Plane_P0, double *Plane_Normal, unsigned short iSection, vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface) { return 0; }
 
@@ -235,7 +233,6 @@ inline vector<vector<double> > CGeometry::GetZCoord() { return Zcoord_plane; }
 inline vector<vector<double> > CPhysicalGeometry::GetZCoord() { return Zcoord_plane; }
 
 inline vector<vector<double> > CMultiGridGeometry::GetZCoord() { return Zcoord_plane; }
-
 
 inline vector<vector<unsigned long> > CGeometry::GetPlanarPoints() { return Plane_points; }
 

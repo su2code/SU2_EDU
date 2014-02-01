@@ -150,18 +150,6 @@ public:
 	 */
 	double GetMin_Delta_Time(void);
   
-  /*!
-	 * \brief Get the value of the maximum delta time.
-	 * \return Value of the maximum delta time.
-	 */
-	virtual double GetMax_Delta_Time(unsigned short val_Species);
-  
-	/*!
-	 * \brief Get the value of the minimum delta time.
-	 * \return Value of the minimum delta time.
-	 */
-	virtual double GetMin_Delta_Time(unsigned short val_Species);
-  
 	/*!
 	 * \brief Get the number of variables of the problem.
 	 */
@@ -408,72 +396,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
 	 */
-	virtual void BC_Normal_Displacement(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config,
-                                      unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Flow_Load(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config,
-                            unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Normal_Load(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config,
-                              unsigned short val_marker);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Pressure(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config,
-                           unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Interface_Boundary(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config,
-                                     unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_NearField_Boundary(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config,
-                                     unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
 	virtual void BC_Isothermal_Wall(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics, CNumerics *visc_numerics, CConfig *config,
                                   unsigned short val_marker);
   
@@ -486,27 +408,6 @@ public:
 	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
 	 */
 	virtual void BC_HeatFlux_Wall(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics, CNumerics *visc_numerics, CConfig *config, unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Dirichlet(CGeometry *geometry, CSolver **solver_container, CConfig *config,
-                            unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Neumann(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CConfig *config,
-                          unsigned short val_marker);
   
 	/*!
 	 * \brief A virtual member.
@@ -559,87 +460,8 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
 	 */
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Custom(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
-                         CConfig *config, unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
 	virtual void BC_Outlet(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics, CNumerics *visc_numerics,
                          CConfig *config, unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Nacelle_Inflow(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics, CNumerics *visc_numerics, CConfig *config, unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Nacelle_Exhaust(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics, CNumerics *visc_numerics, CConfig *config, unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Dielec(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
-                         CConfig *config, unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_marker - Surface marker where the boundary condition is applied.
-	 */
-	virtual void BC_Electrode(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
-                            CConfig *config, unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] iRKStep - Current step of the Runge-Kutta iteration.
-	 */
-	virtual void ExplicitRK_Iteration(CGeometry *geometry, CSolver **solver_container, CConfig *config,
-                                    unsigned short iRKStep);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ExplicitEuler_Iteration(CGeometry *geometry, CSolver **solver_container, CConfig *config);
   
 	/*!
 	 * \brief A virtual member.
@@ -652,16 +474,6 @@ public:
 	/*!
 	 * \brief A virtual member.
 	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] iMesh - Index of the mesh in multigrid computations.
-	 */
-	virtual void Compute_Residual(CGeometry *geometry, CSolver **solver_container, CConfig *config,
-                                unsigned short iMesh);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	virtual void Inviscid_Forces(CGeometry *geometry, CConfig *config);
@@ -669,31 +481,9 @@ public:
 	/*!
 	 * \brief A virtual member.
 	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void Inviscid_DeltaForces(CGeometry *geometry, CSolver **solver_container, CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	virtual void Viscous_Forces(CGeometry *geometry, CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void Viscous_DeltaForces(CGeometry *geometry, CConfig *config);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void Wave_Strength(CGeometry *geometry, CConfig *config);
   
 	/*!
 	 * \brief A virtual member.
@@ -708,13 +498,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	virtual void SetPrimVar_Gradient_LS(CGeometry *geometry, CConfig *config);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetPrimVar_Limiter_MPI(CGeometry *geometry, CConfig *config);
   
 	/*!
 	 * \brief A virtual member.
@@ -743,35 +526,7 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] iMesh - Index of the mesh in multigrid computations.
 	 */
-	virtual void Galerkin_Method(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
-                               CConfig *config, unsigned short iMesh);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] StiffMatrix_Elem - Stiffness matrix of an element
-	 */
-	virtual void AddStiffMatrix(double **StiffMatrix_Elem, unsigned long Point_0, unsigned long Point_1, unsigned long Point_2, unsigned long Point_3 );
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] iMesh - Index of the mesh in multigrid computations.
-	 */
 	virtual void Source_Residual(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CNumerics *second_numerics,
-                               CConfig *config, unsigned short iMesh);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] iMesh - Index of the mesh in multigrid computations.
-	 */
-	virtual void Source_Template(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
                                CConfig *config, unsigned short iMesh);
   
 	/*!
@@ -795,104 +550,6 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the lift coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	virtual double GetCLift_Inv(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the lift coefficient (viscous contribution) on the surface <i>val_marker</i>.
-	 */
-	virtual double GetCLift_Visc(unsigned short val_marker);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the z moment coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	virtual double GetCMz_Inv(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the z moment coefficient (viscous contribution) on the surface <i>val_marker</i>.
-	 */
-	virtual double GetCMz_Visc(unsigned short val_marker);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the lift coefficient on the surface <i>val_marker</i>.
-	 */
-	virtual double GetSurface_CLift(unsigned short val_marker);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the drag coefficient on the surface <i>val_marker</i>.
-	 */
-	virtual double GetSurface_CDrag(unsigned short val_marker);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the x moment coefficient on the surface <i>val_marker</i>.
-	 */
-	virtual double GetSurface_CMx(unsigned short val_marker);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the y moment coefficient on the surface <i>val_marker</i>.
-	 */
-	virtual double GetSurface_CMy(unsigned short val_marker);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the z moment coefficient on the surface <i>val_marker</i>.
-	 */
-	virtual double GetSurface_CMz(unsigned short val_marker);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the lift coefficient (viscous contribution) on the surface <i>val_marker</i>.
-	 */
-	virtual double GetCSideForce_Visc(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the drag coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	virtual double GetCDrag_Inv(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the sideforce coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	virtual double GetCSideForce_Inv(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the efficiency coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	virtual double GetCEff_Inv(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the drag coefficient (viscous contribution) on the surface <i>val_marker</i>.
-	 */
-	virtual double GetCDrag_Visc(unsigned short val_marker);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \return Value of the lift coefficient (inviscid + viscous contribution).
 	 */
 	virtual double GetTotal_CLift(void);
@@ -908,24 +565,6 @@ public:
 	 * \return Value of the efficiency coefficient (inviscid + viscous contribution).
 	 */
 	virtual double GetTotal_CEff(void);
-  
-  /*!
-	 * \brief Provide the total (inviscid + viscous) non dimensional drag coefficient.
-	 * \return Value of the drag coefficient (inviscid + viscous contribution).
-	 */
-	virtual double Get_PressureDrag(void);
-  
-  /*!
-	 * \brief Provide the total (inviscid + viscous) non dimensional drag coefficient.
-	 * \return Value of the drag coefficient (inviscid + viscous contribution).
-	 */
-	virtual double Get_ViscDrag(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the linearized lift coefficient (inviscid contribution).
-	 */
-	virtual double GetTotal_CDeltaLift(void);
   
 	/*!
 	 * \brief A virtual member.
@@ -977,54 +616,6 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \return Value of the linearized drag coefficient (inviscid contribution).
-	 */
-	virtual double GetTotal_CDeltaDrag(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the lift coefficient (inviscid contribution).
-	 */
-	virtual double GetAllBound_CLift_Inv(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the drag coefficient (inviscid contribution).
-	 */
-	virtual double GetAllBound_CDrag_Inv(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the drag coefficient (inviscid contribution).
-	 */
-	virtual double GetAllBound_CSideForce_Inv(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the drag coefficient (inviscid contribution).
-	 */
-	virtual double GetAllBound_CEff_Inv(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the lift coefficient (viscous contribution).
-	 */
-	virtual double GetAllBound_CLift_Visc(void);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \return Value of the lift coefficient (viscous contribution).
-	 */
-	virtual double GetAllBound_CSideForce_Visc(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the drag coefficient (viscous contribution).
-	 */
-	virtual double GetAllBound_CDrag_Visc(void);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \param[in] val_marker - Surface marker where the coefficient is computed.
 	 * \param[in] val_vertex - Vertex of the marker <i>val_marker</i> where the coefficient is evaluated.
 	 * \return Value of the pressure coefficient.
@@ -1071,43 +662,9 @@ public:
   
 	/*!
 	 * \brief A virtual member.
-	 * \param[in] val_var - Index of the variable for the density.
-	 * \return Value of the density at the infinity.
-	 */
-	virtual double GetDensity_Inf(unsigned short val_var);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the velocity at the infinity.
-	 */
-	virtual double GetModVelocity_Inf(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the density x energy at the infinity.
-	 */
-	virtual double GetDensity_Energy_Inf(void);
-  
-	/*!
-	 * \brief A virtual member.
 	 * \return Value of the pressure at the infinity.
 	 */
 	virtual double GetPressure_Inf(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_dim - Index of the adjoint velocity vector.
-	 * \return Value of the density x velocity at the infinity.
-	 */
-	virtual double GetDensity_Velocity_Inf(unsigned short val_dim);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_dim - Index of the velocity vector.
-	 * \param[in] val_var - Index of the variable for the velocity.
-	 * \return Value of the density multiply by the velocity at the infinity.
-	 */
-	virtual double GetDensity_Velocity_Inf(unsigned short val_dim, unsigned short val_var);
   
 	/*!
 	 * \brief A virtual member.
@@ -1115,50 +672,6 @@ public:
 	 * \return Value of the velocity at the infinity.
 	 */
 	virtual double GetVelocity_Inf(unsigned short val_dim);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the viscosity at the infinity.
-	 */
-	virtual double GetViscosity_Inf(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the density at the inlet.
-	 */
-	virtual double GetDensity_Inlet(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the density x energy at the inlet.
-	 */
-	virtual double GetDensity_Energy_Inlet(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_dim - Index of the adjoint velocity vector.
-	 * \return Value of the density x velocity at the inlet.
-	 */
-	virtual double GetDensity_Velocity_Inlet(unsigned short val_dim);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the density at the outlet.
-	 */
-	virtual double GetDensity_Outlet(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \return Value of the density x energy at the outlet.
-	 */
-	virtual double GetDensity_Energy_Outlet(void);
-  
-	/*!
-	 * \brief A virtual member.
-	 * \param[in] val_dim - Index of the adjoint velocity vector.
-	 * \return Value of the density x velocity at the outlet.
-	 */
-	virtual double GetDensity_Velocity_Outlet(unsigned short val_dim);
   
 	/*!
 	 * \brief A virtual member.
@@ -1205,24 +718,10 @@ protected:
 	
   double
   Mach_Inf,	/*!< \brief Mach number at the infinity. */
-	Mach_Inlet,		/*!< \brief Mach number at the inlet. */
-	Mach_Outlet,		/*!< \brief Mach number at the outlet. */
 	Density_Inf,	/*!< \brief Density at the infinity. */
-	Density_Inlet,		/*!< \brief Density at the inlet. */
-	Density_Outlet,		/*!< \brief Density at the outlet. */
-	Density_Back,		/*!< \brief Density at infinity behind the Shock. */
 	Energy_Inf,			/*!< \brief Energy at the infinity. */
-	Energy_Inlet,		/*!< \brief Energy at the inlet. */
-	Energy_Outlet,		/*!< \brief Energy at the outlet. */
-	Energy_Back,		/*!< \brief Energy at the infinity behind the Shock. */
 	Pressure_Inf,		/*!< \brief Pressure at the infinity. */
-	Pressure_Inlet,		/*!< \brief Pressure at the inlet. */
-	Pressure_Outlet,	/*!< \brief Pressure at the outlet. */
-	Pressure_Back,		/*!< \brief Pressure at the infinity behind the Shock. */
-	*Velocity_Inf,		/*!< \brief Flow Velocity vector at the infinity. */
-	*Velocity_Inlet,	/*!< \brief Flow Velocity vector at the inlet. */
-	*Velocity_Outlet,	/*!< \brief Flow Velocity vector at the outlet. */
-	*Velocity_Back;		/*!< \brief Flow Velocity vector at the infinity behind the Shock. */
+	*Velocity_Inf;	/*!< \brief Flow Velocity vector at the outlet. */
 	
   double
   *CDrag_Inv,	/*!< \brief Drag coefficient (inviscid contribution) for each boundary. */
@@ -1240,28 +739,12 @@ protected:
   *Surface_CMy_Inv,   /*!< \brief y Moment coefficient (inviscid contribution) for each monitoring surface. */
   *Surface_CMz_Inv,   /*!< \brief z Moment coefficient (inviscid contribution) for each monitoring surface. */
 	*CEff_Inv,				/*!< \brief Efficiency (Cl/Cd) (inviscid contribution) for each boundary. */
-	*CMerit_Inv,				/*!< \brief Rotor Figure of Merit (inviscid contribution) for each boundary. */
-	*CT_Inv,			/*!< \brief Thrust coefficient (force in -x direction, inviscid contribution) for each boundary. */
-	*CQ_Inv,			/*!< \brief Torque coefficient (moment in -x direction, inviscid contribution) for each boundary. */
-	*CEquivArea_Inv,				/*!< \brief Equivalent area (inviscid contribution) for each boundary. */
-	*CNearFieldOF_Inv,				/*!< \brief Near field pressure (inviscid contribution) for each boundary. */
 	**CPressure,		/*!< \brief Pressure coefficient for each boundary and vertex. */
 	**CHeatTransfer,		/*!< \brief Heat transfer coefficient for each boundary and vertex. */
 	**YPlus,		/*!< \brief Yplus for each boundary and vertex. */
   ***CharacPrimVar,		/*!< \brief Value of the characteristic variables at each boundary. */
 	*ForceInviscid,		/*!< \brief Inviscid force for each boundary. */
-	*MomentInviscid,	/*!< \brief Inviscid moment for each boundary. */
-	*FanFace_MassFlow,	/*!< \brief Mass flow rate for each boundary. */
-	*Exhaust_MassFlow,	/*!< \brief Mass flow rate for each boundary. */
-	*FanFace_Pressure,	/*!< \brief Fan face pressure for each boundary. */
-	*FanFace_Mach,	/*!< \brief Fan face mach number for each boundary. */
-	*FanFace_Area,	/*!< \brief Boundary total area. */
-  *Exhaust_Area,	/*!< \brief Boundary total area. */
-  FanFace_MassFlow_Total,	/*!< \brief Mass flow rate for each boundary. */
-  Exhaust_MassFlow_Total,	/*!< \brief Mass flow rate for each boundary. */
-	FanFace_Pressure_Total,	/*!< \brief Fan face pressure for each boundary. */
-	FanFace_Mach_Total,	/*!< \brief Fan face mach number for each boundary. */
-	InverseDesign;	/*!< \brief Inverse design functional for each boundary. */
+	*MomentInviscid;	/*!< \brief Inviscid moment for each boundary. */
 	
   double
   AllBound_CDrag_Inv,	/*!< \brief Total drag coefficient (inviscid contribution) for all the boundaries. */
@@ -1273,12 +756,7 @@ protected:
 	AllBound_CFx_Inv,			/*!< \brief Total x force coefficient (inviscid contribution) for all the boundaries. */
 	AllBound_CFy_Inv,			/*!< \brief Total y force coefficient (inviscid contribution) for all the boundaries. */
 	AllBound_CFz_Inv,			/*!< \brief Total z force coefficient (inviscid contribution) for all the boundaries. */
-	AllBound_CEff_Inv,			/*!< \brief Efficient coefficient (inviscid contribution) for all the boundaries. */
-	AllBound_CMerit_Inv,			/*!< \brief Rotor Figure of Merit (inviscid contribution) for all the boundaries. */
-	AllBound_CT_Inv,			/*!< \brief Total thrust coefficient (inviscid contribution) for all the boundaries. */
-	AllBound_CQ_Inv,			/*!< \brief Total torque coefficient (inviscid contribution) for all the boundaries. */
-	AllBound_CEquivArea_Inv,			/*!< \brief equivalent area coefficient (inviscid contribution) for all the boundaries. */
-	AllBound_CNearFieldOF_Inv;			/*!< \brief Near-Field press coefficient (inviscid contribution) for all the boundaries. */
+	AllBound_CEff_Inv;			/*!< \brief Efficient coefficient (inviscid contribution) for all the boundaries. */
 	
   double
   Total_CDrag, /*!< \brief Total drag coefficient for all the boundaries. */
@@ -1290,14 +768,7 @@ protected:
 	Total_CFx,			/*!< \brief Total x force coefficient for all the boundaries. */
 	Total_CFy,			/*!< \brief Total y force coefficient for all the boundaries. */
 	Total_CFz,			/*!< \brief Total z force coefficient for all the boundaries. */
-	Total_CEff,			/*!< \brief Total efficiency coefficient for all the boundaries. */
-	Total_CMerit,			/*!< \brief Total rotor Figure of Merit for all the boundaries. */
-	Total_CT,		/*!< \brief Total thrust coefficient for all the boundaries. */
-	Total_CQ,		/*!< \brief Total torque coefficient for all the boundaries. */
-  Total_Q,    /*!< \brief Total heat load for all the boundaries. */
-  Total_Maxq, /*!< \brief Maximum heat flux on all boundaries. */
-	Total_CEquivArea,			/*!< \brief Total Equivalent Area coefficient for all the boundaries. */
-	Total_CNearFieldOF;			/*!< \brief Total Free Surface coefficient for all the boundaries. */
+	Total_CEff;			/*!< \brief Total efficiency coefficient for all the boundaries. */
   double *Surface_CLift,   /*!< \brief Lift coefficient for each monitoring surface. */
   *Surface_CDrag,          /*!< \brief Drag coefficient for each monitoring surface. */
   *Surface_CMx,            /*!< \brief x Moment coefficient for each monitoring surface. */
@@ -1315,9 +786,6 @@ protected:
 	least_squares;        /*!< \brief True if computing gradients by least squares. */
 	double Gamma;									/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
 	double Gamma_Minus_One;				/*!< \brief Fluids's Gamma - 1.0  . */
-  unsigned short nSection;    /*!< \brief Total number of airfoil sections to be cut from each specified marker. */
-  vector<unsigned long> **point1_Airfoil;     /*!< \brief Vector of first points in the list of edges making up an airfoil section. */
-  vector<unsigned long> **point2_Airfoil;     /*!< \brief Vector of second points in the list of edges making up an airfoil section. */
   
   double *Primitive,		/*!< \brief Auxiliary nPrimVar vector. */
 	*Primitive_i,				/*!< \brief Auxiliary nPrimVar vector for storing the primitive at point i. */
@@ -1343,72 +811,10 @@ public:
 	virtual ~CEulerSolver(void);
   
 	/*!
-	 * \brief Compute the density at the inlet.
-	 * \return Value of the density at the infinity.
-	 */
-	double GetDensity_Inlet(void);
-  
-	/*!
-	 * \brief Compute the density multiply by energy at the inlet.
-	 * \return Value of the density multiply by energy at the inlet.
-	 */
-	double GetDensity_Energy_Inlet(void);
-  
-	/*!
-	 * \brief Compute the density multiply by velocity at the inlet.
-	 * \param[in] val_dim - Index of the velocity vector.
-	 * \return Value of the density multiply by the velocity at the inlet.
-	 */
-	double GetDensity_Velocity_Inlet(unsigned short val_dim);
-  
-	/*!
-	 * \brief Compute the density at the inlet.
-	 * \return Value of the density at the infinity.
-	 */
-	double GetDensity_Outlet(void);
-  
-	/*!
-	 * \brief Compute the density multiply by energy at the inlet.
-	 * \return Value of the density multiply by energy at the inlet.
-	 */
-	double GetDensity_Energy_Outlet(void);
-  
-	/*!
-	 * \brief Compute the density multiply by velocity at the inlet.
-	 * \param[in] val_dim - Index of the velocity vector.
-	 * \return Value of the density multiply by the velocity at the inlet.
-	 */
-	double GetDensity_Velocity_Outlet(unsigned short val_dim);
-  
-	/*!
 	 * \brief Compute the density at the infinity.
 	 * \return Value of the density at the infinity.
 	 */
 	double GetDensity_Inf(void);
-  
-	/*!
-	 * \brief Compute the density at infinity  behind the Shock.
-	 * \return Value of the density at infinity behind the Shock .
-	 */
-	double GetDensity_Back(void);
-  
-	/*!
-	 * \brief Compute 2-norm of the velocity at the infinity.
-	 * \return Value of the 2-norm of the velocity at the infinity.
-	 */
-	double GetModVelocity_Inf(void);
-  
-	/*!
-	 * \brief Compute the density multiply by energy at the infinity.
-	 * \return Value of the density multiply by  energy at the infinity.
-	 */
-	double GetDensity_Energy_Inf(void);
-  
-	/*!
-	 * \brief Compute the density multiply by energy at infinity behind the Shock.
-	 * \return Value of the density multiply by  energy at infinity behind the Shock.
-	 */
-	double GetDensity_Energy_Back(void);
   
 	/*!
 	 * \brief Compute the pressure at the infinity.
@@ -1417,38 +823,11 @@ public:
 	double GetPressure_Inf(void);
   
 	/*!
-	 * \brief Compute the pressure at infinity behind the Shock.
-	 * \return Value of the pressure at infinity behind the Shock.
-	 */
-	double GetPressure_Back(void);
-  
-	/*!
-	 * \brief Compute the density multiply by velocity at the infinity.
-	 * \param[in] val_dim - Index of the velocity vector.
-	 * \return Value of the density multiply by the velocity at the infinity.
-	 */
-	double GetDensity_Velocity_Inf(unsigned short val_dim);
-  
-	/*!
-	 * \brief Compute the density multiply by velocity at infinity  behind the Shock.
-	 * \param[in] val_dim - Index of the velocity vector.
-	 * \return Value of the density multiply by the velocity at infinity  behind the Shock.
-	 */
-	double GetDensity_Velocity_Back(unsigned short val_dim);
-  
-	/*!
 	 * \brief Get the velocity at the infinity.
 	 * \param[in] val_dim - Index of the velocity vector.
 	 * \return Value of the velocity at the infinity.
 	 */
 	double GetVelocity_Inf(unsigned short val_dim);
-  
-	/*!
-	 * \brief Get the velocity at infinity behind the Shock.
-	 * \param[in] val_dim - Index of the velocity vector.
-	 * \return Value of the velocity at the Shock.
-	 */
-	double GetVelocity_Back(unsigned short val_dim);
   
 	/*!
 	 * \brief Compute the time step for solving the Euler equations.
@@ -1619,76 +998,6 @@ public:
 	void Inviscid_Forces(CGeometry *geometry, CConfig *config);
   
 	/*!
-	 * \brief Provide the non dimensional lift coefficient (inviscid contribution).
-	 * \param val_marker Surface where the coefficient is going to be computed.
-	 * \return Value of the lift coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	double GetCLift_Inv(unsigned short val_marker);
-  
-  /*!
-	 * \brief Provide the non dimensional z moment coefficient (inviscid contribution).
-	 * \param val_marker Surface where the coefficient is going to be computed.
-	 * \return Value of the z moment coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	double GetCMz_Inv(unsigned short val_marker);
-  
-  /*!
-	 * \brief Provide the non dimensional lift coefficient.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the lift coefficient on the surface <i>val_marker</i>.
-	 */
-	double GetSurface_CLift(unsigned short val_marker);
-  
-  /*!
-	 * \brief Provide the non dimensional drag coefficient.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the drag coefficient on the surface <i>val_marker</i>.
-	 */
-	double GetSurface_CDrag(unsigned short val_marker);
-  
-  /*!
-	 * \brief Provide the non dimensional x moment coefficient.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the x moment coefficient on the surface <i>val_marker</i>.
-	 */
-	double GetSurface_CMx(unsigned short val_marker);
-  
-  /*!
-	 * \brief Provide the non dimensional y moment coefficient.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the y moment coefficient on the surface <i>val_marker</i>.
-	 */
-	double GetSurface_CMy(unsigned short val_marker);
-  
-  /*!
-	 * \brief Provide the non dimensional z moment coefficient.
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the z moment coefficient on the surface <i>val_marker</i>.
-	 */
-	double GetSurface_CMz(unsigned short val_marker);
-  
-	/*!
-	 * \brief Provide the non dimensional drag coefficient (inviscid contribution).
-	 * \param val_marker Surface where the coeficient is going to be computed.
-	 * \return Value of the drag coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	double GetCDrag_Inv(unsigned short val_marker);
-  
-	/*!
-	 * \brief Provide the non dimensional sideforce coefficient (inviscid contribution).
-	 * \param val_marker Surface where the coeficient is going to be computed.
-	 * \return Value of the sideforce coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	double GetCSideForce_Inv(unsigned short val_marker);
-  
-	/*!
-	 * \brief Provide the non dimensional efficiency coefficient (inviscid contribution).
-	 * \param val_marker Surface where the coeficient is going to be computed.
-	 * \return Value of the efficiency coefficient (inviscid contribution) on the surface <i>val_marker</i>.
-	 */
-	double GetCEff_Inv(unsigned short val_marker);
-  
-	/*!
 	 * \brief Provide the total (inviscid + viscous) non dimensional sideforce coefficient.
 	 * \return Value of the sideforce coefficient (inviscid + viscous contribution).
 	 */
@@ -1838,11 +1147,6 @@ private:
   *Surface_CMy_Visc,  /*!< \brief Moment y coefficient (viscous contribution) for each monitoring surface. */
   *Surface_CMz_Visc,  /*!< \brief Moment z coefficient (viscous contribution) for each monitoring surface. */
 	*CEff_Visc,			/*!< \brief Efficiency (Cl/Cd) (Viscous contribution) for each boundary. */
-	*CMerit_Visc,			/*!< \brief Rotor Figure of Merit (Viscous contribution) for each boundary. */
-	*CT_Visc,		/*!< \brief Thrust coefficient (viscous contribution) for each boundary. */
-	*CQ_Visc,		/*!< \brief Torque coefficient (viscous contribution) for each boundary. */
-  *Q_Visc,		/*!< \brief Heat load (viscous contribution) for each boundary. */
-  *Maxq_Visc, /*!< \brief Maximum heat flux (viscous contribution) for each boundary. */
   
 	**CSkinFriction;	/*!< \brief Skin friction coefficient for each boundary and vertex. */
 	double *ForceViscous,	/*!< \brief Viscous force for each boundary. */
@@ -1856,12 +1160,7 @@ private:
 	AllBound_CEff_Visc,			/*!< \brief Efficient coefficient (Viscous contribution) for all the boundaries. */
 	AllBound_CFx_Visc,			/*!< \brief Force x coefficient (inviscid contribution) for all the boundaries. */
 	AllBound_CFy_Visc,			/*!< \brief Force y coefficient (inviscid contribution) for all the boundaries. */
-	AllBound_CFz_Visc,			/*!< \brief Force z coefficient (inviscid contribution) for all the boundaries. */
-	AllBound_CMerit_Visc,			/*!< \brief Rotor Figure of Merit coefficient (Viscous contribution) for all the boundaries. */
-	AllBound_CT_Visc,		/*!< \brief Thrust coefficient (viscous contribution) for all the boundaries. */
-	AllBound_CQ_Visc,		/*!< \brief Torque coefficient (viscous contribution) for all the boundaries. */
-  AllBound_Q_Visc,		/*!< \brief Heat load (viscous contribution) for all the boundaries. */
-  AllBound_Maxq_Visc; /*!< \brief Maximum heat flux (viscous contribution) for all boundaries. */
+	AllBound_CFz_Visc;			/*!< \brief Force z coefficient (inviscid contribution) for all the boundaries. */
   
 public:
   
@@ -1881,12 +1180,6 @@ public:
 	 * \brief Destructor of the class.
 	 */
 	~CNSSolver(void);
-  
-	/*!
-	 * \brief Compute the viscosity at the infinity.
-	 * \return Value of the viscosity at the infinity.
-	 */
-	double GetViscosity_Inf(void);
   
 	/*!
 	 * \brief Compute the time step for solving the Navier-Stokes equations with turbulence model.
@@ -1936,52 +1229,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	void Viscous_Forces(CGeometry *geometry, CConfig *config);
-  
-	/*!
-	 * \brief Get the non dimensional lift coefficient (viscous contribution).
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the lift coefficient (viscous contribution) on the surface <i>val_marker</i>.
-	 */
-	double GetCLift_Visc(unsigned short val_marker);
-  
-  /*!
-	 * \brief Get the non dimensional z moment coefficient (viscous contribution).
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the z moment coefficient (viscous contribution) on the surface <i>val_marker</i>.
-	 */
-	double GetCMz_Visc(unsigned short val_marker);
-  
-  /*!
-	 * \brief Get the non dimensional sideforce coefficient (viscous contribution).
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the sideforce coefficient (viscous contribution) on the surface <i>val_marker</i>.
-	 */
-	double GetCSideForce_Visc(unsigned short val_marker);
-  
-	/*!
-	 * \brief Get the non dimensional drag coefficient (viscous contribution).
-	 * \param[in] val_marker - Surface marker where the coefficient is computed.
-	 * \return Value of the drag coefficient (viscous contribution) on the surface <i>val_marker</i>.
-	 */
-	double GetCDrag_Visc(unsigned short val_marker);
-  
-	/*!
-	 * \brief Get the total non dimensional lift coefficient (viscous contribution).
-	 * \return Value of the lift coefficient (viscous contribution).
-	 */
-	double GetAllBound_CLift_Visc(void);
-  
-  /*!
-	 * \brief Get the total non dimensional sideforce coefficient (viscous contribution).
-	 * \return Value of the lift coefficient (viscous contribution).
-	 */
-	double GetAllBound_CSideForce_Visc(void);
-  
-	/*!
-	 * \brief Get the total non dimensional drag coefficient (viscous contribution).
-	 * \return Value of the drag coefficient (viscous contribution).
-	 */
-	double GetAllBound_CDrag_Visc(void);
   
 	/*!
 	 * \brief Compute the viscous residuals.
@@ -2170,17 +1417,6 @@ public:
                        CConfig *config, unsigned short iMesh);
   
 	/*!
-	 * \brief Source term computation.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] iMesh - Index of the mesh in multigrid computations.
-	 */
-	void Source_Template(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
-                       CConfig *config, unsigned short iMesh);
-  
-	/*!
 	 * \brief Impose the Navier-Stokes wall boundary condition.
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] solver_container - Container vector with all the solutions.
@@ -2299,17 +1535,6 @@ public:
 	 * \param[in] iMesh - Index of the mesh in multigrid computations.
 	 */
 	void Source_Residual(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics, CNumerics *second_numerics,
-                       CConfig *config, unsigned short iMesh);
-  
-	/*!
-	 * \brief Source term computation.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] solver_container - Container vector with all the solutions.
-	 * \param[in] solver - Description of the numerical method.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] iMesh - Index of the mesh in multigrid computations.
-	 */
-	void Source_Template(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
                        CConfig *config, unsigned short iMesh);
   
 	/*!

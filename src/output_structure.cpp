@@ -121,10 +121,7 @@ void COutput::SetSurfaceCSV_Flow(CConfig *config, CGeometry *geometry,
 }
 
 void COutput::MergeConnectivity(CConfig *config, CGeometry *geometry) {
-  
-  int rank = MASTER_NODE;
-  int size = SINGLE_NODE;
-  
+    
   /*--- Merge connectivity for each type of element (excluding halos). Note
    that we only need to merge the connectivity once, as it does not change
    during computation. Check whether the base file has been written. ---*/
@@ -133,42 +130,24 @@ void COutput::MergeConnectivity(CConfig *config, CGeometry *geometry) {
     
     /*--- Merge volumetric grid. ---*/
     
-    if ((rank == MASTER_NODE) && (size != SINGLE_NODE) && (nGlobal_Tria != 0))
-    cout <<"Merging volumetric triangle grid connectivity." << endl;
     MergeVolumetricConnectivity(config, geometry, TRIANGLE    );
     
-    if ((rank == MASTER_NODE) && (size != SINGLE_NODE) && (nGlobal_Quad != 0))
-    cout <<"Merging volumetric rectangle grid connectivity." << endl;
     MergeVolumetricConnectivity(config, geometry, RECTANGLE   );
     
-    if ((rank == MASTER_NODE) && (size != SINGLE_NODE) && (nGlobal_Tetr != 0))
-    cout <<"Merging volumetric tetrahedron grid connectivity." << endl;
     MergeVolumetricConnectivity(config, geometry, TETRAHEDRON );
     
-    if ((rank == MASTER_NODE) && (size != SINGLE_NODE) && (nGlobal_Hexa != 0))
-    cout <<"Merging volumetric hexahedron grid connectivity." << endl;
     MergeVolumetricConnectivity(config, geometry, HEXAHEDRON  );
     
-    if ((rank == MASTER_NODE) && (size != SINGLE_NODE) && (nGlobal_Wedg != 0))
-    cout <<"Merging volumetric wedge grid connectivity." << endl;
     MergeVolumetricConnectivity(config, geometry, WEDGE       );
     
-    if ((rank == MASTER_NODE) && (size != SINGLE_NODE) && (nGlobal_Pyra != 0))
-    cout <<"Merging volumetric pyramid grid connectivity." << endl;
     MergeVolumetricConnectivity(config, geometry, PYRAMID     );
     
     /*--- Merge surface grid. ---*/
     
-    if ((rank == MASTER_NODE) && (size != SINGLE_NODE) && (nGlobal_Line != 0))
-    cout <<"Merging surface line grid connectivity." << endl;
     MergeSurfaceConnectivity(config, geometry, LINE);
     
-    if ((rank == MASTER_NODE) && (size != SINGLE_NODE) && (nGlobal_BoundTria != 0))
-    cout <<"Merging surface triangle grid connectivity." << endl;
     MergeSurfaceConnectivity(config, geometry, TRIANGLE);
     
-    if ((rank == MASTER_NODE) && (size != SINGLE_NODE) && (nGlobal_BoundQuad != 0))
-    cout <<"Merging surface rectangle grid connectivity." << endl;
     MergeSurfaceConnectivity(config, geometry, RECTANGLE);
     
     /*--- Update total number of volume elements after merge. ---*/
@@ -226,8 +205,6 @@ void COutput::MergeCoordinates(CConfig *config, CGeometry *geometry) {
 }
 
 void COutput::MergeVolumetricConnectivity(CConfig *config, CGeometry *geometry, unsigned short Elem_Type) {
-  
-  int rank = MASTER_NODE;
   
   /*--- Local variables needed on all processors ---*/
   
@@ -316,7 +293,6 @@ void COutput::MergeVolumetricConnectivity(CConfig *config, CGeometry *geometry, 
   /*--- Store the particular global element count in the class data,
    and set the class data pointer to the connectivity array. ---*/
   
-  if (rank == MASTER_NODE) {
     switch (Elem_Type) {
       case TRIANGLE:
         nGlobal_Tria = nElem_Total;
@@ -346,13 +322,10 @@ void COutput::MergeVolumetricConnectivity(CConfig *config, CGeometry *geometry, 
         cout << "Error: Unrecognized element type \n";
         exit(0); break;
     }
-  }
   
 }
 
 void COutput::MergeSurfaceConnectivity(CConfig *config, CGeometry *geometry, unsigned short Elem_Type) {
-  
-  int rank = MASTER_NODE;
   
   /*--- Local variables needed on all processors ---*/
   
@@ -441,7 +414,6 @@ void COutput::MergeSurfaceConnectivity(CConfig *config, CGeometry *geometry, uns
   /*--- Store the particular global element count in the class data,
    and set the class data pointer to the connectivity array. ---*/
   
-  if (rank == MASTER_NODE) {
     switch (Elem_Type) {
       case LINE:
         nGlobal_Line = nElem_Total;
@@ -459,7 +431,6 @@ void COutput::MergeSurfaceConnectivity(CConfig *config, CGeometry *geometry, uns
         cout << "Error: Unrecognized element type \n";
         exit(0); break;
     }
-  }
   
 }
 
@@ -788,31 +759,22 @@ void COutput::SetRestart(CConfig *config, CGeometry *geometry) {
 
 void COutput::DeallocateCoordinates(CConfig *config, CGeometry *geometry) {
   
-  int rank = MASTER_NODE;
-  
   /*--- Local variables and initialization ---*/
   
   unsigned short iDim, nDim = geometry->GetnDim();
   
   /*--- The master node alone owns all data found in this routine. ---*/
-  if (rank == MASTER_NODE) {
-    
+  
     /*--- Deallocate memory for coordinate data ---*/
     for (iDim = 0; iDim < nDim; iDim++) {
       delete [] Coords[iDim];
     }
     delete [] Coords;
     
-  }
 }
 
 void COutput::DeallocateConnectivity(CConfig *config, CGeometry *geometry, bool surf_sol) {
   
-  int rank = MASTER_NODE;
-  
-  /*--- The master node alone owns all data found in this routine. ---*/
-  if (rank == MASTER_NODE) {
-    
     /*--- Deallocate memory for connectivity data ---*/
     if (surf_sol) {
       if (nGlobal_Line > 0) delete [] Conn_Line;
@@ -828,23 +790,16 @@ void COutput::DeallocateConnectivity(CConfig *config, CGeometry *geometry, bool 
       if (nGlobal_Pyra > 0) delete [] Conn_Pyra;
     }
     
-  }
 }
 
 void COutput::DeallocateSolution(CConfig *config, CGeometry *geometry) {
   
-  int rank = MASTER_NODE;
-  
-  /*--- The master node alone owns all data found in this routine. ---*/
-  if (rank == MASTER_NODE) {
-    
     /*--- Deallocate memory for solution data ---*/
     for (unsigned short iVar = 0; iVar < nVar_Total; iVar++) {
       delete [] Data[iVar];
     }
     delete [] Data;
     
-  }
 }
 
 void COutput::SetHistory_Header(ofstream *ConvHist_file, CConfig *config) {
@@ -925,11 +880,6 @@ void COutput::SetHistory_Header(ofstream *ConvHist_file, CConfig *config) {
 
 void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geometry, CSolver ***solver_container, CConfig *config, CIntegration **integration, bool DualTime_Iteration, double timeused) {
   
-  int rank = MASTER_NODE;
-  
-  /*--- Output using only the master node ---*/
-  if (rank == MASTER_NODE) {
-    
     unsigned long iIntIter = config->GetIntIter();
     unsigned long iExtIter = config->GetExtIter();
     
@@ -1243,13 +1193,10 @@ void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geomet
       delete [] Surface_CMz;
       
     }
-  }
 }
 
 void COutput::SetResult_Files(CSolver ***solver_container, CGeometry **geometry, CConfig *config, unsigned long iExtIter) {
   
-  int rank = MASTER_NODE;
-    
     /*--- Flags identifying the types of files to be written. ---*/
     bool Wrt_Vol = config->GetWrt_Vol_Sol();
     bool Wrt_Srf = config->GetWrt_Srf_Sol();
@@ -1290,9 +1237,7 @@ void COutput::SetResult_Files(CSolver ***solver_container, CGeometry **geometry,
     /*--- Write restart, CGNS, or Tecplot files using the merged data.
      This data lives only on the master, and these routines are currently
      executed by the master proc alone (as if in serial). ---*/
-    
-    if (rank == MASTER_NODE) {
-      
+  
       /*--- Write a native restart file ---*/
       if (Wrt_Rst)
         SetRestart(config, geometry[MESH_0]);
@@ -1354,15 +1299,12 @@ void COutput::SetResult_Files(CSolver ***solver_container, CGeometry **geometry,
       if (Wrt_Vol || Wrt_Rst)
       DeallocateSolution(config, geometry[MESH_0]);
       
-    }
-    
+  
 }
 
 void COutput::SetBaselineResult_Files(CSolver *solver, CGeometry *geometry, CConfig *config,
                                       unsigned long iExtIter) {
-  
-  int rank = MASTER_NODE;
-  
+    
     /*--- Flags identifying the types of files to be written. ---*/
     
     bool Wrt_Vol = config->GetWrt_Vol_Sol();
@@ -1378,7 +1320,7 @@ void COutput::SetBaselineResult_Files(CSolver *solver, CGeometry *geometry, CCon
      is active by default. ---*/
     
     if (Wrt_Vol || Wrt_Srf) {
-      if (rank == MASTER_NODE) cout <<"Merging grid connectivity." << endl;
+      cout <<"Merging grid connectivity." << endl;
       MergeConnectivity(config, geometry);
     }
     
@@ -1392,12 +1334,9 @@ void COutput::SetBaselineResult_Files(CSolver *solver, CGeometry *geometry, CCon
     /*--- Write restart, CGNS, Tecplot or Paraview files using the merged data.
      This data lives only on the master, and these routines are currently
      executed by the master proc alone (as if in serial). ---*/
-    
-    if (rank == MASTER_NODE) {
-      
+  
       if (Wrt_Vol) {
         
-        if (rank == MASTER_NODE)
         cout <<"Writing volume solution file." << endl;
         
         switch (FileFormat) {
@@ -1424,7 +1363,7 @@ void COutput::SetBaselineResult_Files(CSolver *solver, CGeometry *geometry, CCon
       
       if (Wrt_Srf) {
         
-        if (rank == MASTER_NODE) cout <<"Writing surface solution file." << endl;
+        cout <<"Writing surface solution file." << endl;
         
         switch (FileFormat) {
             
@@ -1456,7 +1395,6 @@ void COutput::SetBaselineResult_Files(CSolver *solver, CGeometry *geometry, CCon
       
       if (Wrt_Vol || Wrt_Srf)
       DeallocateSolution(config, geometry);
-    }
-    
+  
 }
 

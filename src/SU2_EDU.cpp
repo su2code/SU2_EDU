@@ -31,8 +31,6 @@ int main(int argc, char *argv[]) {
   double StartTime = 0.0, StopTime = 0.0, UsedTime = 0.0;
   unsigned short iMesh, iSol, nDim;
   ofstream ConvHist_file;
-  int rank = MASTER_NODE;
-  int size = SINGLE_NODE;
   
   /*--- Create pointers to all of the classes that may be used throughout
    the SU2_EDU code. In general, the pointers are instantiated down a
@@ -125,7 +123,6 @@ int main(int argc, char *argv[]) {
   geometry_container = new CGeometry*[config_container->GetMGLevels()+1];
   geometry_container[MESH_0] = new CPhysicalGeometry(config_container);
   
-  if (rank == MASTER_NODE)
     cout << endl <<"------------------------- Geometry Preprocessing ------------------------" << endl;
   
   /*--- Preprocessing of the geometry. In this routine, the edge-
@@ -135,7 +132,6 @@ int main(int argc, char *argv[]) {
   
   Geometrical_Preprocessing(geometry_container, config_container);
   
-  if (rank == MASTER_NODE)
     cout << endl <<"------------------------- Solver Preprocessing --------------------------" << endl;
   
   /*--- Definition of the solver class: solver_container[#MG_GRIDS][#EQ_SYSTEMS].
@@ -177,21 +173,21 @@ int main(int argc, char *argv[]) {
   Numerics_Preprocessing(numerics_container, solver_container,geometry_container, config_container);
   
   /*--- Surface grid deformation using design variables ---*/
-  if (rank == MASTER_NODE) cout << endl << "------------------------- Surface grid deformation ----------------------" << endl;
+  cout << endl << "------------------------- Surface grid deformation ----------------------" << endl;
   
   /*--- Definition and initialization of the surface deformation class ---*/
   surface_movement->CopyBoundary(geometry_container[MESH_0], config_container);
   
   /*--- Surface grid deformation ---*/
-  if (rank == MASTER_NODE) cout << "Performing the deformation of the surface grid." << endl;
+  cout << "Performing the deformation of the surface grid." << endl;
   surface_movement->SetAirfoil(geometry_container[MESH_0], config_container);
   
   /*--- Volumetric grid deformation ---*/
-  if (rank == MASTER_NODE) cout << endl << "----------------------- Volumetric grid deformation ---------------------" << endl;
+  cout << endl << "----------------------- Volumetric grid deformation ---------------------" << endl;
   
   /*--- Definition of the Class for grid movement ---*/
   
-  if (rank == MASTER_NODE) cout << "Performing the deformation of the volumetric grid." << endl;
+  cout << "Performing the deformation of the volumetric grid." << endl;
   grid_movement = new CVolumetricMovement(geometry_container[MESH_0]);
   grid_movement->SetVolume_Deformation(geometry_container[MESH_0], config_container, true);
   grid_movement->UpdateMultiGrid(geometry_container, config_container);
@@ -205,12 +201,10 @@ int main(int argc, char *argv[]) {
   
   /*--- Open the convergence history file ---*/
   
-  if (rank == MASTER_NODE)
     output->SetHistory_Header(&ConvHist_file, config_container);
   
   /*--- Main external loop of the solver. Within this loop, each iteration ---*/
   
-  if (rank == MASTER_NODE)
     cout << endl <<"------------------------------ Begin Solver -----------------------------" << endl;
   
   StartTime = double(clock())/double(CLOCKS_PER_SEC);
@@ -270,49 +264,19 @@ int main(int argc, char *argv[]) {
   
   /*--- Close the convergence history file. ---*/
   
-  if (rank == MASTER_NODE) {
     ConvHist_file.close();
     cout << endl <<"History file, closed." << endl;
-  }
-  
-  /*--- Solver class deallocation ---*/
-  //    for (iMesh = 0; iMesh <= config_container->GetMGLevels(); iMesh++) {
-  //      for (iSol = 0; iSol < MAX_SOLS; iSol++) {
-  //        if (solver_container[iMesh][iSol] != NULL) {
-  //          delete solver_container[iMesh][iSol];
-  //        }
-  //      }
-  //      delete solver_container[iMesh];
-  //    }
-  //    delete solver_container;
-  //  delete [] solver_container;
-  //  if (rank == MASTER_NODE) cout <<"Solution container, deallocated." << endl;
-  
-  /*--- Geometry class deallocation ---*/
-  //    for (iMesh = 0; iMesh <= config_container->GetMGLevels(); iMesh++) {
-  //      delete geometry_container[iMesh];
-  //    }
-  //    delete geometry_container;
-  //  delete [] geometry_container;
-  //  cout <<"Geometry container, deallocated." << endl;
-  
-  /*--- Integration class deallocation ---*/
-  //  cout <<"Integration container, deallocated." << endl;
   
   StopTime = double(clock())/double(CLOCKS_PER_SEC);
   
   /*--- Compute/print the total time for performance benchmarking. ---*/
   
   UsedTime = StopTime-StartTime;
-  if (rank == MASTER_NODE) {
-    cout << "\nCompleted in " << fixed << UsedTime << " seconds on "<< size;
-    if (size == 1) cout << " core." << endl; else cout << " cores." << endl;
-  }
+    cout << "\nCompleted in " << fixed << UsedTime << " seconds on 1 core." << endl;
   
   /*--- Exit the solver cleanly ---*/
   
-  if (rank == MASTER_NODE)
-    cout << endl <<"------------------------- Exit Success (SU2_EDU) ------------------------" << endl << endl;
+  cout << endl <<"------------------------- Exit Success (SU2_EDU) ------------------------" << endl << endl;
   
   
   return EXIT_SUCCESS;
