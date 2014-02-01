@@ -75,7 +75,6 @@ Build Configuration Summary:
     Preprocessor flags:   ${CPPFLAGS}
     Compiler flags:       ${CXXFLAGS}
     Linker flags:         ${LDFLAGS}
-    MPI support:          $have_MPI
 
 Please be sure to add the [\$]SU2_EDU_RUN environment variables, and update your [\$]PATH with [\$]SU2_EDU_RUN
 
