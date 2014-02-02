@@ -29,7 +29,6 @@ CIntegration::CIntegration(CConfig *config) {
 	New_Func = 0;
 	Cauchy_Counter = 0;
 	Convergence = false;
-	Convergence_OneShot = false;
 	Convergence_FullMG = false;
 	Cauchy_Serie = new double [config->GetCauchy_Elems()+1];	
 }
@@ -146,9 +145,6 @@ void CIntegration::Convergence_Monitoring(CGeometry *geometry, CConfig *config, 
 		if (Cauchy_Value >= config->GetCauchy_Eps()) Convergence = false;
 		else Convergence = true;
 
-		if (Cauchy_Value >= config->GetCauchy_Eps_OneShot()) Convergence_OneShot = false;
-		else Convergence_OneShot = true;
-
 		if (Cauchy_Value >= config->GetCauchy_Eps_FullMG()) Convergence_FullMG = false;
 		else Convergence_FullMG = true;
 	}
@@ -171,7 +167,6 @@ void CIntegration::Convergence_Monitoring(CGeometry *geometry, CConfig *config, 
    of iterations is less than a particular value ---*/
 	if (Iteration < config->GetStartConv_Iter()) {
 		Convergence = false;
-		Convergence_OneShot = false;
 		Convergence_FullMG = false;
 	}
 

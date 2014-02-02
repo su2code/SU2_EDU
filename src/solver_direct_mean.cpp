@@ -1274,7 +1274,7 @@ void CEulerSolver::ImplicitEuler_Iteration(CGeometry *geometry, CSolver **solver
   precond = new CLU_SGSPreconditioner(Jacobian, geometry, config);
   
   CSysSolve system;
-  IterLinSol = system.FGMRES(LinSysRes, LinSysSol, *mat_vec, *precond, config->GetLinear_Solver_Error(),
+  IterLinSol = system.BCGSTAB(LinSysRes, LinSysSol, *mat_vec, *precond, config->GetLinear_Solver_Error(),
                              config->GetLinear_Solver_Iter(), false);
   
   /*--- The the number of iterations of the linear solver ---*/

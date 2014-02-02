@@ -439,9 +439,9 @@ void COutput::MergeSolution(CConfig *config, CGeometry *geometry, CSolver **solv
   /*--- Local variables needed on all processors ---*/
   unsigned short Kind_Solver  = config->GetKind_Solver();
   unsigned short iVar, jVar, FirstIndex = NONE, SecondIndex = NONE, ThirdIndex = NONE;
-  unsigned short nVar_First = 0, nVar_Second = 0, nVar_Third = 0, iVar_Eddy = 0, iVar_Sharp = 0;
+  unsigned short nVar_First = 0, nVar_Second = 0, nVar_Third = 0, iVar_Eddy = 0;
   unsigned short iVar_PressMach = 0, iVar_TempLam = 0,
-  iVar_ViscCoeffs = 0, iVar_Extra = 0;
+  iVar_ViscCoeffs = 0;
   
   unsigned long iPoint = 0, jPoint = 0, iVertex = 0, iMarker = 0;
   double RefDensity, RefPressure, factor;
@@ -505,20 +505,6 @@ void COutput::MergeSolution(CConfig *config, CGeometry *geometry, CSolver **solv
     /*--- Eddy Viscosity ---*/
     iVar_Eddy = nVar_Total;
     nVar_Total += 1;
-  }
-  
-  if ((Kind_Solver == EULER) || (Kind_Solver == NAVIER_STOKES) || (Kind_Solver == RANS)) {
-    /*--- Sharp edges ---*/
-    iVar_Sharp = nVar_Total;
-    nVar_Total += 1;
-  }
-  
-  if (config->GetExtraOutput()) {
-    if (Kind_Solver == RANS) {
-      iVar_Extra  = nVar_Total;
-      nVar_Extra  = solver[TURB_SOL]->GetnOutputVariables();
-      nVar_Total += nVar_Extra;
-    }
   }
   
   /*--- Merge the solution either in serial or parallel. ---*/
@@ -613,7 +599,6 @@ void COutput::MergeSolution(CConfig *config, CGeometry *geometry, CSolver **solv
             Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetPressure(); jVar++;
             Data[jVar][jPoint] = (solver[FLOW_SOL]->node[iPoint]->GetPressure() - RefPressure)*factor*RefAreaCoeff; jVar++;
             Data[jVar][jPoint] = sqrt(solver[FLOW_SOL]->node[iPoint]->GetVelocity2())/solver[FLOW_SOL]->node[iPoint]->GetSoundSpeed(); jVar++;
-          Data[jVar][jPoint] = geometry->node[iPoint]->GetSharpEdge_Distance(); jVar++;
           break;
           /*--- Write pressure, Cp, mach, temperature, laminar viscosity, skin friction, heat transfer, yplus ---*/
         case NAVIER_STOKES:
@@ -626,7 +611,6 @@ void COutput::MergeSolution(CConfig *config, CGeometry *geometry, CSolver **solv
             Data[jVar][jPoint] = Aux_Frict[iPoint]; jVar++;
             Data[jVar][jPoint] = Aux_Heat[iPoint];  jVar++;
             Data[jVar][jPoint] = Aux_yPlus[iPoint]; jVar++;
-          Data[jVar][jPoint] = geometry->node[iPoint]->GetSharpEdge_Distance(); jVar++;
           break;
           /*--- Write pressure, Cp, mach, temperature, laminar viscosity, skin friction, heat transfer, yplus, eddy viscosity ---*/
         case RANS:
@@ -640,7 +624,6 @@ void COutput::MergeSolution(CConfig *config, CGeometry *geometry, CSolver **solv
             Data[jVar][jPoint] = Aux_Heat[iPoint];  jVar++;
             Data[jVar][jPoint] = Aux_yPlus[iPoint]; jVar++;
             Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetEddyViscosity(); jVar++;
-          Data[jVar][jPoint] = geometry->node[iPoint]->GetSharpEdge_Distance(); jVar++;
           break;
       }
     }
@@ -720,10 +703,6 @@ void COutput::SetRestart(CConfig *config, CGeometry *geometry) {
   
   if (Kind_Solver == RANS) {
     restart_file << "\t\"Eddy_Viscosity\"";
-  }
-  
-  if ((Kind_Solver == EULER) || (Kind_Solver == NAVIER_STOKES) || (Kind_Solver == RANS)) {
-    restart_file << "\t\"Sharp_Edge_Dist\"";
   }
   
   restart_file << endl;

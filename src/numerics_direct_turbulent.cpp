@@ -44,11 +44,11 @@ void CUpwSca_TurbSA::ComputeResidual(double *val_residual, double **val_Jacobian
   
   q_ij = 0.0;
   
-    for (iDim = 0; iDim < nDim; iDim++) {
-      Velocity_i[iDim] = V_i[iDim+1];
-      Velocity_j[iDim] = V_j[iDim+1];
-      q_ij += 0.5*(Velocity_i[iDim]+Velocity_j[iDim])*Normal[iDim];
-    }
+  for (iDim = 0; iDim < nDim; iDim++) {
+    Velocity_i[iDim] = V_i[iDim+1];
+    Velocity_j[iDim] = V_j[iDim+1];
+    q_ij += 0.5*(Velocity_i[iDim]+Velocity_j[iDim])*Normal[iDim];
+  }
   
   a0 = 0.5*(q_ij+fabs(q_ij));
   a1 = 0.5*(q_ij-fabs(q_ij));
@@ -73,7 +73,7 @@ CAvgGrad_TurbSA::CAvgGrad_TurbSA(unsigned short val_nDim, unsigned short val_nVa
   Proj_Mean_GradTurbVar_Edge = new double [nVar];
   Mean_GradTurbVar = new double* [nVar];
   for (iVar = 0; iVar < nVar; iVar++)
-  Mean_GradTurbVar[iVar] = new double [nDim];
+    Mean_GradTurbVar[iVar] = new double [nDim];
   
 }
 
@@ -84,16 +84,16 @@ CAvgGrad_TurbSA::~CAvgGrad_TurbSA(void) {
   delete [] Proj_Mean_GradTurbVar_Kappa;
   delete [] Proj_Mean_GradTurbVar_Edge;
   for (iVar = 0; iVar < nVar; iVar++)
-  delete [] Mean_GradTurbVar[iVar];
+    delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
   
 }
 
 void CAvgGrad_TurbSA::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
   
-    Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
-    Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
-    Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
+  Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
+  Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
+  Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
   
   /*--- Compute mean effective viscosity ---*/
   
@@ -148,7 +148,7 @@ CAvgGradCorrected_TurbSA::CAvgGradCorrected_TurbSA(unsigned short val_nDim, unsi
   Proj_Mean_GradTurbVar_Corrected = new double [nVar];
   Mean_GradTurbVar = new double* [nVar];
   for (iVar = 0; iVar < nVar; iVar++)
-  Mean_GradTurbVar[iVar] = new double [nDim];
+    Mean_GradTurbVar[iVar] = new double [nDim];
   
 }
 
@@ -160,16 +160,16 @@ CAvgGradCorrected_TurbSA::~CAvgGradCorrected_TurbSA(void) {
   delete [] Proj_Mean_GradTurbVar_Edge;
   delete [] Proj_Mean_GradTurbVar_Corrected;
   for (iVar = 0; iVar < nVar; iVar++)
-  delete [] Mean_GradTurbVar[iVar];
+    delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
   
 }
 
 void CAvgGradCorrected_TurbSA::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
   
-    Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
-    Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
-    Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
+  Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
+  Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
+  Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
   
   /*--- Compute mean effective viscosity ---*/
   
@@ -239,8 +239,8 @@ CSourcePieceWise_TurbSA::~CSourcePieceWise_TurbSA(void) {
 
 void CSourcePieceWise_TurbSA::ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config) {
   
-    Density_i = V_i[nDim+2];
-    Laminar_Viscosity_i = V_i[nDim+5];
+  Density_i = V_i[nDim+2];
+  Laminar_Viscosity_i = V_i[nDim+5];
   
   val_residual[0] = 0.0;
   Production = 0;
@@ -288,7 +288,7 @@ void CSourcePieceWise_TurbSA::ComputeResidual(double *val_residual, double **val
     
     norm2_Grad = 0.0;
     for (iDim = 0; iDim < nDim; iDim++)
-    norm2_Grad += TurbVar_Grad_i[0][iDim]*TurbVar_Grad_i[0][iDim];
+      norm2_Grad += TurbVar_Grad_i[0][iDim]*TurbVar_Grad_i[0][iDim];
     CrossProduction = cb2_sigma*norm2_Grad*Volume;
     
     val_residual[0] = Production - Destruction + CrossProduction;
@@ -311,7 +311,7 @@ void CSourcePieceWise_TurbSA::ComputeResidual(double *val_residual, double **val
   }
   
   
- }
+}
 
 CUpwSca_TurbSST::CUpwSca_TurbSST(unsigned short val_nDim, unsigned short val_nVar,
                                  CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
@@ -332,15 +332,15 @@ CUpwSca_TurbSST::~CUpwSca_TurbSST(void) {
 
 void CUpwSca_TurbSST::ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config) {
   
-    Density_i = V_i[nDim+2];
-    Density_j = V_j[nDim+2];
+  Density_i = V_i[nDim+2];
+  Density_j = V_j[nDim+2];
   
   q_ij = 0.0;
-    for (iDim = 0; iDim < nDim; iDim++) {
-      Velocity_i[iDim] = V_i[iDim+1];
-      Velocity_j[iDim] = V_j[iDim+1];
-      q_ij += 0.5*(Velocity_i[iDim]+Velocity_j[iDim])*Normal[iDim];
-    }
+  for (iDim = 0; iDim < nDim; iDim++) {
+    Velocity_i[iDim] = V_i[iDim+1];
+    Velocity_j[iDim] = V_j[iDim+1];
+    q_ij += 0.5*(Velocity_i[iDim]+Velocity_j[iDim])*Normal[iDim];
+  }
   
   a0 = 0.5*(q_ij+fabs(q_ij));
   a1 = 0.5*(q_ij-fabs(q_ij));
@@ -375,7 +375,7 @@ CAvgGrad_TurbSST::CAvgGrad_TurbSST(unsigned short val_nDim, unsigned short val_n
   Proj_Mean_GradTurbVar_Corrected = new double [nVar];
   Mean_GradTurbVar = new double* [nVar];
   for (iVar = 0; iVar < nVar; iVar++)
-  Mean_GradTurbVar[iVar] = new double [nDim];
+    Mean_GradTurbVar[iVar] = new double [nDim];
   
 }
 
@@ -388,7 +388,7 @@ CAvgGrad_TurbSST::~CAvgGrad_TurbSST(void) {
   delete [] Proj_Mean_GradTurbVar_Edge;
   delete [] Proj_Mean_GradTurbVar_Corrected;
   for (iVar = 0; iVar < nVar; iVar++)
-  delete [] Mean_GradTurbVar[iVar];
+    delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
   
 }
@@ -398,9 +398,9 @@ void CAvgGrad_TurbSST::ComputeResidual(double *val_residual, double **Jacobian_i
   double sigma_kine_i, sigma_kine_j, sigma_omega_i, sigma_omega_j;
   double diff_i_kine, diff_i_omega, diff_j_kine, diff_j_omega;
   
-    Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
-    Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
-    Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
+  Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
+  Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
+  Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
   
   /*--- Compute the blended constant for the viscous terms ---*/
   sigma_kine_i  = F1_i*sigma_k1 + (1.0 - F1_i)*sigma_k2;
@@ -470,7 +470,7 @@ CAvgGradCorrected_TurbSST::CAvgGradCorrected_TurbSST(unsigned short val_nDim, un
   Proj_Mean_GradTurbVar_Corrected = new double [nVar];
   Mean_GradTurbVar = new double* [nVar];
   for (iVar = 0; iVar < nVar; iVar++)
-  Mean_GradTurbVar[iVar] = new double [nDim];
+    Mean_GradTurbVar[iVar] = new double [nDim];
   
 }
 
@@ -483,7 +483,7 @@ CAvgGradCorrected_TurbSST::~CAvgGradCorrected_TurbSST(void) {
   delete [] Proj_Mean_GradTurbVar_Edge;
   delete [] Proj_Mean_GradTurbVar_Corrected;
   for (iVar = 0; iVar < nVar; iVar++)
-  delete [] Mean_GradTurbVar[iVar];
+    delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
   
 }
@@ -493,9 +493,9 @@ void CAvgGradCorrected_TurbSST::ComputeResidual(double *val_residual, double **J
   double sigma_kine_i, sigma_kine_j, sigma_omega_i, sigma_omega_j;
   double diff_i_kine, diff_i_omega, diff_j_kine, diff_j_omega;
   
-    Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
-    Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
-    Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
+  Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
+  Laminar_Viscosity_i = V_i[nDim+5];  Laminar_Viscosity_j = V_j[nDim+5];
+  Eddy_Viscosity_i = V_i[nDim+6];     Eddy_Viscosity_j = V_j[nDim+6];
   
   /*--- Compute the blended constant for the viscous terms ---*/
   sigma_kine_i  = F1_i*sigma_k1 + (1.0 - F1_i)*sigma_k2;
@@ -572,9 +572,9 @@ void CSourcePieceWise_TurbSST::ComputeResidual(double *val_residual, double **va
   double alfa_blended, beta_blended;
   double diverg, pk, pw, zeta;
   
-    Density_i = V_i[nDim+2];
-    Laminar_Viscosity_i = V_i[nDim+5];
-    Eddy_Viscosity_i = V_i[nDim+6];
+  Density_i = V_i[nDim+2];
+  Laminar_Viscosity_i = V_i[nDim+5];
+  Eddy_Viscosity_i = V_i[nDim+6];
   
   val_residual[0] = 0.0;        val_residual[1] = 0.0;
   val_Jacobian_i[0][0] = 0.0;		val_Jacobian_i[0][1] = 0.0;
@@ -591,7 +591,7 @@ void CSourcePieceWise_TurbSST::ComputeResidual(double *val_residual, double **va
     
     diverg = 0.0;
     for (iDim = 0; iDim < nDim; iDim++)
-    diverg += PrimVar_Grad_i[iDim+1][iDim];
+      diverg += PrimVar_Grad_i[iDim+1][iDim];
     
     pk = Eddy_Viscosity_i*StrainMag*StrainMag - 2.0/3.0*Density_i*TurbVar_i[0]*diverg;
     pk = min(pk,20.0*beta_star*Density_i*TurbVar_i[1]*TurbVar_i[0]);

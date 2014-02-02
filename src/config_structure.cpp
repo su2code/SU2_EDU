@@ -265,13 +265,13 @@ void CConfig::SetConfig_Options() {
   /* CONFIG_CATEGORY: Linear solver definition */
   
   /* DESCRIPTION: Linear solver for the implicit, mesh deformation, or discrete adjoint systems */
-  AddEnumOption("LINEAR_SOLVER", Kind_Linear_Solver, Linear_Solver_Map, "FGMRES");
+  AddEnumOption("LINEAR_SOLVER", Kind_Linear_Solver, Linear_Solver_Map, "BCGSTAB");
   /* DESCRIPTION: Preconditioner for the Krylov linear solvers */
   AddEnumOption("LINEAR_SOLVER_PREC", Kind_Linear_Solver_Prec, Linear_Solver_Prec_Map, "LU_SGS");
   /* DESCRIPTION: Minimum error threshold for the linear solver for the implicit formulation */
-  AddScalarOption("LINEAR_SOLVER_ERROR", Linear_Solver_Error, 1E-5);
+  AddScalarOption("LINEAR_SOLVER_ERROR", Linear_Solver_Error, 1E-4);
   /* DESCRIPTION: Maximum number of iterations of the linear solver for the implicit formulation */
-  AddScalarOption("LINEAR_SOLVER_ITER", Linear_Solver_Iter, 2);
+  AddScalarOption("LINEAR_SOLVER_ITER", Linear_Solver_Iter, 10);
   /* DESCRIPTION: Relaxation of the linear solver for the implicit formulation */
   AddScalarOption("LINEAR_SOLVER_RELAX", Linear_Solver_Relax, 1.0);
   /* DESCRIPTION: Roe-Turkel preconditioning for low Mach number flows */
@@ -359,11 +359,11 @@ void CConfig::SetConfig_Options() {
   /* DESCRIPTION: Convergence criteria */
   AddEnumOption("CONV_CRITERIA", ConvCriteria, Converge_Crit_Map, "RESIDUAL");
   /* DESCRIPTION: Residual reduction (order of magnitude with respect to the initial value) */
-  AddScalarOption("RESIDUAL_REDUCTION", OrderMagResidual, 3.0);
+  AddScalarOption("RESIDUAL_REDUCTION", OrderMagResidual, 5.0);
   /* DESCRIPTION: Min value of the residual (log10 of the residual) */
   AddScalarOption("RESIDUAL_MINVAL", MinLogResidual, -8.0);
   /* DESCRIPTION: Iteration number to begin convergence monitoring */
-  AddScalarOption("STARTCONV_ITER", StartConv_Iter, 5);
+  AddScalarOption("STARTCONV_ITER", StartConv_Iter, 0);
   /* DESCRIPTION: Number of elements to apply the criteria */
   AddScalarOption("CAUCHY_ELEMS", Cauchy_Elems, 100);
   /* DESCRIPTION: Epsilon to control the series convergence */
@@ -395,11 +395,11 @@ void CConfig::SetConfig_Options() {
   /* DESCRIPTION: Jacobi implicit smoothing of the correction */
   AddListOption("MG_CORRECTION_SMOOTH", nMG_CorrecSmooth, MG_CorrecSmooth);
   /* DESCRIPTION: Damping factor for the residual restriction */
-  AddScalarOption("MG_DAMP_RESTRICTION", Damp_Res_Restric, 0.9);
+  AddScalarOption("MG_DAMP_RESTRICTION", Damp_Res_Restric, 0.75);
   /* DESCRIPTION: Damping factor for the correction prolongation */
-  AddScalarOption("MG_DAMP_PROLONGATION", Damp_Correc_Prolong, 0.9);
+  AddScalarOption("MG_DAMP_PROLONGATION", Damp_Correc_Prolong, 0.75);
   /* DESCRIPTION: CFL reduction factor on the coarse levels */
-  AddScalarOption("MG_CFL_REDUCTION", MG_CFLRedCoeff, 0.9);
+  AddScalarOption("MG_CFL_REDUCTION", MG_CFLRedCoeff, 0.75);
   /* DESCRIPTION: Maximum number of children in the agglomeration stage */
   AddScalarOption("MAX_CHILDREN", MaxChildren, 500);
   /* DESCRIPTION: Maximum length of an agglomerated element (relative to the domain) */
@@ -409,9 +409,9 @@ void CConfig::SetConfig_Options() {
   /* CONFIG_CATEGORY: Spatial Discretization */
   
   /* DESCRIPTION: Numerical method for spatial gradients */
-  AddEnumOption("NUM_METHOD_GRAD", Kind_Gradient_Method, Gradient_Map, "WEIGHTED_LEAST_SQUARES");
+  AddEnumOption("NUM_METHOD_GRAD", Kind_Gradient_Method, Gradient_Map, "GREEN_GAUSS");
   /* DESCRIPTION: Coefficient for the limiter */
-  AddScalarOption("LIMITER_COEFF", LimiterCoeff, 0.5);
+  AddScalarOption("LIMITER_COEFF", LimiterCoeff, 3.0);
   
   /* DESCRIPTION: Convective numerical method */
   Kind_ConvNumScheme_Flow = SPACE_CENTERED; Kind_Centered_Flow = JST; Kind_Upwind_Flow = ROE_2ND;
@@ -422,7 +422,7 @@ void CConfig::SetConfig_Options() {
   AddEnumOption("SOUR_NUM_METHOD_FLOW", Kind_SourNumScheme_Flow, Source_Map, "NONE");
   /* DESCRIPTION: Slope limiter */
   AddEnumOption("SLOPE_LIMITER_FLOW", Kind_SlopeLimit_Flow, Limiter_Map, "VENKATAKRISHNAN");
-  default_vec_3d[0] = 0.15; default_vec_3d[1] = 0.5; default_vec_3d[2] = 0.02;
+  default_vec_3d[0] = 0.15; default_vec_3d[1] = 0.5; default_vec_3d[2] = 0.04;
   /* DESCRIPTION: 1st, 2nd and 4th order artificial dissipation coefficients */
   AddArrayOption("AD_COEFF_FLOW", 3, Kappa_Flow, default_vec_3d);
   
@@ -764,11 +764,12 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
   
   /*--- Set default values for the grid based in the Reynolds number for SU2_EDU ---*/
   
-    if (Kind_Solver == EULER) Mesh_FileName = "naca0012_inviscid.su2";
+    if (Kind_Solver == EULER) Mesh_FileName = "mesh_NACA0012_INV.su2";
     else {
-      if (Reynolds < 1E5) Mesh_FileName = "naca0012_re1e5.su2";
-      if ((Reynolds >= 1E5) && (Reynolds <= 1E7)) Mesh_FileName = "naca0012_re1e6.su2";
-      if (Reynolds > 1E7) Mesh_FileName = "naca0012_re1e7.su2";
+      if (Reynolds < 1E5) Mesh_FileName = "mesh_NACA0012_1E-4m.su2";
+      if ((Reynolds >= 1E5) && (Reynolds < 1E6)) Mesh_FileName = "mesh_NACA0012_1E-5m.su2";
+      if ((Reynolds >= 1E6) && (Reynolds <= 1E7)) Mesh_FileName = "mesh_NACA0012_1E-6m.su2";
+      if (Reynolds > 1E7) Mesh_FileName = "mesh_NACA0012_1E-7m.su2";
     }
   
   /*--- Don't do any deformation if there is no Design variable information ---*/
@@ -1152,7 +1153,7 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
   if (RefOriginMoment_X == NULL) {
     RefOriginMoment_X = new double[nMarker_Monitoring];
     for (iMarker = 0; iMarker < nMarker_Monitoring; iMarker++ )
-      RefOriginMoment_X[iMarker] = 0.0;
+      RefOriginMoment_X[iMarker] = 0.25;
   } else {
     if (nRefOriginMoment_X == 1) {
       
@@ -1223,6 +1224,11 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
   Kappa_2nd_Flow = Kappa_Flow[1];
   Kappa_4th_Flow = Kappa_Flow[2];
   
+  // Reduce artificial dissipation if NS simulation.
+  if ((Kind_Solver == RANS) || (Kind_Solver == NAVIER_STOKES)) {
+    Kappa_4th_Flow = 0.01;
+  }
+  
   // make the MG_PreSmooth, MG_PostSmooth, and MG_CorrecSmooth arrays consistent with nMultiLevel
   unsigned short * tmp_smooth = new unsigned short[nMultiLevel+1];
   
@@ -1253,7 +1259,7 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
     nMG_PreSmooth = nMultiLevel+1;
     MG_PreSmooth = new unsigned short[nMG_PreSmooth];
     for (unsigned int i = 0; i < nMG_PreSmooth; i++)
-      MG_PreSmooth[i] = i+1;
+      MG_PreSmooth[i] = 1;
   }
   
   if ((nMG_PostSmooth != nMultiLevel+1) && (nMG_PostSmooth != 0)) {
@@ -1307,7 +1313,7 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
     nMG_CorrecSmooth = nMultiLevel+1;
     MG_CorrecSmooth = new unsigned short[nMG_CorrecSmooth];
     for (unsigned int i = 0; i < nMG_CorrecSmooth; i++)
-      MG_CorrecSmooth[i] = 0;
+      MG_CorrecSmooth[i] = 1;
   }
   
   

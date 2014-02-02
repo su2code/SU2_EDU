@@ -361,6 +361,7 @@
 		05DCEA561820625F0065E4D8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = NO_MPI;
 				GCC_VERSION = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -370,6 +371,7 @@
 		05DCEA571820625F0065E4D8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = NO_MPI;
 				GCC_VERSION = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";

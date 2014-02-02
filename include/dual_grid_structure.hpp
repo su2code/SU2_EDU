@@ -219,12 +219,6 @@ public:
 	 * \return Value of the distance to the nearest wall.
 	 */
 	double GetWall_Distance(void);
-	
-  /*!
-	 * \brief Get the value of the distance to a sharp edge
-	 * \return Value of the distance to the nearest wall.
-	 */
-	double GetSharpEdge_Distance(void);
   
 	/*! 
 	 * \brief Set the number of elements that compose the control volume.

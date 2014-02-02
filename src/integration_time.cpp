@@ -50,6 +50,12 @@ void CMultiGridIntegration::MultiGrid_Iteration(CGeometry **geometry, CSolver **
                   MESH_0, config->GetMGCycle(), RunTime_EqSystem,
                   Iteration);
   
+  /*--- Computes primitive variables and gradients in the finest mesh (useful for the next solver (turbulence) and output ---*/
+  
+  solver_container[MESH_0][SolContainer_Position]->Preprocessing(geometry[MESH_0],
+                                                                 solver_container[MESH_0], config,
+                                                                 MESH_0, NO_RK_ITER, RunTime_EqSystem);
+  
   /*--- Compute non-dimensional parameters and the convergence monitor ---*/
   
   NonDimensional_Parameters(geometry, solver_container, numerics_container, config,
@@ -217,6 +223,7 @@ void CMultiGridIntegration::GetProlongated_Correction(unsigned short RunTime_EqS
 
 void CMultiGridIntegration::SmoothProlongated_Correction(unsigned short RunTime_EqSystem, CSolver *solver, CGeometry *geometry,
                                                           unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config) {
+  
   double *Residual_Old, *Residual_Sum, *Residual, *Residual_i, *Residual_j;
   unsigned short iVar, iSmooth, iMarker, nneigh;
   unsigned long iEdge, iPoint, jPoint, iVertex;
@@ -430,7 +437,6 @@ CSingleGridIntegration::~CSingleGridIntegration(void) { }
 void CSingleGridIntegration::SingleGrid_Iteration(CGeometry **geometry, CSolver ***solver_container,
                                                   CNumerics ****numerics_container, CConfig *config, unsigned short RunTime_EqSystem, unsigned long Iteration) {
   unsigned short iMesh;
-  double monitor = 0.0;
   
   unsigned short SolContainer_Position = config->GetContainerPosition(RunTime_EqSystem);
   
@@ -459,11 +465,6 @@ void CSingleGridIntegration::SingleGrid_Iteration(CGeometry **geometry, CSolver 
   /*--- Postprocessing ---*/
   
   solver_container[MESH_0][SolContainer_Position]->Postprocessing(geometry[MESH_0], solver_container[MESH_0], config, MESH_0);
-  
-
-  /*--- Convergence strategy ---*/
-  
-  Convergence_Monitoring(geometry[MESH_0], config, Iteration, monitor);
   
   /*--- Copy the solution to the coarse levels ---*/
   

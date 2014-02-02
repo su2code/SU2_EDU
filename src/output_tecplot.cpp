@@ -53,7 +53,7 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
   
   strcpy (cstr, filename.c_str());
   
-    sprintf (buffer, ".dat");
+    sprintf (buffer, ".plt");
   
   strcat(cstr,buffer);
   
@@ -109,10 +109,6 @@ void COutput::SetTecplot_ASCII(CConfig *config, CGeometry *geometry, bool surf_s
     
     if (Kind_Solver == RANS) {
       Tecplot_File << ", \"Eddy_Viscosity\"";
-    }
-    
-    if ((Kind_Solver == EULER) || (Kind_Solver == NAVIER_STOKES) || (Kind_Solver == RANS)) {
-      Tecplot_File << ", \"Sharp_Edge_Dist\"";
     }
     
     if (config->GetExtraOutput()) {

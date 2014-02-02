@@ -190,8 +190,6 @@ inline void CPoint::SetSharpEdge_Distance(double val_distance) { SharpEdge_Dista
 
 inline double CPoint::GetWall_Distance(void) { return Wall_Distance; }
 
-inline double CPoint::GetSharpEdge_Distance(void) { return SharpEdge_Distance; }
-
 inline void CPoint::SetNodes_Coord(double *val_coord_Edge_CG, double *val_coord_FaceElem_CG, double *val_coord_Elem_CG, CConfig *config) { }
 
 inline void CPoint::SetNodes_Coord(double *val_coord_Edge_CG, double *val_coord_Elem_CG, CConfig *config) { }

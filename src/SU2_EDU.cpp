@@ -92,10 +92,10 @@ int main(int argc, char *argv[]) {
     /*-- Check for valid input --*/
     if (myStream >> SimType) {
       if (SimType == 0) {
-        strcpy(config_file_name, "Inviscid_ConfigFile.cfg");
+        strcpy(config_file_name, "ConfigFile_INV.cfg");
         break;
       } else if(SimType == 1) {
-        strcpy(config_file_name, "Viscous_ConfigFile.cfg");
+        strcpy(config_file_name, "ConfigFile_RANS.cfg");
         break;
       }
     }
