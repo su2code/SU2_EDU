@@ -1,0 +1,29 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Autoconf/Automake
+*.Po
+*.dirstamp
+*.log
+*.status
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Python files
+*.pyc
+
+# Mac files
+*.DS_Store
+*.xcuserdatad
+
+# Compiled Makefiles
+Makefile

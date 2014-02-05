@@ -28,13 +28,13 @@ You will find more information and the latest news in:
   SU2_EDU INSTALLATION
 ---------------------------------------------------
 
-To build SU2_EDU from source, the basic steps are to run the './configure', 'make', and 'make install' commands in the root directory of the source distribution. Please note that more detailed instructions on the configure and build processes can be found within the INSTALL file. 
+To build SU2_EDU from the source code, just open a terminal and run the './configure' and  'make' commands in the root directory of the source distribution. There is no need to supply a prefix for an installation location (or to run the 'make install' command), as the default location within the bin/ folder in the root directory contains the config files and meshes that are needed. Please note that more detailed instructions on the configure and build processes can be found within the INSTALL file. 
 
 ---------------------------------------------------
   RUNNING SU2_EDU
 ---------------------------------------------------
 
-After installation, the SU2_EDU binary executable can be found in the SU2_EDU/bin/ directory. To run SU2_EDU, follow these steps:
+After building, the SU2_EDU binary executable can be found in the SU2_EDU/bin/ directory. To run SU2_EDU, follow these steps:
 
 1. Prepare an airfoil definition by either obtaining a set of airfoil coordinates or creating your own definition. An example airfoil definition is included in the bin/ directory within the airfoil_e174.dat file. We also recommend the excellent airfoil database website hosted by the UIUC Applied Aerodynamics Group (http://aerospace.illinois.edu/m-selig/ads/coord_database.html), which contains nearly 1,600 airfoil definitions.
 

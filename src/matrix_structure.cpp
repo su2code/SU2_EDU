@@ -78,6 +78,7 @@ CSysMatrix::~CSysMatrix(void) {
     if (zVector[iElem] != NULL)     delete [] zVector[iElem];
     if (rVector[iElem] != NULL)     delete [] rVector[iElem];
   }
+  
   if (UBlock != NULL)     delete [] UBlock;
   if (invUBlock != NULL)  delete [] invUBlock;
   if (LBlock != NULL)     delete [] LBlock;
@@ -182,7 +183,9 @@ void CSysMatrix::Initialize(unsigned long nPoint, unsigned long nPointDomain,
   
 }
 
-void CSysMatrix::SetIndexes(unsigned long val_nPoint, unsigned long val_nPointDomain, unsigned short val_nVar, unsigned short val_nEq, unsigned long* val_row_ptr, unsigned long* val_col_ind, unsigned long val_nnz) {
+void CSysMatrix::SetIndexes(unsigned long val_nPoint, unsigned long val_nPointDomain,
+                            unsigned short val_nVar, unsigned short val_nEq, unsigned long* val_row_ptr,
+                            unsigned long* val_col_ind, unsigned long val_nnz) {
   
   unsigned long iVar;
   
@@ -720,8 +723,8 @@ unsigned short CSysMatrix::BuildLineletPreconditioner(CGeometry *geometry, CConf
   
   bool *check_Point, add_point;
   unsigned long iEdge, iPoint, jPoint, index_Point, iLinelet, iVertex, next_Point, counter, iElem;
-  unsigned short iMarker, iNode, ExtraLines = 100;
-  double alpha = 0.9, weight, max_weight, *normal, area, volume_iPoint, volume_jPoint, MeanPoints;
+  unsigned short iMarker, iNode, MeanPoints, ExtraLines = 100;
+  double alpha = 0.9, weight, max_weight, *normal, area, volume_iPoint, volume_jPoint;
   unsigned long Local_nPoints, Local_nLineLets, Global_nPoints, Global_nLineLets;
   
   /*--- Memory allocation --*/

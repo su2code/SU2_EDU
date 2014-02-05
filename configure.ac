@@ -2,10 +2,10 @@
 # Stanford University Aerospace Design Lab
 #
 # Created: 		10/26/12
-# Last updated:         10/11/13
+# Last updated:         02/04/14
 #
-# Created by: 		M. Colonno  10/26/12
-# Updated by: 		T. Economon  10/30/13
+# Created by: 		M. Colonno
+# Updated by: 		T. Economon
 #
 ##########################
 
@@ -14,21 +14,10 @@ AC_INIT([SU2_EDU], [1.0.0], [susquared-dev@lists.stanford.edu],
 AC_PREREQ([2.59])
 AM_INIT_AUTOMAKE([subdir-objects])
 
-# optional bindings
-AC_ARG_WITH(MPI,
-    	AS_HELP_STRING([--with-MPI[=ARG]], [Build parallel version with MPI tools, ARG = MPI C++ compiler]), 
-	[with_MPI=$withval], [with_MPI="no"])
-
 ###########################
+# Force the NO_MPI directive and -O3 optimization
 
-have_MPI="no"
-if test "$with_MPI" != "no"
-then
-	CXX="$with_MPI"	
-	have_MPI="yes"
-else
-	CXXFLAGS=""$CXXFLAGS" -DNO_MPI"
-fi
+CXXFLAGS=""$CXXFLAGS" -DNO_MPI -O3"
 
 ###########################
 
@@ -38,14 +27,12 @@ AC_OUTPUT(Makefile)
 
 abs_srcdir=`(cd $srcdir && pwd)`
 
-########################## Force installation into /path/to/SU2_EDU/bin/
+##########################
 
-#abs_prefix=`(cd $prefix && pwd)`
-abs_prefix=`(pwd)`
+abs_prefix=`(cd $prefix && pwd)`
 
-######################### Force -O3 optimization
+#########################
 
-CXXFLAGS=""$CXXFLAGS" -O3"
 
 AC_MSG_RESULT([
 
@@ -69,18 +56,15 @@ Release 1.0.0 (su2.stanford.edu)
 Build Configuration Summary:
 
     Source code location: ${abs_srcdir}
-    Install location: 	  ${abs_prefix}
     Version:              ${VERSION}
     Compiler:             ${CXX}
-    Preprocessor flags:   ${CPPFLAGS}
     Compiler flags:       ${CXXFLAGS}
-    Linker flags:         ${LDFLAGS}
 
-Please be sure to add the [\$]SU2_EDU_RUN environment variables, and update your [\$]PATH with [\$]SU2_EDU_RUN
 
-Based on the input to this configuration, add these lines to your .bashrc file -
+The build has been configured. Run the 'make' command to compile SU2_EDU.
 
-export SU2_EDU_RUN="${abs_prefix}/bin"
-export PATH=[\$]PATH:[\$]SU2_EDU_RUN
+After building, the SU2_EDU executable can be found in the bin/ directory.
+
+Detailed instructions for running SU2_EDU can be found in the README file.
 
 ])
