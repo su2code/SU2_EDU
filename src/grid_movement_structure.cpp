@@ -1421,8 +1421,6 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   string AirfoilFile;
   char AirfoilFormat[15];
   char AirfoilClose[15];
-  double AirfoilScale = 1.0;
-  double TrailingEdge = 0.95;
   unsigned short nUpper, nLower, iUpper, iLower;
   ifstream airfoil_file;
   string text_line;
@@ -1483,58 +1481,12 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
     }
   }
   
-  
-  //  /*-- Get airfoil scaling --*/
-  //  while(1) {
-  //
-  //    cout << endl;
-  //    cout << "Enter airfoil scaling [1.0]: " ;
-  //    getline(cin, Input);
-  //
-  //    stringstream myStream(Input);
-  //
-  //    /*-- Handle default option --*/
-  //    if (Input.empty())
-  //      myStream << "1.0";
-  //
-  //    /*-- Check for valid input --*/
-  //    if (myStream >> AirfoilScale) {
-  //        break;
-  //    }
-  //
-  //  }
-  
-  /*-- Decide whether or not to close the airfoil --*/
-  while(1) {
-    
-    cout << endl;
-    cout << "Close the airfoil (Y/N)? [N]: ";
-    
-    getline(cin, Input);
-    
-    /*-- Handle default option --*/
-    if (Input.empty())
-      Input = "N";
-    
-    /*-- Check for valid input --*/
-    if (Input.compare("Y")==0) {
-      strcpy(AirfoilClose, "Yes");
-      break;
-    } else if (Input.compare("N")==0) {
-      strcpy(AirfoilClose, "No");
-      break;
-    }
-    cout << "Repeating loop" << endl;
-    
-  }
-  
-  //  cout << "Surface mesh orientation (clockwise, or anticlockwise): ";
-  //  scanf ("%s", MeshOrientation);
-  
   /*--- The first line is the header ---*/
   
   getline (airfoil_file, text_line);
   cout << "File info: " << text_line << endl;
+  
+  strcpy(AirfoilClose, "Yes");
   
   if (strcmp (AirfoilFormat,"Selig") == 0) {
     
@@ -1545,10 +1497,16 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
       
       point_line >> Airfoil_Coord[0] >> Airfoil_Coord[1];
       
+      /*--- Identify if the airfoil has a close trailing edge ---*/
+      
+      double Distance = sqrt(pow((Airfoil_Coord[0]-1.0), 2.0) +  pow((Airfoil_Coord[1]-0.0), 2.0));
+      if (Distance < 1E-6) strcpy(AirfoilClose, "No");
+      
       /*--- Store the coordinates in vectors ---*/
       
       Xcoord.push_back(Airfoil_Coord[0]);
-      Ycoord.push_back(Airfoil_Coord[1]*AirfoilScale);
+      Ycoord.push_back(Airfoil_Coord[1]);
+      
     }
     
   }
@@ -1575,17 +1533,15 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
       getline (airfoil_file, text_line);
       istringstream point_line(text_line);
       point_line >> Airfoil_Coord[0] >> Airfoil_Coord[1];
+      
+      /*--- Identify if the airfoil has a close trailing edge ---*/
+
+      double Distance = sqrt(pow((Airfoil_Coord[0]-1.0), 2.0) +  pow((Airfoil_Coord[1]-0.0), 2.0));
+      if (Distance < 1E-6) strcpy(AirfoilClose, "No");
+      
       Xcoord[nUpper-iUpper-1] = Airfoil_Coord[0];
+      Ycoord[nUpper-iUpper-1] = Airfoil_Coord[1];
       
-      double factor;
-      if (strcmp (AirfoilClose,"Yes") == 0) {
-        double x = (Airfoil_Coord[0] - TrailingEdge) / (1.0-TrailingEdge);
-        factor = (1.0-x)+sin(PI_NUMBER*(1.0-x))/PI_NUMBER;
-        if (x < TrailingEdge) factor = 1.0;
-      }
-      else factor = 1.0;
-      
-      Ycoord[nUpper-iUpper-1] = Airfoil_Coord[1]*AirfoilScale*factor;
     }
     
     getline (airfoil_file, text_line);
@@ -1595,16 +1551,34 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
       istringstream point_line(text_line);
       point_line >> Airfoil_Coord[0] >> Airfoil_Coord[1];
       
-      double factor;
-      if (strcmp (AirfoilClose,"Yes") == 0) {
-        double x = (Airfoil_Coord[0] - TrailingEdge) / (1.0-TrailingEdge);
-        factor = (1.0-x)+sin(PI_NUMBER*(1.0-x))/PI_NUMBER;
-        if (x < TrailingEdge) factor = 1.0;
-      }
-      else factor = 1.0;
+      /*--- Identify if the airfoil has a close trailing edge ---*/
+
+      double Distance = sqrt(pow((Airfoil_Coord[0]-1.0), 2.0) +  pow((Airfoil_Coord[1]-0.0), 2.0));
+      if (Distance < 1E-6) strcpy(AirfoilClose, "No");
       
       Xcoord[nUpper+iLower-1] = Airfoil_Coord[0];
-      Ycoord[nUpper+iLower-1] = Airfoil_Coord[1]*AirfoilScale*factor;
+      Ycoord[nUpper+iLower-1] = Airfoil_Coord[1];
+      
+    }
+    
+  }
+  
+  /*--- Close the airfoil ---*/
+  
+  if (strcmp (AirfoilClose,"Yes") == 0) {
+    
+    cout << "The airfoil trailing edge has been closed." << endl;
+
+    for (iVar = 0; iVar < Xcoord.size(); iVar++) {
+      
+      double factor;
+      double coeff = 10000;
+      
+      /*--- Global closing method ---*/
+      
+      factor = -atan(coeff*(Xcoord[iVar]-1.0))*2/PI_NUMBER;
+      Ycoord[iVar] = Ycoord[iVar]*factor;
+      
     }
     
   }
@@ -1617,9 +1591,9 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
   if (AddBegin) { Xcoord.insert(Xcoord.begin(), 1.0);   Ycoord.insert(Ycoord.begin(), 0.0);}
   if (AddEnd) { Xcoord.push_back(1.0);                Ycoord.push_back(0.0);}
   
-  /*--- Change the orientation (depend on the input file, and the mesh file) ---*/
   
-  //  if (strcmp (MeshOrientation,"clockwise") == 0) {
+  /*--- Change the orientation (depend on the input file, and the mesh file) ---*/
+
   for (iVar = 0; iVar < Xcoord.size(); iVar++) {
     Xcoord_Aux.push_back(Xcoord[iVar]);
     Ycoord_Aux.push_back(Ycoord[iVar]);
@@ -1629,7 +1603,6 @@ void CSurfaceMovement::SetAirfoil(CGeometry *boundary, CConfig *config) {
     Xcoord[iVar] = Xcoord_Aux[Xcoord.size()-iVar-1];
     Ycoord[iVar] = Ycoord_Aux[Xcoord.size()-iVar-1];
   }
-  //  }
   
   /*--- Compute the total arch length ---*/
   
