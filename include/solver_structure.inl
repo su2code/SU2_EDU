@@ -2,7 +2,7 @@
  * \file solver_structure.inl
  * \brief In-Line subroutines of the <i>solver_structure.hpp</i> file.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *

@@ -2,7 +2,7 @@
  * \file output_structure.cpp
  * \brief Main subroutines for output solver information.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -121,7 +121,7 @@ void COutput::SetSurfaceCSV_Flow(CConfig *config, CGeometry *geometry,
 }
 
 void COutput::MergeConnectivity(CConfig *config, CGeometry *geometry) {
-    
+  
   /*--- Merge connectivity for each type of element (excluding halos). Note
    that we only need to merge the connectivity once, as it does not change
    during computation. Check whether the base file has been written. ---*/
@@ -158,7 +158,7 @@ void COutput::MergeConnectivity(CConfig *config, CGeometry *geometry) {
     /*--- Update total number of surface elements after merge. ---*/
     
     nSurf_Elem = nGlobal_Line + nGlobal_BoundTria + nGlobal_BoundQuad;
-        
+    
   }
 }
 
@@ -270,7 +270,7 @@ void COutput::MergeVolumetricConnectivity(CConfig *config, CGeometry *geometry, 
       for (iNode = 0; iNode < NODES_PER_ELEMENT; iNode++) {
         iPoint = geometry->elem[iElem]->GetNode(iNode);
         if (!geometry->node[iPoint]->GetDomain())
-        isHalo = true;
+          isHalo = true;
       }
       
       /*--- Loop over all nodes in this element and load the
@@ -293,35 +293,35 @@ void COutput::MergeVolumetricConnectivity(CConfig *config, CGeometry *geometry, 
   /*--- Store the particular global element count in the class data,
    and set the class data pointer to the connectivity array. ---*/
   
-    switch (Elem_Type) {
-      case TRIANGLE:
-        nGlobal_Tria = nElem_Total;
-        if (nGlobal_Tria > 0) Conn_Tria = Conn_Elem;
-        break;
-      case RECTANGLE:
-        nGlobal_Quad = nElem_Total;
-        if (nGlobal_Quad > 0) Conn_Quad = Conn_Elem;
-        break;
-      case TETRAHEDRON:
-        nGlobal_Tetr = nElem_Total;
-        if (nGlobal_Tetr > 0) Conn_Tetr = Conn_Elem;
-        break;
-      case HEXAHEDRON:
-        nGlobal_Hexa = nElem_Total;
-        if (nGlobal_Hexa > 0) Conn_Hexa = Conn_Elem;
-        break;
-      case WEDGE:
-        nGlobal_Wedg = nElem_Total;
-        if (nGlobal_Wedg > 0) Conn_Wedg = Conn_Elem;
-        break;
-      case PYRAMID:
-        nGlobal_Pyra = nElem_Total;
-        if (nGlobal_Pyra > 0) Conn_Pyra = Conn_Elem;
-        break;
-      default:
-        cout << "Error: Unrecognized element type \n";
-        exit(0); break;
-    }
+  switch (Elem_Type) {
+    case TRIANGLE:
+      nGlobal_Tria = nElem_Total;
+      if (nGlobal_Tria > 0) Conn_Tria = Conn_Elem;
+      break;
+    case RECTANGLE:
+      nGlobal_Quad = nElem_Total;
+      if (nGlobal_Quad > 0) Conn_Quad = Conn_Elem;
+      break;
+    case TETRAHEDRON:
+      nGlobal_Tetr = nElem_Total;
+      if (nGlobal_Tetr > 0) Conn_Tetr = Conn_Elem;
+      break;
+    case HEXAHEDRON:
+      nGlobal_Hexa = nElem_Total;
+      if (nGlobal_Hexa > 0) Conn_Hexa = Conn_Elem;
+      break;
+    case WEDGE:
+      nGlobal_Wedg = nElem_Total;
+      if (nGlobal_Wedg > 0) Conn_Wedg = Conn_Elem;
+      break;
+    case PYRAMID:
+      nGlobal_Pyra = nElem_Total;
+      if (nGlobal_Pyra > 0) Conn_Pyra = Conn_Elem;
+      break;
+    default:
+      cout << "Error: Unrecognized element type \n";
+      exit(0); break;
+  }
   
 }
 
@@ -382,55 +382,55 @@ void COutput::MergeSurfaceConnectivity(CConfig *config, CGeometry *geometry, uns
    to be sent to the master node. ---*/
   jNode = 0; jElem = 0; nElem_Total = 0; bool isHalo;
   for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++)
-  if (config->GetMarker_All_Plotting(iMarker) == YES)
-  for (iElem = 0; iElem < geometry->GetnElem_Bound(iMarker); iElem++) {
-    
-    if (geometry->bound[iMarker][iElem]->GetVTK_Type() == Elem_Type) {
-      
-      /*--- Check if this is a halo node. ---*/
-      isHalo = false;
-      for (iNode = 0; iNode < NODES_PER_ELEMENT; iNode++) {
-        iPoint = geometry->bound[iMarker][iElem]->GetNode(iNode);
-        if (!geometry->node[iPoint]->GetDomain())
-        isHalo = true;
-      }
-      
-      /*--- Loop over all nodes in this element and load the
-       connectivity into the temporary array. Do not merge any
-       halo cells (periodic BC). Note that we are adding one to
-       the index value because CGNS/Tecplot use 1-based indexing. ---*/
-      if (!isHalo) {
-        nElem_Total++;
-        for (iNode = 0; iNode < NODES_PER_ELEMENT; iNode++) {
-          Conn_Elem[jNode] = (int)geometry->bound[iMarker][iElem]->GetNode(iNode) + 1;
+    if (config->GetMarker_All_Plotting(iMarker) == YES)
+      for (iElem = 0; iElem < geometry->GetnElem_Bound(iMarker); iElem++) {
+        
+        if (geometry->bound[iMarker][iElem]->GetVTK_Type() == Elem_Type) {
           
-          /*--- Increment jNode as the counter. ---*/
-          jNode++;
+          /*--- Check if this is a halo node. ---*/
+          isHalo = false;
+          for (iNode = 0; iNode < NODES_PER_ELEMENT; iNode++) {
+            iPoint = geometry->bound[iMarker][iElem]->GetNode(iNode);
+            if (!geometry->node[iPoint]->GetDomain())
+              isHalo = true;
+          }
+          
+          /*--- Loop over all nodes in this element and load the
+           connectivity into the temporary array. Do not merge any
+           halo cells (periodic BC). Note that we are adding one to
+           the index value because CGNS/Tecplot use 1-based indexing. ---*/
+          if (!isHalo) {
+            nElem_Total++;
+            for (iNode = 0; iNode < NODES_PER_ELEMENT; iNode++) {
+              Conn_Elem[jNode] = (int)geometry->bound[iMarker][iElem]->GetNode(iNode) + 1;
+              
+              /*--- Increment jNode as the counter. ---*/
+              jNode++;
+            }
+          }
         }
       }
-    }
-  }
   
   /*--- Store the particular global element count in the class data,
    and set the class data pointer to the connectivity array. ---*/
   
-    switch (Elem_Type) {
-      case LINE:
-        nGlobal_Line = nElem_Total;
-        if (nGlobal_Line > 0) Conn_Line = Conn_Elem;
-        break;
-      case TRIANGLE:
-        nGlobal_BoundTria = nElem_Total;
-        if (nGlobal_BoundTria > 0) Conn_BoundTria = Conn_Elem;
-        break;
-      case RECTANGLE:
-        nGlobal_BoundQuad = nElem_Total;
-        if (nGlobal_BoundQuad > 0) Conn_BoundQuad = Conn_Elem;
-        break;
-      default:
-        cout << "Error: Unrecognized element type \n";
-        exit(0); break;
-    }
+  switch (Elem_Type) {
+    case LINE:
+      nGlobal_Line = nElem_Total;
+      if (nGlobal_Line > 0) Conn_Line = Conn_Elem;
+      break;
+    case TRIANGLE:
+      nGlobal_BoundTria = nElem_Total;
+      if (nGlobal_BoundTria > 0) Conn_BoundTria = Conn_Elem;
+      break;
+    case RECTANGLE:
+      nGlobal_BoundQuad = nElem_Total;
+      if (nGlobal_BoundQuad > 0) Conn_BoundQuad = Conn_Elem;
+      break;
+    default:
+      cout << "Error: Unrecognized element type \n";
+      exit(0); break;
+  }
   
 }
 
@@ -459,8 +459,8 @@ void COutput::MergeSolution(CConfig *config, CGeometry *geometry, CSolver **solv
   
   /*--- Set the non-dimensionalization ---*/
   if (flow) {
-      RefVel2 = 0.0;
-      for (iDim = 0; iDim < nDim; iDim++)
+    RefVel2 = 0.0;
+    for (iDim = 0; iDim < nDim; iDim++)
       RefVel2  += solver[FLOW_SOL]->GetVelocity_Inf(iDim)*solver[FLOW_SOL]->GetVelocity_Inf(iDim);
     RefDensity  = solver[FLOW_SOL]->GetDensity_Inf();
     RefPressure = solver[FLOW_SOL]->GetPressure_Inf();
@@ -535,14 +535,14 @@ void COutput::MergeSolution(CConfig *config, CGeometry *geometry, CSolver **solv
       Aux_yPlus[iPoint] = 0.0;
     }
     for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++)
-    if (config->GetMarker_All_Plotting(iMarker) == YES) {
-      for(iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
-        iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
-        Aux_Frict[iPoint] = solver[FLOW_SOL]->GetCSkinFriction(iMarker,iVertex);
-        Aux_Heat[iPoint]  = solver[FLOW_SOL]->GetHeatTransferCoeff(iMarker,iVertex);
-        Aux_yPlus[iPoint] = solver[FLOW_SOL]->GetYPlus(iMarker,iVertex);
+      if (config->GetMarker_All_Plotting(iMarker) == YES) {
+        for(iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+          iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+          Aux_Frict[iPoint] = solver[FLOW_SOL]->GetCSkinFriction(iMarker,iVertex);
+          Aux_Heat[iPoint]  = solver[FLOW_SOL]->GetHeatTransferCoeff(iMarker,iVertex);
+          Aux_yPlus[iPoint] = solver[FLOW_SOL]->GetYPlus(iMarker,iVertex);
+        }
       }
-    }
   }
   
   /*--- Loop over all points in the mesh, but only write data
@@ -596,34 +596,34 @@ void COutput::MergeSolution(CConfig *config, CGeometry *geometry, CSolver **solv
         case EULER:
           
           /*--- Load buffers with the pressure, Cp, and mach variables. ---*/
-            Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetPressure(); jVar++;
-            Data[jVar][jPoint] = (solver[FLOW_SOL]->node[iPoint]->GetPressure() - RefPressure)*factor*RefAreaCoeff; jVar++;
-            Data[jVar][jPoint] = sqrt(solver[FLOW_SOL]->node[iPoint]->GetVelocity2())/solver[FLOW_SOL]->node[iPoint]->GetSoundSpeed(); jVar++;
+          Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetPressure(); jVar++;
+          Data[jVar][jPoint] = (solver[FLOW_SOL]->node[iPoint]->GetPressure() - RefPressure)*factor*RefAreaCoeff; jVar++;
+          Data[jVar][jPoint] = sqrt(solver[FLOW_SOL]->node[iPoint]->GetVelocity2())/solver[FLOW_SOL]->node[iPoint]->GetSoundSpeed(); jVar++;
           break;
           /*--- Write pressure, Cp, mach, temperature, laminar viscosity, skin friction, heat transfer, yplus ---*/
         case NAVIER_STOKES:
-            Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetPressure(); jVar++;
-            Data[jVar][jPoint] = (solver[FLOW_SOL]->node[iPoint]->GetPressure() - RefPressure)*factor*RefAreaCoeff; jVar++;
-            Data[jVar][jPoint] = sqrt(solver[FLOW_SOL]->node[iPoint]->GetVelocity2())/
-            solver[FLOW_SOL]->node[iPoint]->GetSoundSpeed(); jVar++;
-            Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetTemperature(); jVar++;
-            Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetLaminarViscosity(); jVar++;
-            Data[jVar][jPoint] = Aux_Frict[iPoint]; jVar++;
-            Data[jVar][jPoint] = Aux_Heat[iPoint];  jVar++;
-            Data[jVar][jPoint] = Aux_yPlus[iPoint]; jVar++;
+          Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetPressure(); jVar++;
+          Data[jVar][jPoint] = (solver[FLOW_SOL]->node[iPoint]->GetPressure() - RefPressure)*factor*RefAreaCoeff; jVar++;
+          Data[jVar][jPoint] = sqrt(solver[FLOW_SOL]->node[iPoint]->GetVelocity2())/
+          solver[FLOW_SOL]->node[iPoint]->GetSoundSpeed(); jVar++;
+          Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetTemperature(); jVar++;
+          Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetLaminarViscosity(); jVar++;
+          Data[jVar][jPoint] = Aux_Frict[iPoint]; jVar++;
+          Data[jVar][jPoint] = Aux_Heat[iPoint];  jVar++;
+          Data[jVar][jPoint] = Aux_yPlus[iPoint]; jVar++;
           break;
           /*--- Write pressure, Cp, mach, temperature, laminar viscosity, skin friction, heat transfer, yplus, eddy viscosity ---*/
         case RANS:
-            Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetPressure(); jVar++;
-            Data[jVar][jPoint] = (solver[FLOW_SOL]->node[iPoint]->GetPressure() - RefPressure)*factor*RefAreaCoeff; jVar++;
-            Data[jVar][jPoint] = sqrt(solver[FLOW_SOL]->node[iPoint]->GetVelocity2())/
-            solver[FLOW_SOL]->node[iPoint]->GetSoundSpeed(); jVar++;
-            Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetTemperature(); jVar++;
-            Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetLaminarViscosity(); jVar++;
-            Data[jVar][jPoint] = Aux_Frict[iPoint]; jVar++;
-            Data[jVar][jPoint] = Aux_Heat[iPoint];  jVar++;
-            Data[jVar][jPoint] = Aux_yPlus[iPoint]; jVar++;
-            Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetEddyViscosity(); jVar++;
+          Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetPressure(); jVar++;
+          Data[jVar][jPoint] = (solver[FLOW_SOL]->node[iPoint]->GetPressure() - RefPressure)*factor*RefAreaCoeff; jVar++;
+          Data[jVar][jPoint] = sqrt(solver[FLOW_SOL]->node[iPoint]->GetVelocity2())/
+          solver[FLOW_SOL]->node[iPoint]->GetSoundSpeed(); jVar++;
+          Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetTemperature(); jVar++;
+          Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetLaminarViscosity(); jVar++;
+          Data[jVar][jPoint] = Aux_Frict[iPoint]; jVar++;
+          Data[jVar][jPoint] = Aux_Heat[iPoint];  jVar++;
+          Data[jVar][jPoint] = Aux_yPlus[iPoint]; jVar++;
+          Data[jVar][jPoint] = solver[FLOW_SOL]->node[iPoint]->GetEddyViscosity(); jVar++;
           break;
       }
     }
@@ -744,41 +744,41 @@ void COutput::DeallocateCoordinates(CConfig *config, CGeometry *geometry) {
   
   /*--- The master node alone owns all data found in this routine. ---*/
   
-    /*--- Deallocate memory for coordinate data ---*/
-    for (iDim = 0; iDim < nDim; iDim++) {
-      delete [] Coords[iDim];
-    }
-    delete [] Coords;
-    
+  /*--- Deallocate memory for coordinate data ---*/
+  for (iDim = 0; iDim < nDim; iDim++) {
+    delete [] Coords[iDim];
+  }
+  delete [] Coords;
+  
 }
 
 void COutput::DeallocateConnectivity(CConfig *config, CGeometry *geometry, bool surf_sol) {
   
-    /*--- Deallocate memory for connectivity data ---*/
-    if (surf_sol) {
-      if (nGlobal_Line > 0) delete [] Conn_Line;
-      if (nGlobal_BoundTria > 0) delete [] Conn_BoundTria;
-      if (nGlobal_BoundQuad > 0) delete [] Conn_BoundQuad;
-    }
-    else {
-      if (nGlobal_Tria > 0) delete [] Conn_Tria;
-      if (nGlobal_Quad > 0) delete [] Conn_Quad;
-      if (nGlobal_Tetr > 0) delete [] Conn_Tetr;
-      if (nGlobal_Hexa > 0) delete [] Conn_Hexa;
-      if (nGlobal_Wedg > 0) delete [] Conn_Wedg;
-      if (nGlobal_Pyra > 0) delete [] Conn_Pyra;
-    }
-    
+  /*--- Deallocate memory for connectivity data ---*/
+  if (surf_sol) {
+    if (nGlobal_Line > 0) delete [] Conn_Line;
+    if (nGlobal_BoundTria > 0) delete [] Conn_BoundTria;
+    if (nGlobal_BoundQuad > 0) delete [] Conn_BoundQuad;
+  }
+  else {
+    if (nGlobal_Tria > 0) delete [] Conn_Tria;
+    if (nGlobal_Quad > 0) delete [] Conn_Quad;
+    if (nGlobal_Tetr > 0) delete [] Conn_Tetr;
+    if (nGlobal_Hexa > 0) delete [] Conn_Hexa;
+    if (nGlobal_Wedg > 0) delete [] Conn_Wedg;
+    if (nGlobal_Pyra > 0) delete [] Conn_Pyra;
+  }
+  
 }
 
 void COutput::DeallocateSolution(CConfig *config, CGeometry *geometry) {
   
-    /*--- Deallocate memory for solution data ---*/
-    for (unsigned short iVar = 0; iVar < nVar_Total; iVar++) {
-      delete [] Data[iVar];
-    }
-    delete [] Data;
-    
+  /*--- Deallocate memory for solution data ---*/
+  for (unsigned short iVar = 0; iVar < nVar_Total; iVar++) {
+    delete [] Data[iVar];
+  }
+  delete [] Data;
+  
 }
 
 void COutput::SetHistory_Header(ofstream *ConvHist_file, CConfig *config) {
@@ -792,7 +792,7 @@ void COutput::SetHistory_Header(ofstream *ConvHist_file, CConfig *config) {
   
   bool isothermal = false;
   for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++)
-  if (config->GetMarker_All_Boundary(iMarker) == ISOTHERMAL) isothermal = true;
+    if (config->GetMarker_All_Boundary(iMarker) == ISOTHERMAL) isothermal = true;
   
   /*--- Write file name with extension ---*/
   string filename = config->GetConv_FileName();
@@ -824,7 +824,7 @@ void COutput::SetHistory_Header(ofstream *ConvHist_file, CConfig *config) {
     case SA:	sprintf (turb_resid, ",\"Res_Turb[0]\""); break;
     case SST:	sprintf (turb_resid, ",\"Res_Turb[0]\",\"Res_Turb[1]\""); break;
   }
-
+  
   
   /*--- End of the header ---*/
   
@@ -859,521 +859,521 @@ void COutput::SetHistory_Header(ofstream *ConvHist_file, CConfig *config) {
 
 void COutput::SetConvergence_History(ofstream *ConvHist_file, CGeometry **geometry, CSolver ***solver_container, CConfig *config, CIntegration **integration, bool DualTime_Iteration, double timeused) {
   
-    unsigned long iIntIter = config->GetIntIter();
-    unsigned long iExtIter = config->GetExtIter();
-    
-    /*--- WARNING: These buffers have hard-coded lengths. Note that you
-     may have to adjust them to be larger if adding more entries. ---*/
-    char begin[1000], direct_coeff[1000], flow_resid[1000], turb_resid[1000], end[1000];
-    double dummy = 0.0;
-    unsigned short iVar;
-    
-    unsigned long LinSolvIter = 0;
-    double timeiter = timeused/double(iExtIter+1);
-    
-    unsigned short FinestMesh = config->GetFinestMesh();
-    unsigned short nDim = geometry[FinestMesh]->GetnDim();
-    
-    bool turbulent = ((config->GetKind_Solver() == RANS));
-    bool flow = (config->GetKind_Regime() == EULER) || (config->GetKind_Regime() == NAVIER_STOKES) || (config->GetKind_Regime() == RANS);
-    
-    /*--- Initialize variables to store information from all domains (direct solution) ---*/
-    double Total_CLift = 0.0, Total_CDrag = 0.0, Total_CSideForce = 0.0, Total_CMx = 0.0, Total_CMy = 0.0, Total_CMz = 0.0, Total_CEff = 0.0,
-    Total_CFx = 0.0, Total_CFy = 0.0, Total_CFz = 0.0;
-    
-    /*--- Residual arrays ---*/
-    double *residual_flow = NULL, *residual_turbulent = NULL, *residual_transition = NULL, *residual_TNE2 = NULL, *residual_levelset = NULL;
-    double *residual_adjflow = NULL, *residual_adjturbulent = NULL, *residual_adjTNE2 = NULL, *residual_adjlevelset = NULL;
-    double *residual_wave = NULL; double *residual_fea = NULL; double *residual_heat = NULL;
-    
-    /*--- Coefficients Monitored arrays ---*/
-    double *aeroelastic_plunge = NULL, *aeroelastic_pitch = NULL, *Surface_CLift = NULL, *Surface_CDrag = NULL, *Surface_CMx = NULL, *Surface_CMy = NULL, *Surface_CMz = NULL;
-    
-    /*--- Initialize number of variables ---*/
-    unsigned short nVar_Flow = 0, nVar_LevelSet = 0, nVar_Turb = 0, nVar_Trans = 0, nVar_TNE2 = 0, nVar_Wave = 0, nVar_Heat = 0, nVar_FEA = 0,     nVar_AdjFlow = 0, nVar_AdjTNE2 = 0, nVar_AdjLevelSet = 0, nVar_AdjTurb = 0;
-    
-    /*--- Direct problem variables ---*/
-    nVar_Flow = nDim+2;
-    if (turbulent) {
-      switch (config->GetKind_Turb_Model()){
-        case SA:	nVar_Turb = 1; break;
-        case SST: nVar_Turb = 2; break;
-      }
+  unsigned long iIntIter = config->GetIntIter();
+  unsigned long iExtIter = config->GetExtIter();
+  
+  /*--- WARNING: These buffers have hard-coded lengths. Note that you
+   may have to adjust them to be larger if adding more entries. ---*/
+  char begin[1000], direct_coeff[1000], flow_resid[1000], turb_resid[1000], end[1000];
+  double dummy = 0.0;
+  unsigned short iVar;
+  
+  unsigned long LinSolvIter = 0;
+  double timeiter = timeused/double(iExtIter+1);
+  
+  unsigned short FinestMesh = config->GetFinestMesh();
+  unsigned short nDim = geometry[FinestMesh]->GetnDim();
+  
+  bool turbulent = ((config->GetKind_Solver() == RANS));
+  bool flow = (config->GetKind_Regime() == EULER) || (config->GetKind_Regime() == NAVIER_STOKES) || (config->GetKind_Regime() == RANS);
+  
+  /*--- Initialize variables to store information from all domains (direct solution) ---*/
+  double Total_CLift = 0.0, Total_CDrag = 0.0, Total_CSideForce = 0.0, Total_CMx = 0.0, Total_CMy = 0.0, Total_CMz = 0.0, Total_CEff = 0.0,
+  Total_CFx = 0.0, Total_CFy = 0.0, Total_CFz = 0.0;
+  
+  /*--- Residual arrays ---*/
+  double *residual_flow = NULL, *residual_turbulent = NULL, *residual_transition = NULL, *residual_TNE2 = NULL, *residual_levelset = NULL;
+  double *residual_adjflow = NULL, *residual_adjturbulent = NULL, *residual_adjTNE2 = NULL, *residual_adjlevelset = NULL;
+  double *residual_wave = NULL; double *residual_fea = NULL; double *residual_heat = NULL;
+  
+  /*--- Coefficients Monitored arrays ---*/
+  double *aeroelastic_plunge = NULL, *aeroelastic_pitch = NULL, *Surface_CLift = NULL, *Surface_CDrag = NULL, *Surface_CMx = NULL, *Surface_CMy = NULL, *Surface_CMz = NULL;
+  
+  /*--- Initialize number of variables ---*/
+  unsigned short nVar_Flow = 0, nVar_LevelSet = 0, nVar_Turb = 0, nVar_Trans = 0, nVar_TNE2 = 0, nVar_Wave = 0, nVar_Heat = 0, nVar_FEA = 0,     nVar_AdjFlow = 0, nVar_AdjTNE2 = 0, nVar_AdjLevelSet = 0, nVar_AdjTurb = 0;
+  
+  /*--- Direct problem variables ---*/
+  nVar_Flow = nDim+2;
+  if (turbulent) {
+    switch (config->GetKind_Turb_Model()){
+      case SA:	nVar_Turb = 1; break;
+      case SST: nVar_Turb = 2; break;
     }
-    
-    /*--- Adjoint problem variables ---*/
-    nVar_AdjFlow = nDim+2;
-    if (turbulent) {
-      switch (config->GetKind_Turb_Model()){
-        case SA:	nVar_AdjTurb = 1; break;
-        case SST: nVar_AdjTurb = 2; break;
-      }
+  }
+  
+  /*--- Adjoint problem variables ---*/
+  nVar_AdjFlow = nDim+2;
+  if (turbulent) {
+    switch (config->GetKind_Turb_Model()){
+      case SA:	nVar_AdjTurb = 1; break;
+      case SST: nVar_AdjTurb = 2; break;
     }
-    
-    /*--- Allocate memory for the residual ---*/
-    residual_flow       = new double[nVar_Flow];
-    residual_turbulent  = new double[nVar_Turb];
-    residual_transition = new double[nVar_Trans];
-    residual_TNE2       = new double[nVar_TNE2];
-    residual_levelset   = new double[nVar_LevelSet];
-    residual_wave       = new double[nVar_Wave];
-    residual_fea        = new double[nVar_FEA];
-    residual_heat       = new double[nVar_Heat];
-    
-    residual_adjflow      = new double[nVar_AdjFlow];
-    residual_adjturbulent = new double[nVar_AdjTurb];
-    residual_adjTNE2      = new double[nVar_AdjTNE2];
-    residual_adjlevelset  = new double[nVar_AdjLevelSet];
-    
-    /*--- Allocate memory for the coefficients being monitored ---*/
-    aeroelastic_plunge = new double[config->GetnMarker_Monitoring()];
-    aeroelastic_pitch  = new double[config->GetnMarker_Monitoring()];
-    Surface_CLift      = new double[config->GetnMarker_Monitoring()];
-    Surface_CDrag      = new double[config->GetnMarker_Monitoring()];
-    Surface_CMx        = new double[config->GetnMarker_Monitoring()];
-    Surface_CMy        = new double[config->GetnMarker_Monitoring()];
-    Surface_CMz        = new double[config->GetnMarker_Monitoring()];
-    
-    /*--- Write information from nodes ---*/
-    switch (config->GetKind_Solver()) {
-        
-      case EULER:                   case NAVIER_STOKES:                   case RANS:
-        
-        /*--- Flow solution coefficients ---*/
-        Total_CLift       = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CLift();
-        Total_CDrag       = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CDrag();
-        Total_CSideForce  = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CSideForce();
-        Total_CEff        = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CEff();
-        Total_CMx         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CMx();
-        Total_CMy         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CMy();
-        Total_CMz         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CMz();
-        Total_CFx         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CFx();
-        Total_CFy         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CFy();
-        Total_CFz         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CFz();
-        
-        /*--- Flow Residuals ---*/
-        
-        for (iVar = 0; iVar < nVar_Flow; iVar++)
+  }
+  
+  /*--- Allocate memory for the residual ---*/
+  residual_flow       = new double[nVar_Flow];
+  residual_turbulent  = new double[nVar_Turb];
+  residual_transition = new double[nVar_Trans];
+  residual_TNE2       = new double[nVar_TNE2];
+  residual_levelset   = new double[nVar_LevelSet];
+  residual_wave       = new double[nVar_Wave];
+  residual_fea        = new double[nVar_FEA];
+  residual_heat       = new double[nVar_Heat];
+  
+  residual_adjflow      = new double[nVar_AdjFlow];
+  residual_adjturbulent = new double[nVar_AdjTurb];
+  residual_adjTNE2      = new double[nVar_AdjTNE2];
+  residual_adjlevelset  = new double[nVar_AdjLevelSet];
+  
+  /*--- Allocate memory for the coefficients being monitored ---*/
+  aeroelastic_plunge = new double[config->GetnMarker_Monitoring()];
+  aeroelastic_pitch  = new double[config->GetnMarker_Monitoring()];
+  Surface_CLift      = new double[config->GetnMarker_Monitoring()];
+  Surface_CDrag      = new double[config->GetnMarker_Monitoring()];
+  Surface_CMx        = new double[config->GetnMarker_Monitoring()];
+  Surface_CMy        = new double[config->GetnMarker_Monitoring()];
+  Surface_CMz        = new double[config->GetnMarker_Monitoring()];
+  
+  /*--- Write information from nodes ---*/
+  switch (config->GetKind_Solver()) {
+      
+    case EULER:                   case NAVIER_STOKES:                   case RANS:
+      
+      /*--- Flow solution coefficients ---*/
+      Total_CLift       = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CLift();
+      Total_CDrag       = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CDrag();
+      Total_CSideForce  = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CSideForce();
+      Total_CEff        = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CEff();
+      Total_CMx         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CMx();
+      Total_CMy         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CMy();
+      Total_CMz         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CMz();
+      Total_CFx         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CFx();
+      Total_CFy         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CFy();
+      Total_CFz         = solver_container[FinestMesh][FLOW_SOL]->GetTotal_CFz();
+      
+      /*--- Flow Residuals ---*/
+      
+      for (iVar = 0; iVar < nVar_Flow; iVar++)
         residual_flow[iVar] = solver_container[FinestMesh][FLOW_SOL]->GetRes_RMS(iVar);
-        
-        /*--- Turbulent residual ---*/
-        
-        if (turbulent) {
-          for (iVar = 0; iVar < nVar_Turb; iVar++)
-          residual_turbulent[iVar] = solver_container[FinestMesh][TURB_SOL]->GetRes_RMS(iVar);
-        }
-        
-        
-        /*--- Iterations of the linear solver ---*/
-        
-        LinSolvIter = (unsigned long) solver_container[FinestMesh][FLOW_SOL]->GetIterLinSolver();
-
-        
-        break;
-        
-    }
-    
-    /*--- Header frecuency ---*/
-    
-    bool Unsteady = ((config->GetUnsteady_Simulation() == DT_STEPPING_1ST) ||
-                     (config->GetUnsteady_Simulation() == DT_STEPPING_2ND));
-    bool In_NoDualTime = (!DualTime_Iteration && (iExtIter % config->GetWrt_Con_Freq() == 0));
-    bool In_DualTime_0 = (DualTime_Iteration && (iIntIter % 10 == 0));
-    bool In_DualTime_1 = (!DualTime_Iteration && Unsteady);
-    bool In_DualTime_2 = (Unsteady && DualTime_Iteration && (iExtIter % config->GetWrt_Con_Freq() == 0));
-    bool In_DualTime_3 = (Unsteady && !DualTime_Iteration && (iExtIter % config->GetWrt_Con_Freq() == 0));
-    
-    bool write_heads;
-    if (Unsteady) write_heads = (iIntIter == 0);
-    else write_heads = (((iExtIter % (config->GetWrt_Con_Freq()*20)) == 0));
-    
-    if ((In_NoDualTime || In_DualTime_0 || In_DualTime_1) && (In_NoDualTime || In_DualTime_2 || In_DualTime_3)) {
       
-      /*--- Prepare the history file output, note that the dual
-       time output don't write to the history file ---*/
-      if (!DualTime_Iteration) {
-        
-        /*--- Write the begining of the history file ---*/
-        sprintf (begin, "%12d", int(iExtIter));
-        
-        /*--- Write the end of the history file ---*/
-        sprintf (end, ", %12.10f, %12.10f\n", double(LinSolvIter), timeused/60.0);
-        
-        /*--- Write the solution and residual of the history file ---*/
-        switch (config->GetKind_Solver()) {
-            
-          case EULER : case NAVIER_STOKES: case RANS:
-            
-            /*--- Direct coefficients ---*/
-            sprintf (direct_coeff, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f",
-                     Total_CLift, Total_CDrag, Total_CSideForce, Total_CMx, Total_CMy, Total_CMz, Total_CFx, Total_CFy,
-                     Total_CFz, Total_CEff);
-            
-            /*--- Flow residual ---*/
-            if (nDim == 2) {
-              sprintf (flow_resid, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f", log10 (residual_flow[0]), log10 (residual_flow[1]), log10 (residual_flow[2]), log10 (residual_flow[3]), dummy );
-            }
-            else {
-              sprintf (flow_resid, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f", log10 (residual_flow[0]), log10 (residual_flow[1]), log10 (residual_flow[2]), log10 (residual_flow[3]), log10 (residual_flow[4]) );
-            }
-            
-            /*--- Turbulent residual ---*/
-            if (turbulent){
-              switch(nVar_Turb) {
-                case 1: sprintf (turb_resid, ", %12.10f", log10 (residual_turbulent[0])); break;
-                case 2: sprintf (turb_resid, ", %12.10f, %12.10f", log10(residual_turbulent[0]), log10(residual_turbulent[1])); break;
-              }
-            }
-            
-            break;
-            
-        }
+      /*--- Turbulent residual ---*/
+      
+      if (turbulent) {
+        for (iVar = 0; iVar < nVar_Turb; iVar++)
+          residual_turbulent[iVar] = solver_container[FinestMesh][TURB_SOL]->GetRes_RMS(iVar);
       }
       
-      /*--- Write the screen header---*/
-      if ((write_heads) && !(!DualTime_Iteration && Unsteady)) {
-        
-        if (!Unsteady) {
-          switch (config->GetKind_Solver()) {
-            case EULER :                  case NAVIER_STOKES:
-              cout << endl << " Min Delta Time: " << solver_container[FinestMesh][FLOW_SOL]->GetMin_Delta_Time()<<
-              ". Max Delta Time: " << solver_container[FinestMesh][FLOW_SOL]->GetMax_Delta_Time() << ".";
-              break;
-          }
-        }
-        else {
-          if (flow) {
-            cout << endl << " Min DT: " << solver_container[FinestMesh][FLOW_SOL]->GetMin_Delta_Time()<<
-            ". Max DT: " << solver_container[FinestMesh][FLOW_SOL]->GetMax_Delta_Time() <<
-            ". Dual Time step: " << ".";
+      
+      /*--- Iterations of the linear solver ---*/
+      
+      LinSolvIter = (unsigned long) solver_container[FinestMesh][FLOW_SOL]->GetIterLinSolver();
+      
+      
+      break;
+      
+  }
+  
+  /*--- Header frecuency ---*/
+  
+  bool Unsteady = ((config->GetUnsteady_Simulation() == DT_STEPPING_1ST) ||
+                   (config->GetUnsteady_Simulation() == DT_STEPPING_2ND));
+  bool In_NoDualTime = (!DualTime_Iteration && (iExtIter % config->GetWrt_Con_Freq() == 0));
+  bool In_DualTime_0 = (DualTime_Iteration && (iIntIter % 10 == 0));
+  bool In_DualTime_1 = (!DualTime_Iteration && Unsteady);
+  bool In_DualTime_2 = (Unsteady && DualTime_Iteration && (iExtIter % config->GetWrt_Con_Freq() == 0));
+  bool In_DualTime_3 = (Unsteady && !DualTime_Iteration && (iExtIter % config->GetWrt_Con_Freq() == 0));
+  
+  bool write_heads;
+  if (Unsteady) write_heads = (iIntIter == 0);
+  else write_heads = (((iExtIter % (config->GetWrt_Con_Freq()*20)) == 0));
+  
+  if ((In_NoDualTime || In_DualTime_0 || In_DualTime_1) && (In_NoDualTime || In_DualTime_2 || In_DualTime_3)) {
+    
+    /*--- Prepare the history file output, note that the dual
+     time output don't write to the history file ---*/
+    if (!DualTime_Iteration) {
+      
+      /*--- Write the begining of the history file ---*/
+      sprintf (begin, "%12d", int(iExtIter));
+      
+      /*--- Write the end of the history file ---*/
+      sprintf (end, ", %12.10f, %12.10f\n", double(LinSolvIter), timeused/60.0);
+      
+      /*--- Write the solution and residual of the history file ---*/
+      switch (config->GetKind_Solver()) {
+          
+        case EULER : case NAVIER_STOKES: case RANS:
+          
+          /*--- Direct coefficients ---*/
+          sprintf (direct_coeff, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f, %12.10f",
+                   Total_CLift, Total_CDrag, Total_CSideForce, Total_CMx, Total_CMy, Total_CMz, Total_CFx, Total_CFy,
+                   Total_CFz, Total_CEff);
+          
+          /*--- Flow residual ---*/
+          if (nDim == 2) {
+            sprintf (flow_resid, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f", log10 (residual_flow[0]), log10 (residual_flow[1]), log10 (residual_flow[2]), log10 (residual_flow[3]), dummy );
           }
           else {
-            cout << endl << " Dual Time step: "  << ".";
+            sprintf (flow_resid, ", %12.10f, %12.10f, %12.10f, %12.10f, %12.10f", log10 (residual_flow[0]), log10 (residual_flow[1]), log10 (residual_flow[2]), log10 (residual_flow[3]), log10 (residual_flow[4]) );
           }
-        }
-        
-        switch (config->GetKind_Solver()) {
-          case EULER :                  case NAVIER_STOKES:
-            
-            /*--- Visualize the maximum residual ---*/
-            cout << endl << " Maximum residual: " << log10(solver_container[FinestMesh][FLOW_SOL]->GetRes_Max(0))
-            <<", located at point "<< solver_container[FinestMesh][FLOW_SOL]->GetPoint_Max(0) << "." << endl;
-            
-            if (!Unsteady) cout << endl << " Iter" << "    Time(s)";
-            else cout << endl << " IntIter" << " ExtIter";
-            
-            cout << "     Res[Rho]" << "     Res[RhoE]" << "   CLift(Total)" << "   CDrag(Total)" << endl;
-            
-            break;
-            
-          case RANS :
-            
-            /*--- Visualize the maximum residual ---*/
-            cout << endl << " Maximum residual: " << log10(solver_container[FinestMesh][FLOW_SOL]->GetRes_Max(0))
-            <<", located at point "<< solver_container[FinestMesh][FLOW_SOL]->GetPoint_Max(0) << "." << endl;
-            
-            if (!Unsteady) cout << endl << " Iter" << "    Time(s)";
-            else cout << endl << " IntIter" << " ExtIter";
-            cout << "      Res[Rho]";
-            
-            switch (config->GetKind_Turb_Model()){
-              case SA:	cout << "       Res[nu]"; break;
-              case SST:	cout << "     Res[kine]" << "     Res[omega]"; break;
+          
+          /*--- Turbulent residual ---*/
+          if (turbulent){
+            switch(nVar_Turb) {
+              case 1: sprintf (turb_resid, ", %12.10f", log10 (residual_turbulent[0])); break;
+              case 2: sprintf (turb_resid, ", %12.10f, %12.10f", log10(residual_turbulent[0]), log10(residual_turbulent[1])); break;
             }
-            
-            cout << "   CLift(Total)"   << "   CDrag(Total)"   << endl;
-            break;
-            
-            
-        }
-        
+          }
+          
+          break;
+          
       }
-      
-      /*--- Write the solution on the screen and history file ---*/
-      cout.precision(6);
-      cout.setf(ios::fixed,ios::floatfield);
+    }
+    
+    /*--- Write the screen header---*/
+    if ((write_heads) && !(!DualTime_Iteration && Unsteady)) {
       
       if (!Unsteady) {
-        cout.width(5); cout << iExtIter;
-        cout.width(11); cout << timeiter;
-        
-      } else {
-        cout.width(8); cout << iIntIter;
-        cout.width(8); cout << iExtIter;
+        switch (config->GetKind_Solver()) {
+          case EULER :                  case NAVIER_STOKES:
+            cout << endl << " Min Delta Time: " << solver_container[FinestMesh][FLOW_SOL]->GetMin_Delta_Time()<<
+            ". Max Delta Time: " << solver_container[FinestMesh][FLOW_SOL]->GetMax_Delta_Time() << ".";
+            break;
+        }
+      }
+      else {
+        if (flow) {
+          cout << endl << " Min DT: " << solver_container[FinestMesh][FLOW_SOL]->GetMin_Delta_Time()<<
+          ". Max DT: " << solver_container[FinestMesh][FLOW_SOL]->GetMax_Delta_Time() <<
+          ". Dual Time step: " << ".";
+        }
+        else {
+          cout << endl << " Dual Time step: "  << ".";
+        }
       }
       
       switch (config->GetKind_Solver()) {
-        case EULER : case NAVIER_STOKES:
+        case EULER :                  case NAVIER_STOKES:
           
-          if (!DualTime_Iteration) {
-            ConvHist_file[0] << begin << direct_coeff << flow_resid;
-            ConvHist_file[0] << end;
-            ConvHist_file[0].flush();
-          }
+          /*--- Visualize the maximum residual ---*/
+          cout << endl << " Maximum residual: " << log10(solver_container[FinestMesh][FLOW_SOL]->GetRes_Max(0))
+          <<", located at point "<< solver_container[FinestMesh][FLOW_SOL]->GetPoint_Max(0) << "." << endl;
           
-          cout.precision(6);
-          cout.setf(ios::fixed,ios::floatfield);
-          cout.width(13); cout << log10(residual_flow[0]);
-              if (nDim == 2 ) { cout.width(14); cout << log10(residual_flow[3]); }
-              else { cout.width(14); cout << log10(residual_flow[4]); }
+          if (!Unsteady) cout << endl << " Iter" << "    Time(s)";
+          else cout << endl << " IntIter" << " ExtIter";
           
-          cout.width(15); cout << min(1000.0,max(-1000.0, Total_CLift)); cout.width(15); cout << min(1000.0,max(-1000.0, Total_CDrag));
-          cout << endl;
+          cout << "     Res[Rho]" << "     Res[RhoE]" << "   CLift(Total)" << "   CDrag(Total)" << endl;
           
           break;
           
         case RANS :
           
-          if (!DualTime_Iteration) {
-            ConvHist_file[0] << begin << direct_coeff << flow_resid << turb_resid << end;
-            ConvHist_file[0].flush();
+          /*--- Visualize the maximum residual ---*/
+          cout << endl << " Maximum residual: " << log10(solver_container[FinestMesh][FLOW_SOL]->GetRes_Max(0))
+          <<", located at point "<< solver_container[FinestMesh][FLOW_SOL]->GetPoint_Max(0) << "." << endl;
+          
+          if (!Unsteady) cout << endl << " Iter" << "    Time(s)";
+          else cout << endl << " IntIter" << " ExtIter";
+          cout << "      Res[Rho]";
+          
+          switch (config->GetKind_Turb_Model()){
+            case SA:	cout << "       Res[nu]"; break;
+            case SST:	cout << "     Res[kine]" << "     Res[omega]"; break;
           }
           
-          cout.precision(6);
-          cout.setf(ios::fixed,ios::floatfield);
-          
-          cout.width(14);
-          cout << log10(residual_flow[0]);
-          
-          switch(nVar_Turb) {
-            case 1: cout.width(14); cout << log10(residual_turbulent[0]); break;
-            case 2: cout.width(14); cout << log10(residual_turbulent[0]);
-              cout.width(15); cout << log10(residual_turbulent[1]); break;
-          }
-          
-          
-          cout.width(15); cout << min(1000.0,max(-1000.0, Total_CLift)); cout.width(15); cout << min(1000.0,max(-1000.0, Total_CDrag));
-          cout << endl;
-          
+          cout << "   CLift(Total)"   << "   CDrag(Total)"   << endl;
           break;
           
           
       }
-      cout.unsetf(ios::fixed);
-      
-      delete [] residual_flow;
-      delete [] residual_levelset;
-      delete [] residual_TNE2;
-      delete [] residual_turbulent;
-      delete [] residual_transition;
-      delete [] residual_wave;
-      delete [] residual_fea;
-      delete [] residual_heat;
-      
-      delete [] residual_adjflow;
-      delete [] residual_adjTNE2;
-      delete [] residual_adjlevelset;
-      delete [] residual_adjturbulent;
-      
-      delete [] Surface_CLift;
-      delete [] Surface_CDrag;
-      delete [] Surface_CMx;
-      delete [] Surface_CMy;
-      delete [] Surface_CMz;
       
     }
+    
+    /*--- Write the solution on the screen and history file ---*/
+    cout.precision(6);
+    cout.setf(ios::fixed,ios::floatfield);
+    
+    if (!Unsteady) {
+      cout.width(5); cout << iExtIter;
+      cout.width(11); cout << timeiter;
+      
+    } else {
+      cout.width(8); cout << iIntIter;
+      cout.width(8); cout << iExtIter;
+    }
+    
+    switch (config->GetKind_Solver()) {
+      case EULER : case NAVIER_STOKES:
+        
+        if (!DualTime_Iteration) {
+          ConvHist_file[0] << begin << direct_coeff << flow_resid;
+          ConvHist_file[0] << end;
+          ConvHist_file[0].flush();
+        }
+        
+        cout.precision(6);
+        cout.setf(ios::fixed,ios::floatfield);
+        cout.width(13); cout << log10(residual_flow[0]);
+        if (nDim == 2 ) { cout.width(14); cout << log10(residual_flow[3]); }
+        else { cout.width(14); cout << log10(residual_flow[4]); }
+        
+        cout.width(15); cout << min(1000.0,max(-1000.0, Total_CLift)); cout.width(15); cout << min(1000.0,max(-1000.0, Total_CDrag));
+        cout << endl;
+        
+        break;
+        
+      case RANS :
+        
+        if (!DualTime_Iteration) {
+          ConvHist_file[0] << begin << direct_coeff << flow_resid << turb_resid << end;
+          ConvHist_file[0].flush();
+        }
+        
+        cout.precision(6);
+        cout.setf(ios::fixed,ios::floatfield);
+        
+        cout.width(14);
+        cout << log10(residual_flow[0]);
+        
+        switch(nVar_Turb) {
+          case 1: cout.width(14); cout << log10(residual_turbulent[0]); break;
+          case 2: cout.width(14); cout << log10(residual_turbulent[0]);
+            cout.width(15); cout << log10(residual_turbulent[1]); break;
+        }
+        
+        
+        cout.width(15); cout << min(1000.0,max(-1000.0, Total_CLift)); cout.width(15); cout << min(1000.0,max(-1000.0, Total_CDrag));
+        cout << endl;
+        
+        break;
+        
+        
+    }
+    cout.unsetf(ios::fixed);
+    
+    delete [] residual_flow;
+    delete [] residual_levelset;
+    delete [] residual_TNE2;
+    delete [] residual_turbulent;
+    delete [] residual_transition;
+    delete [] residual_wave;
+    delete [] residual_fea;
+    delete [] residual_heat;
+    
+    delete [] residual_adjflow;
+    delete [] residual_adjTNE2;
+    delete [] residual_adjlevelset;
+    delete [] residual_adjturbulent;
+    
+    delete [] Surface_CLift;
+    delete [] Surface_CDrag;
+    delete [] Surface_CMx;
+    delete [] Surface_CMy;
+    delete [] Surface_CMz;
+    
+  }
 }
 
 void COutput::SetResult_Files(CSolver ***solver_container, CGeometry **geometry, CConfig *config, unsigned long iExtIter) {
   
-    /*--- Flags identifying the types of files to be written. ---*/
-    bool Wrt_Vol = config->GetWrt_Vol_Sol();
-    bool Wrt_Srf = config->GetWrt_Srf_Sol();
-    bool Wrt_Csv = config->GetWrt_Csv_Sol();
-    bool Wrt_Rst = config->GetWrt_Restart();
+  /*--- Flags identifying the types of files to be written. ---*/
+  bool Wrt_Vol = config->GetWrt_Vol_Sol();
+  bool Wrt_Srf = config->GetWrt_Srf_Sol();
+  bool Wrt_Csv = config->GetWrt_Csv_Sol();
+  bool Wrt_Rst = config->GetWrt_Restart();
+  
+  switch (config->GetKind_Solver()) {
+      
+    case EULER : case NAVIER_STOKES : case RANS :
+      
+      if (Wrt_Csv) SetSurfaceCSV_Flow(config, geometry[MESH_0], solver_container[MESH_0][FLOW_SOL], iExtIter);
+      break;
+      
+  }
+  
+  /*--- Get the file output format ---*/
+  
+  unsigned short FileFormat = config->GetOutput_FileFormat();
+  
+  /*--- Merge the node coordinates and connectivity, if necessary. This
+   is only performed if a volume solution file is requested, and it
+   is active by default. ---*/
+  
+  if (Wrt_Vol || Wrt_Srf)
+    MergeConnectivity(config, geometry[MESH_0]);
+  
+  /*--- Merge coordinates of all grid nodes (excluding ghost points).
+   The grid coordinates are always merged and included first in the
+   restart files. ---*/
+  
+  MergeCoordinates(config, geometry[MESH_0]);
+  
+  /*--- Merge the solution data needed for volume solutions and restarts ---*/
+  
+  if (Wrt_Vol || Wrt_Rst)
+    MergeSolution(config, geometry[MESH_0], solver_container[MESH_0]);
+  
+  /*--- Write restart, CGNS, or Tecplot files using the merged data.
+   This data lives only on the master, and these routines are currently
+   executed by the master proc alone (as if in serial). ---*/
+  
+  /*--- Write a native restart file ---*/
+  if (Wrt_Rst)
+    SetRestart(config, geometry[MESH_0]);
+  
+  if (Wrt_Vol) {
     
-    switch (config->GetKind_Solver()) {
+    switch (FileFormat) {
         
-      case EULER : case NAVIER_STOKES : case RANS :
+      case TECPLOT:
         
-        if (Wrt_Csv) SetSurfaceCSV_Flow(config, geometry[MESH_0], solver_container[MESH_0][FLOW_SOL], iExtIter);
+        /*--- Write a Tecplot ASCII file ---*/
+        SetTecplot_ASCII(config, geometry[MESH_0], false);
+        DeallocateConnectivity(config, geometry[MESH_0], false);
         break;
         
+      case PARAVIEW:
+        
+        /*--- Write a Paraview ASCII file ---*/
+        SetParaview_ASCII(config, geometry[MESH_0], false);
+        DeallocateConnectivity(config, geometry[MESH_0], false);
+        break;
+        
+      default:
+        break;
     }
     
-    /*--- Get the file output format ---*/
-    
-    unsigned short FileFormat = config->GetOutput_FileFormat();
-    
-    /*--- Merge the node coordinates and connectivity, if necessary. This
-     is only performed if a volume solution file is requested, and it
-     is active by default. ---*/
-    
-    if (Wrt_Vol || Wrt_Srf)
-    MergeConnectivity(config, geometry[MESH_0]);
-    
-    /*--- Merge coordinates of all grid nodes (excluding ghost points).
-     The grid coordinates are always merged and included first in the
-     restart files. ---*/
-    
-    MergeCoordinates(config, geometry[MESH_0]);
-    
-    /*--- Merge the solution data needed for volume solutions and restarts ---*/
-    
-    if (Wrt_Vol || Wrt_Rst)
-    MergeSolution(config, geometry[MESH_0], solver_container[MESH_0]);
-    
-    /*--- Write restart, CGNS, or Tecplot files using the merged data.
-     This data lives only on the master, and these routines are currently
-     executed by the master proc alone (as if in serial). ---*/
+  }
   
-      /*--- Write a native restart file ---*/
-      if (Wrt_Rst)
-        SetRestart(config, geometry[MESH_0]);
-      
-      if (Wrt_Vol) {
+  if (Wrt_Srf) {
+    
+    switch (FileFormat) {
         
-        switch (FileFormat) {
-            
-          case TECPLOT:
-            
-            /*--- Write a Tecplot ASCII file ---*/
-            SetTecplot_ASCII(config, geometry[MESH_0], false);
-            DeallocateConnectivity(config, geometry[MESH_0], false);
-            break;
-            
-          case PARAVIEW:
-            
-            /*--- Write a Paraview ASCII file ---*/
-            SetParaview_ASCII(config, geometry[MESH_0], false);
-            DeallocateConnectivity(config, geometry[MESH_0], false);
-            break;
-            
-          default:
-            break;
-        }
+      case TECPLOT:
         
-      }
-      
-      if (Wrt_Srf) {
+        /*--- Write a Tecplot ASCII file ---*/
+        SetTecplot_ASCII(config, geometry[MESH_0], true);
+        DeallocateConnectivity(config, geometry[MESH_0], true);
+        break;
         
-        switch (FileFormat) {
-            
-          case TECPLOT:
-            
-            /*--- Write a Tecplot ASCII file ---*/
-            SetTecplot_ASCII(config, geometry[MESH_0], true);
-            DeallocateConnectivity(config, geometry[MESH_0], true);
-            break;
-            
-          case PARAVIEW:
-            
-            /*--- Write a Paraview ASCII file ---*/
-            SetParaview_ASCII(config, geometry[MESH_0], true);
-            DeallocateConnectivity(config, geometry[MESH_0], true);
-            break;
-            
-          default:
-            break;
-        }
+      case PARAVIEW:
         
-      }
-      
-      /*--- Release memory needed for merging the solution data. ---*/
-      if (((Wrt_Vol) || (Wrt_Srf)) && (FileFormat == TECPLOT ||
-                                       FileFormat == TECPLOT_BINARY ||
-                                       FileFormat == PARAVIEW))
-      DeallocateCoordinates(config, geometry[MESH_0]);
-      
-      if (Wrt_Vol || Wrt_Rst)
-      DeallocateSolution(config, geometry[MESH_0]);
-      
+        /*--- Write a Paraview ASCII file ---*/
+        SetParaview_ASCII(config, geometry[MESH_0], true);
+        DeallocateConnectivity(config, geometry[MESH_0], true);
+        break;
+        
+      default:
+        break;
+    }
+    
+  }
+  
+  /*--- Release memory needed for merging the solution data. ---*/
+  if (((Wrt_Vol) || (Wrt_Srf)) && (FileFormat == TECPLOT ||
+                                   FileFormat == TECPLOT_BINARY ||
+                                   FileFormat == PARAVIEW))
+    DeallocateCoordinates(config, geometry[MESH_0]);
+  
+  if (Wrt_Vol || Wrt_Rst)
+    DeallocateSolution(config, geometry[MESH_0]);
+  
   
 }
 
 void COutput::SetBaselineResult_Files(CSolver *solver, CGeometry *geometry, CConfig *config,
                                       unsigned long iExtIter) {
-    
-    /*--- Flags identifying the types of files to be written. ---*/
-    
-    bool Wrt_Vol = config->GetWrt_Vol_Sol();
-    bool Wrt_Srf = config->GetWrt_Srf_Sol();
-//    bool Wrt_Rst = config->GetWrt_Restart();
   
-    /*--- Get the file output format ---*/
+  /*--- Flags identifying the types of files to be written. ---*/
+  
+  bool Wrt_Vol = config->GetWrt_Vol_Sol();
+  bool Wrt_Srf = config->GetWrt_Srf_Sol();
+  //    bool Wrt_Rst = config->GetWrt_Restart();
+  
+  /*--- Get the file output format ---*/
+  
+  unsigned short FileFormat = config->GetOutput_FileFormat();
+  
+  /*--- Merge the node coordinates and connectivity if necessary. This
+   is only performed if a volume solution file is requested, and it
+   is active by default. ---*/
+  
+  if (Wrt_Vol || Wrt_Srf) {
+    cout <<"Merging grid connectivity." << endl;
+    MergeConnectivity(config, geometry);
+  }
+  
+  /*--- Merge the solution data needed for volume solutions and restarts ---*/
+  
+  //    if (Wrt_Vol || Wrt_Rst) {
+  //      if (rank == MASTER_NODE) cout <<"Merging solution." << endl;
+  //      MergeBaselineSolution(config, geometry, solver, iZone);
+  //    }
+  
+  /*--- Write restart, CGNS, Tecplot or Paraview files using the merged data.
+   This data lives only on the master, and these routines are currently
+   executed by the master proc alone (as if in serial). ---*/
+  
+  if (Wrt_Vol) {
     
-    unsigned short FileFormat = config->GetOutput_FileFormat();
+    cout <<"Writing volume solution file." << endl;
     
-    /*--- Merge the node coordinates and connectivity if necessary. This
-     is only performed if a volume solution file is requested, and it
-     is active by default. ---*/
-    
-    if (Wrt_Vol || Wrt_Srf) {
-      cout <<"Merging grid connectivity." << endl;
-      MergeConnectivity(config, geometry);
+    switch (FileFormat) {
+        
+      case TECPLOT:
+        
+        /*--- Write a Tecplot ASCII file ---*/
+        SetTecplot_ASCII(config, geometry, false);
+        DeallocateConnectivity(config, geometry, false);
+        break;
+        
+      case PARAVIEW:
+        
+        /*--- Write a Paraview ASCII file ---*/
+        SetParaview_ASCII(config, geometry, false);
+        DeallocateConnectivity(config, geometry, false);
+        break;
+        
+      default:
+        break;
     }
     
-    /*--- Merge the solution data needed for volume solutions and restarts ---*/
-    
-//    if (Wrt_Vol || Wrt_Rst) {
-//      if (rank == MASTER_NODE) cout <<"Merging solution." << endl;
-//      MergeBaselineSolution(config, geometry, solver, iZone);
-//    }
-    
-    /*--- Write restart, CGNS, Tecplot or Paraview files using the merged data.
-     This data lives only on the master, and these routines are currently
-     executed by the master proc alone (as if in serial). ---*/
+  }
   
-      if (Wrt_Vol) {
+  if (Wrt_Srf) {
+    
+    cout <<"Writing surface solution file." << endl;
+    
+    switch (FileFormat) {
         
-        cout <<"Writing volume solution file." << endl;
+      case TECPLOT:
         
-        switch (FileFormat) {
-            
-          case TECPLOT:
-            
-            /*--- Write a Tecplot ASCII file ---*/
-            SetTecplot_ASCII(config, geometry, false);
-            DeallocateConnectivity(config, geometry, false);
-            break;
-            
-          case PARAVIEW:
-            
-            /*--- Write a Paraview ASCII file ---*/
-            SetParaview_ASCII(config, geometry, false);
-            DeallocateConnectivity(config, geometry, false);
-            break;
-            
-          default:
-            break;
-        }
+        /*--- Write a Tecplot ASCII file ---*/
+        SetTecplot_ASCII(config, geometry, true);
+        DeallocateConnectivity(config, geometry, true);
+        break;
         
-      }
-      
-      if (Wrt_Srf) {
+      case PARAVIEW:
         
-        cout <<"Writing surface solution file." << endl;
+        /*--- Write a Paraview ASCII file ---*/
+        SetParaview_ASCII(config, geometry, true);
+        DeallocateConnectivity(config, geometry, true);
+        break;
         
-        switch (FileFormat) {
-            
-          case TECPLOT:
-            
-            /*--- Write a Tecplot ASCII file ---*/
-            SetTecplot_ASCII(config, geometry, true);
-            DeallocateConnectivity(config, geometry, true);
-            break;
-            
-          case PARAVIEW:
-            
-            /*--- Write a Paraview ASCII file ---*/
-            SetParaview_ASCII(config, geometry, true);
-            DeallocateConnectivity(config, geometry, true);
-            break;
-            
-          default:
-            break;
-        }
-      }
-      
-      if (FileFormat == TECPLOT_BINARY) {
-        if (!wrote_base_file)
-        DeallocateConnectivity(config, geometry, false);
-        if (!wrote_surf_file)
-        DeallocateConnectivity(config, geometry, wrote_surf_file);
-      }
-      
-      if (Wrt_Vol || Wrt_Srf)
-      DeallocateSolution(config, geometry);
+      default:
+        break;
+    }
+  }
+  
+  if (FileFormat == TECPLOT_BINARY) {
+    if (!wrote_base_file)
+      DeallocateConnectivity(config, geometry, false);
+    if (!wrote_surf_file)
+      DeallocateConnectivity(config, geometry, wrote_surf_file);
+  }
+  
+  if (Wrt_Vol || Wrt_Srf)
+    DeallocateSolution(config, geometry);
   
 }
 

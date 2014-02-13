@@ -2,7 +2,7 @@
  * \file vector_structure.cpp
  * \brief Main classes required for solving linear systems of equations
  * \author Current Development: Stanford University.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -43,7 +43,7 @@ CSysVector::CSysVector(const unsigned long & size, const double & val) {
   
   vec_val = new double[nElm];
   for (unsigned int i = 0; i < nElm; i++)
-  vec_val[i] = val;
+    vec_val[i] = val;
   
 }
 
@@ -60,10 +60,10 @@ CSysVector::CSysVector(const unsigned long & numBlk, const unsigned long & numBl
     << "invalid input: numBlk, numVar = " << numBlk << "," << numVar << endl;
     throw(-1);
   }
-	
+  
   vec_val = new double[nElm];
   for (unsigned int i = 0; i < nElm; i++)
-  vec_val[i] = val;
+    vec_val[i] = val;
   
 }
 
@@ -76,7 +76,7 @@ CSysVector::CSysVector(const CSysVector & u) {
   
   vec_val = new double[nElm];
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] = u.vec_val[i];
+    vec_val[i] = u.vec_val[i];
   
 }
 
@@ -95,7 +95,7 @@ CSysVector::CSysVector(const unsigned long & size, const double* u_array) {
   
   vec_val = new double[nElm];
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] = u_array[i];
+    vec_val[i] = u_array[i];
   
 }
 
@@ -115,14 +115,14 @@ CSysVector::CSysVector(const unsigned long & numBlk, const unsigned long & numBl
   
   vec_val = new double[nElm];
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] = u_array[i];
+    vec_val[i] = u_array[i];
   
 }
 
 CSysVector::~CSysVector() {
   delete [] vec_val;
   nElm = -1;
-	nElmDomain = -1;
+  nElmDomain = -1;
   nBlk = -1;
   nBlkDomain = -1;
   nVar = -1;
@@ -140,10 +140,10 @@ void CSysVector::Initialize(const unsigned long & numBlk, const unsigned long & 
     << "invalid input: numBlk, numVar = " << numBlk << "," << numVar << endl;
     throw(-1);
   }
-	
+  
   vec_val = new double[nElm];
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] = val;
+    vec_val[i] = val;
   
 }
 
@@ -154,7 +154,7 @@ void CSysVector::Equals_AX(const double & a, CSysVector & x) {
     throw(-1);
   }
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] = a * x.vec_val[i];
+    vec_val[i] = a * x.vec_val[i];
 }
 
 void CSysVector::Plus_AX(const double & a, CSysVector & x) {
@@ -164,7 +164,7 @@ void CSysVector::Plus_AX(const double & a, CSysVector & x) {
     throw(-1);
   }
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] += a * x.vec_val[i];
+    vec_val[i] += a * x.vec_val[i];
 }
 
 void CSysVector::Equals_AX_Plus_BY(const double & a, CSysVector & x, const double & b, CSysVector & y) {
@@ -174,7 +174,7 @@ void CSysVector::Equals_AX_Plus_BY(const double & a, CSysVector & x, const doubl
     throw(-1);
   }
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] = a * x.vec_val[i] + b * y.vec_val[i];
+    vec_val[i] = a * x.vec_val[i] + b * y.vec_val[i];
 }
 
 CSysVector & CSysVector::operator=(const CSysVector & u) {
@@ -187,19 +187,19 @@ CSysVector & CSysVector::operator=(const CSysVector & u) {
   nElmDomain = u.nElmDomain;
   
   nBlk = u.nBlk;
-	nBlkDomain = u.nBlkDomain;
+  nBlkDomain = u.nBlkDomain;
   
   nVar = u.nVar;
   vec_val = new double[nElm];
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] = u.vec_val[i];
+    vec_val[i] = u.vec_val[i];
   
   return *this;
 }
 
 CSysVector & CSysVector::operator=(const double & val) {
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] = val;
+    vec_val[i] = val;
   return *this;
 }
 
@@ -219,7 +219,7 @@ CSysVector & CSysVector::operator+=(const CSysVector & u) {
     throw(-1);
   }
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] += u.vec_val[i];
+    vec_val[i] += u.vec_val[i];
   return *this;
 }
 
@@ -239,7 +239,7 @@ CSysVector & CSysVector::operator-=(const CSysVector & u) {
     throw(-1);
   }
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] -= u.vec_val[i];
+    vec_val[i] -= u.vec_val[i];
   return *this;
 }
 
@@ -264,7 +264,7 @@ CSysVector operator*(const double & val, const CSysVector & u) {
 CSysVector & CSysVector::operator*=(const double & val) {
   
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] *= val;
+    vec_val[i] *= val;
   return *this;
 }
 
@@ -280,7 +280,7 @@ CSysVector CSysVector::operator/(const double & val) const {
 CSysVector & CSysVector::operator/=(const double & val) {
   
   for (unsigned long i = 0; i < nElm; i++)
-  vec_val[i] /= val;
+    vec_val[i] /= val;
   return *this;
 }
 
@@ -298,28 +298,28 @@ double CSysVector::norm() const {
 void CSysVector::CopyToArray(double* u_array) {
   
   for (unsigned long i = 0; i < nElm; i++)
-  u_array[i] = vec_val[i];
+    u_array[i] = vec_val[i];
 }
 
 void CSysVector::AddBlock(unsigned long val_ipoint, double *val_residual) {
   unsigned short iVar;
   
   for (iVar = 0; iVar < nVar; iVar++)
-  vec_val[val_ipoint*nVar+iVar] += val_residual[iVar];
+    vec_val[val_ipoint*nVar+iVar] += val_residual[iVar];
 }
 
 void CSysVector::SubtractBlock(unsigned long val_ipoint, double *val_residual) {
   unsigned short iVar;
   
   for (iVar = 0; iVar < nVar; iVar++)
-  vec_val[val_ipoint*nVar+iVar] -= val_residual[iVar];
+    vec_val[val_ipoint*nVar+iVar] -= val_residual[iVar];
 }
 
 void CSysVector::SetBlock(unsigned long val_ipoint, double *val_residual) {
   unsigned short iVar;
   
   for (iVar = 0; iVar < nVar; iVar++)
-  vec_val[val_ipoint*nVar+iVar] = val_residual[iVar];
+    vec_val[val_ipoint*nVar+iVar] = val_residual[iVar];
 }
 
 void CSysVector::SetBlock(unsigned long val_ipoint, unsigned short val_var, double val_residual) {
@@ -331,7 +331,7 @@ void CSysVector::SetBlock_Zero(unsigned long val_ipoint) {
   unsigned short iVar;
   
   for (iVar = 0; iVar < nVar; iVar++)
-  vec_val[val_ipoint*nVar+iVar] = 0.0;
+    vec_val[val_ipoint*nVar+iVar] = 0.0;
 }
 
 void CSysVector::SetBlock_Zero(unsigned long val_ipoint, unsigned short val_var) {
@@ -359,7 +359,7 @@ double dotProd(const CSysVector & u, const CSysVector & v) {
    processors (we use nElemDomain instead of nElem) ---*/
   double loc_prod = 0.0;
   for (unsigned long i = 0; i < u.nElmDomain; i++)
-  loc_prod += u.vec_val[i]*v.vec_val[i];
+    loc_prod += u.vec_val[i]*v.vec_val[i];
   double prod = 0.0;
   
   prod = loc_prod;

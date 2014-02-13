@@ -9,7 +9,7 @@
 #
 ##########################
 
-AC_INIT([SU2_EDU], [1.0.0], [susquared-dev@lists.stanford.edu],
+AC_INIT([SU2_EDU], [1.1.0], [susquared-dev@lists.stanford.edu],
         [SU2_EDU], [http://su2.stanford.edu])
 AC_PREREQ([2.59])
 AM_INIT_AUTOMAKE([subdir-objects])
@@ -43,7 +43,7 @@ AC_MSG_RESULT([
 .--)   | |  `--'  |  / /_     |  |____ |  '--'  ||  `--'  | 
 |_____/   \______/  |____|    |_______||_______/  \______/  
 
-Release 1.0.0 (su2.stanford.edu)
+Release 1.1.0 (su2.stanford.edu)
 
 -------------------------------------------------------------------------
 | SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).       |

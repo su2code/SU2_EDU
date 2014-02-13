@@ -2,7 +2,7 @@
  * \file definition_structure.cpp
  * \brief Main subroutines used by SU2_CFD.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -25,7 +25,7 @@
 void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   
   unsigned short iMGlevel;
-    
+  
   /*--- Compute elements surrounding points, points surrounding points,
    and elements surrounding elements ---*/
   

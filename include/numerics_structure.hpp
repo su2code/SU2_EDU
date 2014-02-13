@@ -5,7 +5,7 @@
  *        <i>numerics_convective.cpp</i>, <i>numerics_viscous.cpp</i>, and
  *        <i>numerics_source.cpp</i> files.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -38,7 +38,7 @@ using namespace std;
  * \class CNumerics
  * \brief Class for defining the numerical methods.
  * \author F. Palacios.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CNumerics {
 protected:
@@ -1237,7 +1237,7 @@ public:
  * \brief Class for solving an approximate Riemann solver of Roe for the flow equations.
  * \ingroup ConvDiscr
  * \author A. Bueno (UPM) & F. Palacios (Stanford University).
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CUpwRoe_Flow : public CNumerics {
 private:
@@ -1283,7 +1283,7 @@ public:
  * \brief Class for solving an approximate Riemann solver of Roe with Turkel Preconditioning for the flow equations.
  * \ingroup ConvDiscr
  * \author A. K. Lonkar (Stanford University)
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CUpwRoeTurkel_Flow : public CNumerics {
 private:
@@ -1338,7 +1338,7 @@ public:
  * \brief Class for solving an approximate Riemann AUSM.
  * \ingroup ConvDiscr
  * \author F. Palacios
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CUpwAUSM_Flow : public CNumerics {
 private:
@@ -1385,7 +1385,7 @@ public:
  * \brief Class for solving an approximate Riemann AUSM.
  * \ingroup ConvDiscr
  * \author F. Palacios, based on the Joe code implementation
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CUpwHLLC_Flow : public CNumerics {
 private:
@@ -1433,7 +1433,7 @@ public:
  * \brief Class for doing a scalar upwind solver for the Spalar-Allmaral turbulence model equations.
  * \ingroup ConvDiscr
  * \author A. Bueno.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CUpwSca_TurbSA : public CNumerics {
 private:
@@ -1472,7 +1472,7 @@ public:
  * \brief Class for doing a scalar upwind solver for the Menter SST turbulence model equations.
  * \ingroup ConvDiscr
  * \author A. Campos.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CUpwSca_TurbSST : public CNumerics {
 private:
@@ -1513,7 +1513,7 @@ public:
  * \brief Class for centered shceme - JST.
  * \ingroup ConvDiscr
  * \author F. Palacios.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CCentJST_Flow : public CNumerics {
   
@@ -1568,7 +1568,7 @@ public:
  * \brief Class for computing the Lax-Friedrich centered scheme.
  * \ingroup ConvDiscr
  * \author F. Palacios.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CCentLax_Flow : public CNumerics {
 private:
@@ -1620,7 +1620,7 @@ public:
  * \brief Class for computing viscous term using the average of gradients.
  * \ingroup ViscDiscr
  * \author A. Bueno, and F. Palacios.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CAvgGrad_Flow : public CNumerics {
 private:
@@ -1664,7 +1664,7 @@ public:
  * \brief Class for computing viscous term using average of gradients (Spalart-Allmaras Turbulence model).
  * \ingroup ViscDiscr
  * \author A. Bueno.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CAvgGrad_TurbSA : public CNumerics {
 private:
@@ -1710,7 +1710,7 @@ public:
  * \brief Class for computing viscous term using the average of gradients with a correction.
  * \ingroup ViscDiscr
  * \author A. Bueno, and F. Palacios.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CAvgGradCorrected_Flow : public CNumerics {
 private:
@@ -1755,7 +1755,7 @@ public:
  * \brief Class for computing viscous term using average of gradients with correction (Spalart-Allmaras turbulence model).
  * \ingroup ViscDiscr
  * \author A. Bueno.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CAvgGradCorrected_TurbSA : public CNumerics {
 private:
@@ -1796,7 +1796,7 @@ public:
  * \brief Class for computing viscous term using average of gradient with correction (Menter SST turbulence model).
  * \ingroup ViscDiscr
  * \author A. Bueno.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CAvgGrad_TurbSST : public CNumerics {
 private:
@@ -1858,7 +1858,7 @@ public:
  * \brief Class for computing viscous term using average of gradient with correction (Menter SST turbulence model).
  * \ingroup ViscDiscr
  * \author A. Bueno.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CAvgGradCorrected_TurbSST : public CNumerics {
 private:
@@ -1920,7 +1920,7 @@ public:
  * \brief Dummy class.
  * \ingroup SourceDiscr
  * \author F. Palacios.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CSourceNothing : public CNumerics {
 public:
@@ -1944,7 +1944,7 @@ public:
  * \brief Class for integrating the source terms of the Spalart-Allmaras turbulence model equation.
  * \ingroup SourceDiscr
  * \author A. Bueno.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CSourcePieceWise_TurbSA : public CNumerics {
 private:
@@ -2046,7 +2046,7 @@ public:
  * \brief Class for integrating the source terms of the Menter SST turbulence model equations.
  * \ingroup SourceDiscr
  * \author A. Campos.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CSourcePieceWise_TurbSST : public CNumerics {
 private:

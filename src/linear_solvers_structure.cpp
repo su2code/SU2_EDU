@@ -2,7 +2,7 @@
  * \file linear_solvers_structure.cpp
  * \brief Main classes required for solving linear systems of equations
  * \author Current Development: Stanford University.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -62,7 +62,7 @@ void CSysSolve::solveReduced(const int & n, const vector<vector<double> > & Hsbg
                              const vector<double> & rhs, vector<double> & x) {
   // initialize...
   for (int i = 0; i < n; i++)
-  x[i] = rhs[i];
+    x[i] = rhs[i];
   // ... and backsolve
   for (int i = n-1; i >= 0; i--) {
     x[i] /= Hsbg[i][i];
@@ -141,7 +141,7 @@ void CSysSolve::writeHistory(const int & iter, const double & res, const double 
 
 unsigned long CSysSolve::ConjugateGradient(const CSysVector & b, CSysVector & x, CMatrixVectorProduct & mat_vec,
                                            CPreconditioner & precond, double tol, unsigned long m, bool monitoring) {
-	
+  
   int rank = 0;
   
   /*--- Check the subspace size ---*/
@@ -202,7 +202,7 @@ unsigned long CSysSolve::ConjugateGradient(const CSysVector & b, CSysVector & x,
     precond(r, z);
     
     /*--- Calculate Gram-Schmidt coefficient beta,
-		 beta = dotProd(r_{i+1}, z_{i+1}) / dotProd(r_{i}, z_{i}) ---*/
+     beta = dotProd(r_{i+1}, z_{i+1}) / dotProd(r_{i}, z_{i}) ---*/
     beta = 1.0 / r_dot_z;
     r_dot_z = dotProd(r, z);
     beta *= r_dot_z;
@@ -231,14 +231,14 @@ unsigned long CSysSolve::ConjugateGradient(const CSysVector & b, CSysVector & x,
   //      cout << "# true_res - calc_res = " << true_res - norm_r << endl;
   //    }
   //  }
-	
-	return i;
+  
+  return i;
   
 }
 
 unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVectorProduct & mat_vec,
                                 CPreconditioner & precond, double tol, unsigned long m, bool monitoring) {
-	
+  
   int rank = 0;
   
   /*---  Check the subspace size ---*/
@@ -254,8 +254,8 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
   }
   
   /*---  Define various arrays
-	 Note: elements in w and z are initialized to x to avoid creating
-	 a temporary CSysVector object for the copy constructor ---*/
+   Note: elements in w and z are initialized to x to avoid creating
+   a temporary CSysVector object for the copy constructor ---*/
   vector<CSysVector> w(m+1, x);
   vector<CSysVector> z(m+1, x);
   vector<double> g(m+1, 0.0);
@@ -268,7 +268,7 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
   double norm0 = b.norm();
   
   /*---  Calculate the initial residual (actually the negative residual)
-	 and compute its norm ---*/
+   and compute its norm ---*/
   mat_vec(x,w[0]);
   w[0] -= b;
   
@@ -281,7 +281,7 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
   }
   
   /*---  Normalize residual to get w_{0} (the negative sign is because w[0]
-	 holds the negative residual, as mentioned above) ---*/
+   holds the negative residual, as mentioned above) ---*/
   w[0] /= -beta;
   
   /*---  Initialize the RHS of the reduced system ---*/
@@ -313,10 +313,10 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
     modGramSchmidt(i, H, w);
     
     /*---  Apply old Givens rotations to new column of the Hessenberg matrix
-		 then generate the new Givens rotation matrix and apply it to
-		 the last two elements of H[:][i] and g ---*/
+     then generate the new Givens rotation matrix and apply it to
+     the last two elements of H[:][i] and g ---*/
     for (int k = 0; k < i; k++)
-    applyGivens(sn[k], cs[k], H[k][i], H[k+1][i]);
+      applyGivens(sn[k], cs[k], H[k][i], H[k+1][i]);
     generateGivens(H[i][i], H[i+1][i], sn[i], cs[i]);
     applyGivens(sn[i], cs[i], g[i], g[i+1]);
     
@@ -350,14 +350,14 @@ unsigned long CSysSolve::FGMRES(const CSysVector & b, CSysVector & x, CMatrixVec
   //      cout << "# res - beta = " << res - beta << endl;
   //    }
   //  }
-	
-	return i;
+  
+  return i;
   
 }
 
 unsigned long CSysSolve::BCGSTAB(const CSysVector & b, CSysVector & x, CMatrixVectorProduct & mat_vec,
                                  CPreconditioner & precond, double tol, unsigned long m, bool monitoring) {
-	
+  
   int rank = 0;
   
   /*--- Check the subspace size ---*/
@@ -365,19 +365,19 @@ unsigned long CSysSolve::BCGSTAB(const CSysVector & b, CSysVector & x, CMatrixVe
     if (rank == 0) cerr << "CSysSolve::BCGSTAB: illegal value for subspace size, m = " << m << endl;
     exit(1);
   }
-	
+  
   CSysVector r(b);
   CSysVector r_0(b);
   CSysVector p(b);
-	CSysVector v(b);
+  CSysVector v(b);
   CSysVector s(b);
-	CSysVector t(b);
-	CSysVector phat(b);
-	CSysVector shat(b);
+  CSysVector t(b);
+  CSysVector phat(b);
+  CSysVector shat(b);
   CSysVector A_x(b);
   
   /*--- Calculate the initial residual, compute norm, and check if system is already solved ---*/
-	mat_vec(x,A_x);
+  mat_vec(x,A_x);
   r -= A_x; r_0 = r; // recall, r holds b initially
   double norm_r = r.norm();
   double norm0 = b.norm();
@@ -385,10 +385,10 @@ unsigned long CSysSolve::BCGSTAB(const CSysVector & b, CSysVector & x, CMatrixVe
     if (rank == 0) cout << "CSysSolve::BCGSTAB(): system solved by initial guess." << endl;
     return 0;
   }
-	
-	/*--- Initialization ---*/
+  
+  /*--- Initialization ---*/
   double alpha = 1.0, beta = 1.0, omega = 1.0, rho = 1.0, rho_prime = 1.0;
-	
+  
   /*--- Set the norm to the initial initial residual value ---*/
   norm0 = norm_r;
   
@@ -398,45 +398,45 @@ unsigned long CSysSolve::BCGSTAB(const CSysVector & b, CSysVector & x, CMatrixVe
     writeHeader("BCGSTAB", tol, norm_r);
     writeHistory(i, norm_r, norm0);
   }
-	
+  
   /*---  Loop over all search directions ---*/
   for (i = 0; i < m; i++) {
-		
-		/*--- Compute rho_prime ---*/
-		rho_prime = rho;
-		
-		/*--- Compute rho_i ---*/
-		rho = dotProd(r, r_0);
-		
-		/*--- Compute beta ---*/
-		beta = (rho / rho_prime) * (alpha /omega);
-		
-		/*--- p_{i} = r_{i-1} + beta * p_{i-1} - beta * omega * v_{i-1} ---*/
-		double beta_omega = -beta*omega;
-		p.Equals_AX_Plus_BY(beta, p, beta_omega, v);
-		p.Plus_AX(1.0, r);
-		
-		/*--- Preconditioning step ---*/
-		precond(p, phat);
-		mat_vec(phat, v);
     
-		/*--- Calculate step-length alpha ---*/
+    /*--- Compute rho_prime ---*/
+    rho_prime = rho;
+    
+    /*--- Compute rho_i ---*/
+    rho = dotProd(r, r_0);
+    
+    /*--- Compute beta ---*/
+    beta = (rho / rho_prime) * (alpha /omega);
+    
+    /*--- p_{i} = r_{i-1} + beta * p_{i-1} - beta * omega * v_{i-1} ---*/
+    double beta_omega = -beta*omega;
+    p.Equals_AX_Plus_BY(beta, p, beta_omega, v);
+    p.Plus_AX(1.0, r);
+    
+    /*--- Preconditioning step ---*/
+    precond(p, phat);
+    mat_vec(phat, v);
+    
+    /*--- Calculate step-length alpha ---*/
     double r_0_v = dotProd(r_0, v);
     alpha = rho / r_0_v;
     
-		/*--- s_{i} = r_{i-1} - alpha * v_{i} ---*/
-		s.Equals_AX_Plus_BY(1.0, r, -alpha, v);
-		
-		/*--- Preconditioning step ---*/
-		precond(s, shat);
-		mat_vec(shat, t);
+    /*--- s_{i} = r_{i-1} - alpha * v_{i} ---*/
+    s.Equals_AX_Plus_BY(1.0, r, -alpha, v);
     
-		/*--- Calculate step-length omega ---*/
+    /*--- Preconditioning step ---*/
+    precond(s, shat);
+    mat_vec(shat, t);
+    
+    /*--- Calculate step-length omega ---*/
     omega = dotProd(t, s) / dotProd(t, t);
     
-		/*--- Update solution and residual: ---*/
+    /*--- Update solution and residual: ---*/
     x.Plus_AX(alpha, phat); x.Plus_AX(omega, shat);
-		r.Equals_AX_Plus_BY(1.0, s, -omega, t);
+    r.Equals_AX_Plus_BY(1.0, s, -omega, t);
     
     /*--- Check if solution has converged, else output the relative residual if necessary ---*/
     norm_r = r.norm();
@@ -449,7 +449,7 @@ unsigned long CSysSolve::BCGSTAB(const CSysVector & b, CSysVector & x, CMatrixVe
     cout << "# BCGSTAB final (true) residual:" << endl;
     cout << "# Iteration = " << i << ": |res|/|res0| = "  << norm_r/norm0 << endl;
   }
-	
+  
   //  /*--- Recalculate final residual (this should be optional) ---*/
   //	mat_vec(x, A_x);
   //  r = b; r -= A_x;
@@ -460,6 +460,6 @@ unsigned long CSysSolve::BCGSTAB(const CSysVector & b, CSysVector & x, CMatrixVe
   //    cout << "# true residual norm and calculated residual norm do not agree." << endl;
   //    cout << "# true_res - calc_res = " << true_res <<" "<< norm_r << endl;
   //  }
-	
-	return i;
+  
+  return i;
 }

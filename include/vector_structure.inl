@@ -2,7 +2,7 @@
  * \file vector_structure.inl
  * \brief inline subroutines of the <i>vector_structure.hpp</i> file.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *

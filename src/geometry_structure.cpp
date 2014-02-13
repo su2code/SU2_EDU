@@ -2,7 +2,7 @@
  * \file geometry_structure.cpp
  * \brief Main subroutines for creating the primal grid and multigrid structure.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -941,7 +941,7 @@ void CPhysicalGeometry::Read_SU2_Format(CConfig *config, string val_mesh_filenam
         Global_nPoint = nPoint;
         Global_nPointDomain = nPointDomain;
         
-          cout << Global_nPointDomain << " points, and " << Global_nPoint-Global_nPointDomain << " ghost points." << endl;
+        cout << Global_nPointDomain << " points, and " << Global_nPoint-Global_nPointDomain << " ghost points." << endl;
       }
       else if (iCount == 1) {
         stream_line >> nPoint;

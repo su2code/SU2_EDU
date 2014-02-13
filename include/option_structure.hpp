@@ -2,7 +2,7 @@
  * \file option_structure.hpp
  * \brief Defines classes for referencing options for easy input in CConfig
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * Many of the classes in this file are templated, and therefore must
  * be declared and defined here; to keep all elements together, there

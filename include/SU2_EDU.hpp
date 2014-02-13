@@ -3,7 +3,7 @@
  * \brief Headers of the main subroutines of the code SU2_CFD.
  *        The subroutines and functions are in the <i>SU2_CFD.cpp</i> file.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *

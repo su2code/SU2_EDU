@@ -4,7 +4,7 @@
  *        each kind of governing equation (direct, adjoint and linearized).
  *        The subroutines and functions are in the <i>variable_structure.cpp</i> file.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  * 
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -36,7 +36,7 @@ using namespace std;
  * \class CVariable
  * \brief Main class for defining the variables.
  * \author F. Palacios.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CVariable {
 protected:
@@ -916,7 +916,7 @@ public:
  * \brief Main class for defining the variables of the Euler's solver.
  * \ingroup Euler_Equations
  * \author F. Palacios.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CEulerVariable : public CVariable {
 protected:
@@ -1172,7 +1172,7 @@ public:
  * \brief Main class for defining the variables of the Navier-Stokes' solver.
  * \ingroup Navier_Stokes_Equations
  * \author F. Palacios.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CNSVariable : public CEulerVariable {
 private:
@@ -1279,7 +1279,7 @@ public:
  * \brief Main class for defining the variables of the turbulence model.
  * \ingroup Turbulence_Model
  * \author A. Bueno.
- * \version 1.0.0
+ * \version 1.1.0
  */
 class CTurbVariable : public CVariable {
 protected:
@@ -1322,7 +1322,7 @@ public:
  * \brief Main class for defining the variables of the turbulence model.
  * \ingroup Turbulence_Model
  * \author A. Bueno.
- * \version 1.0.0
+ * \version 1.1.0
  */
 
 class CTurbSAVariable : public CTurbVariable {
@@ -1354,7 +1354,7 @@ public:
  * \brief Main class for defining the variables of the turbulence model.
  * \ingroup Turbulence_Model
  * \author A. Bueno.
- * \version 1.0.0
+ * \version 1.1.0
  */
 
 class CTurbSSTVariable : public CTurbVariable {

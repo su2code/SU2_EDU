@@ -2,7 +2,7 @@
  * \file variable_direct_mean.cpp
  * \brief Definition of the solution fields.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -89,14 +89,14 @@ CEulerVariable::CEulerVariable(double val_density, double *val_velocity,
   
   /*--- Solution and old solution initialization from input ---*/
   
-    Solution[0]     = val_density;
-    Solution_Old[0] = val_density;
-    for (iDim = 0; iDim < nDim; iDim++) {
-      Solution[iDim+1]     = val_density*val_velocity[iDim];
-      Solution_Old[iDim+1] = val_density*val_velocity[iDim];
-    }
-    Solution[nVar-1]     = val_density*val_energy;
-    Solution_Old[nVar-1] = val_density*val_energy;
+  Solution[0]     = val_density;
+  Solution_Old[0] = val_density;
+  for (iDim = 0; iDim < nDim; iDim++) {
+    Solution[iDim+1]     = val_density*val_velocity[iDim];
+    Solution_Old[iDim+1] = val_density*val_velocity[iDim];
+  }
+  Solution[nVar-1]     = val_density*val_energy;
+  Solution_Old[nVar-1] = val_density*val_energy;
   
   /*--- Incompressible flow, primitive variables nDim+3, (P,vx,vy,vz,rho,beta),
    FreeSurface Incompressible flow, primitive variables nDim+4, (P,vx,vy,vz,rho,beta,dist),
@@ -200,7 +200,7 @@ CEulerVariable::CEulerVariable(double *val_solution, unsigned short val_ndim,
 }
 
 CEulerVariable::~CEulerVariable(void) {
-
+  
   if (Primitive         != NULL) delete [] Primitive;
   if (Limiter_Primitive != NULL) delete [] Limiter_Primitive;
   
@@ -245,19 +245,19 @@ bool CEulerVariable::SetPrimVar_Compressible(CConfig *config) {
   
   SetVelocity();
   
-   /*--- Set the value of the density from the conservative variables ---*/
+  /*--- Set the value of the density from the conservative variables ---*/
   
   check_dens = SetDensity();
   
-   /*--- Compute pressure (requires calculated velocity^2) ---*/
+  /*--- Compute pressure (requires calculated velocity^2) ---*/
   
   check_press = SetPressure(Gamma);
   
-   /*--- Compute the sound speed (requires calculated pressure) ---*/
+  /*--- Compute the sound speed (requires calculated pressure) ---*/
   
   check_sos = SetSoundSpeed(Gamma);
   
-   /*--- Compute the temperature (requires calculated pressure) ---*/
+  /*--- Compute the temperature (requires calculated pressure) ---*/
   
   check_temp = SetTemperature(Gas_Constant);
   
@@ -433,9 +433,9 @@ bool CNSVariable::SetPrimVar_Compressible(double eddy_visc, double turb_ke, CCon
   /*--- Compute the enthalpy (requires calculated pressure) ---*/
   
   SetEnthalpy();
-
+  
   /*--- Compute the laminar viscosity (requires calculated temperature) ---*/
-
+  
   SetLaminarViscosity(config);
   
   /*--- Set eddy viscosity ---*/

@@ -2,7 +2,7 @@
  * \file config_structure.cpp
  * \brief Main file for reading the config file.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -357,7 +357,7 @@ void CConfig::SetConfig_Options() {
   /* CONFIG_CATEGORY: Convergence*/
   
   /* DESCRIPTION: Convergence criteria */
-  AddEnumOption("CONV_CRITERIA", ConvCriteria, Converge_Crit_Map, "RESIDUAL");
+  AddEnumOption("CONV_CRITERIA", ConvCriteria, Converge_Crit_Map, "CAUCHY");
   /* DESCRIPTION: Residual reduction (order of magnitude with respect to the initial value) */
   AddScalarOption("RESIDUAL_REDUCTION", OrderMagResidual, 5.0);
   /* DESCRIPTION: Min value of the residual (log10 of the residual) */
@@ -365,9 +365,9 @@ void CConfig::SetConfig_Options() {
   /* DESCRIPTION: Iteration number to begin convergence monitoring */
   AddScalarOption("STARTCONV_ITER", StartConv_Iter, 0);
   /* DESCRIPTION: Number of elements to apply the criteria */
-  AddScalarOption("CAUCHY_ELEMS", Cauchy_Elems, 100);
+  AddScalarOption("CAUCHY_ELEMS", Cauchy_Elems, 50);
   /* DESCRIPTION: Epsilon to control the series convergence */
-  AddScalarOption("CAUCHY_EPS", Cauchy_Eps, 1E-10);
+  AddScalarOption("CAUCHY_EPS", Cauchy_Eps, 1E-5);
   /* DESCRIPTION: Flow functional for the Cauchy criteria */
   AddEnumOption("CAUCHY_FUNC_FLOW", Cauchy_Func_Flow, Objective_Map, "DRAG");
   /* DESCRIPTION: Adjoint functional for the Cauchy criteria */
@@ -720,7 +720,7 @@ void CConfig::SetParsing(char case_filename[200]) {
   string text_line, option_name;
   ifstream case_file;
   vector<string> option_value;
-    
+  
   /*--- Read the configuration file ---*/
   case_file.open(case_filename, ios::in);
   
@@ -750,7 +750,7 @@ void CConfig::SetParsing(char case_filename[200]) {
 void CConfig::SetPostprocessing(unsigned short val_software) {
   
   unsigned short iZone;
-    
+  
   /*--- Store the SU2 module that we are executing. ---*/
   Kind_SU2 = val_software;
   
@@ -764,13 +764,13 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
   
   /*--- Set default values for the grid based in the Reynolds number for SU2_EDU ---*/
   
-    if (Kind_Solver == EULER) Mesh_FileName = "mesh_NACA0012_INV.su2";
-    else {
-      if (Reynolds < 1E5) Mesh_FileName = "mesh_NACA0012_1E-4m.su2";
-      if ((Reynolds >= 1E5) && (Reynolds < 1E6)) Mesh_FileName = "mesh_NACA0012_1E-5m.su2";
-      if ((Reynolds >= 1E6) && (Reynolds <= 1E7)) Mesh_FileName = "mesh_NACA0012_1E-6m.su2";
-      if (Reynolds > 1E7) Mesh_FileName = "mesh_NACA0012_1E-7m.su2";
-    }
+  if (Kind_Solver == EULER) Mesh_FileName = "mesh_NACA0012_INV.su2";
+  else {
+    if (Reynolds < 1E5) Mesh_FileName = "mesh_NACA0012_1E-4m.su2";
+    if ((Reynolds >= 1E5) && (Reynolds < 1E6)) Mesh_FileName = "mesh_NACA0012_1E-5m.su2";
+    if ((Reynolds >= 1E6) && (Reynolds <= 1E7)) Mesh_FileName = "mesh_NACA0012_1E-6m.su2";
+    if (Reynolds > 1E7) Mesh_FileName = "mesh_NACA0012_1E-7m.su2";
+  }
   
   /*--- Don't do any deformation if there is no Design variable information ---*/
   if (Design_Variable == NULL) {

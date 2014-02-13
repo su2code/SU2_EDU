@@ -2,7 +2,7 @@
  * \file grid_movement_structure.cpp
  * \brief Subroutines for doing the grid movement using different strategies.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -261,7 +261,7 @@ double CVolumetricMovement::SetFEAMethodContributions_Elem(CGeometry *geometry) 
   double *Coord_0, *Coord_1, Length, MinLength = 1E10, **StiffMatrix_Elem, Scale, CoordCorners[8][3];
   double *Edge_Vector = new double [nDim];
   bool RightVol;
-    
+  
   /*--- Allocate maximum size (rectangle and hexahedron) ---*/
   
   if (nDim == 2) {

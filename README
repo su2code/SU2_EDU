@@ -1,5 +1,5 @@
 ---------------------------------------------------
-  SU2 Educational Version (SU2_EDU) ver 1.0.0
+  SU2 Educational Version (SU2_EDU) ver 1.1.0
 ---------------------------------------------------
 
 SU2_EDU is a new, educational version of the Euler/Navier-Stokes/RANS solver from the SU2 suite. The simplified structure of the code makes it suitable for students and beginners in CFD. By focusing on a handful of key numerical methods and capabilities, SU2_EDU is ideal for use in CFD courses, for independent studies, or just to learn about a new field! Due to their common class heirarchy and organization, SU2_EDU acts as a natural stepping stone to the more comprehensive, fully-featured SU2 suite.
@@ -42,7 +42,7 @@ After building, the SU2_EDU binary executable can be found in the SU2_EDU/bin/ d
 
 3. Run the executable by entering "./SU2_EDU" at the command line in the terminal. You will be prompted for your airfoil definition filename, format, and trailing edge type. SU2_EDU will then compute the flow around the airfoil and print the convergence history to the console in the process.
 
-4. Post-process the results. Several output files will be written which contain the surface (surface_flow.dat, surface_flow.csv) and volume (flow.dat) solutions. A history of the solver convergence and force coefficients can be found in the history.plt file. The surface_flow.dat and flow.dat files can be opened in the Tecplot visualization package. If you have access to Python (including the NumPy and matplotlib packages), the plot_pressure.py file found in the bin directory can be used to plot the pressure distribution and airfoil shape from the surface_flow.csv output file. This script is typically executed by entering "python plot_pressure.py -f surface_flow.csv" at the command line. The result is a figure named pressure_distribution.png.
+4. Post-process the results. Several output files will be written that contain the surface (surface_flow.vtk, surface_flow.csv) and volume (flow.vtk) solutions. A history of the solver convergence and force coefficients can be found in the history.csv file. The surface_flow.vtk and flow.vtk files can be opened in the open-source ParaView visualization package (freely available at http://www.paraview.org). The surface_flow.csv and history.csv files are standard comma-separated value (CSV) files. CSV is the format read by the Excel software package, for example, but many free software packages can read and manipulate CSV files. If you have access to Python (including the NumPy and matplotlib packages), the plot_pressure.py file found in the bin directory can be used to plot the pressure distribution and airfoil shape from the surface_flow.csv output file. This script is typically executed by entering "python plot_pressure.py -f surface_flow.csv" at the command line. The result is a figure named pressure_distribution.png. It is meant to be a simple script for quickly visualizing the results of your airfoil simulation (and for you to add new features or modify).
 
 
 Thanks for building, and happy analyzing!

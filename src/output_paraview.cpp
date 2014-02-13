@@ -2,7 +2,7 @@
  * \file output_paraview.cpp
  * \brief Main subroutines for output solver information.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -23,24 +23,24 @@
 #include "../include/output_structure.hpp"
 
 void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, bool surf_sol) {
-    
-	/*--- Local variables and initialization ---*/
-	unsigned short iDim, iVar, nDim = geometry->GetnDim();
-	unsigned short Kind_Solver = config->GetKind_Solver();
-    
-	unsigned long iPoint, iElem, iNode;
+  
+  /*--- Local variables and initialization ---*/
+  unsigned short iDim, iVar, nDim = geometry->GetnDim();
+  unsigned short Kind_Solver = config->GetKind_Solver();
+  
+  unsigned long iPoint, iElem, iNode;
   unsigned long *LocalIndex = NULL;
   bool *SurfacePoint = NULL;
   
   unsigned long nSurf_Elem_Storage;
   unsigned long nGlobal_Elem_Storage;
   
-	bool adjoint = config->GetAdjoint();
-    
-	char cstr[200], buffer[50];
-	string filename;
-    
-	/*--- Write file name with extension ---*/
+  bool adjoint = config->GetAdjoint();
+  
+  char cstr[200], buffer[50];
+  string filename;
+  
+  /*--- Write file name with extension ---*/
   if (surf_sol) {
     if (adjoint)
       filename = config->GetSurfAdjCoeff_FileName();
@@ -54,31 +54,31 @@ void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, bool surf_
       filename = config->GetFlow_FileName();
   }
   
-	strcpy (cstr, filename.c_str());
+  strcpy (cstr, filename.c_str());
   
-		sprintf (buffer, ".vtk");
+  sprintf (buffer, ".vtk");
   
-	strcat(cstr,buffer);
-    
-	/*--- Open Paraview ASCII file and write the header. ---*/
-	ofstream Paraview_File;
-	Paraview_File.open(cstr, ios::out);
+  strcat(cstr,buffer);
+  
+  /*--- Open Paraview ASCII file and write the header. ---*/
+  ofstream Paraview_File;
+  Paraview_File.open(cstr, ios::out);
   Paraview_File.precision(6);
   Paraview_File << "# vtk DataFile Version 3.0\n";
   Paraview_File << "vtk output\n";
   Paraview_File << "ASCII\n";
-	Paraview_File << "DATASET UNSTRUCTURED_GRID\n";
+  Paraview_File << "DATASET UNSTRUCTURED_GRID\n";
   
-  /*--- If it's a surface output, print only the points 
+  /*--- If it's a surface output, print only the points
    that are in the element list, change the numbering ---*/
   
   if (surf_sol) {
-        
+    
     LocalIndex = new unsigned long [nGlobal_Poin+1];
     SurfacePoint = new bool [nGlobal_Poin+1];
-
+    
     for (iPoint = 0; iPoint < nGlobal_Poin+1; iPoint++) SurfacePoint[iPoint] = false;
-
+    
     for(iElem = 0; iElem < nGlobal_Line; iElem++) {
       iNode = iElem*N_POINTS_LINE;
       SurfacePoint[Conn_Line[iNode+0]] = true;
@@ -110,29 +110,14 @@ void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, bool surf_
   if (surf_sol) Paraview_File << "POINTS "<< nSurf_Poin <<" float\n";
   else Paraview_File << "POINTS "<< nGlobal_Poin <<" float\n";
   
-	/*--- Write surface and volumetric solution data. ---*/
+  /*--- Write surface and volumetric solution data. ---*/
   for (iPoint = 0; iPoint < nGlobal_Poin; iPoint++) {
     
     if (surf_sol) {
       
       if (LocalIndex[iPoint+1] != 0) {
         
-          /*--- Write the node coordinates ---*/
-          if (config->GetKind_SU2() != SU2_SOL) {
-            for(iDim = 0; iDim < nDim; iDim++)
-              Paraview_File << scientific << Coords[iDim][iPoint] << "\t";
-            if (nDim == 2) Paraview_File << scientific << "0.0" << "\t";
-          }
-          else {
-            for(iDim = 0; iDim < nDim; iDim++)
-              Paraview_File << scientific << Data[iDim][iPoint] << "\t";
-            if (nDim == 2) Paraview_File << scientific << "0.0" << "\t";
-          }
-        
-      }
-      
-    } else {
-      
+        /*--- Write the node coordinates ---*/
         if (config->GetKind_SU2() != SU2_SOL) {
           for(iDim = 0; iDim < nDim; iDim++)
             Paraview_File << scientific << Coords[iDim][iPoint] << "\t";
@@ -144,6 +129,21 @@ void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, bool surf_
           if (nDim == 2) Paraview_File << scientific << "0.0" << "\t";
         }
         
+      }
+      
+    } else {
+      
+      if (config->GetKind_SU2() != SU2_SOL) {
+        for(iDim = 0; iDim < nDim; iDim++)
+          Paraview_File << scientific << Coords[iDim][iPoint] << "\t";
+        if (nDim == 2) Paraview_File << scientific << "0.0" << "\t";
+      }
+      else {
+        for(iDim = 0; iDim < nDim; iDim++)
+          Paraview_File << scientific << Data[iDim][iPoint] << "\t";
+        if (nDim == 2) Paraview_File << scientific << "0.0" << "\t";
+      }
+      
     }
   }
   
@@ -247,8 +247,8 @@ void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, bool surf_
   else Paraview_File << "\nCELL_TYPES " << nGlobal_Elem << "\n";
   
   if (surf_sol) {
-    for(iElem = 0; iElem < nGlobal_Line; iElem++) Paraview_File << "3\t";    
-    for(iElem = 0; iElem < nGlobal_BoundTria; iElem++) Paraview_File << "5\t";    
+    for(iElem = 0; iElem < nGlobal_Line; iElem++) Paraview_File << "3\t";
+    for(iElem = 0; iElem < nGlobal_BoundTria; iElem++) Paraview_File << "5\t";
     for(iElem = 0; iElem < nGlobal_BoundQuad; iElem++) Paraview_File << "9\t";
   }
   else {
@@ -292,13 +292,40 @@ void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, bool surf_
       
     }
     
-  }  
+  }
   
   else {
     
     for (iVar = 0; iVar < nVar_Consv; iVar++) {
       
-      Paraview_File << "\nSCALARS Conservative_" << iVar+1 << " float 1\n";
+      Paraview_File << "\nSCALARS ";
+      
+      if (nDim == 2) {
+        if (iVar == 0)      Paraview_File << "Density";
+        else if (iVar == 1) Paraview_File << "Momentum_X";
+        else if (iVar == 2) Paraview_File << "Momentum_Y";
+        else if (iVar == 3) Paraview_File << "Density_Energy";
+        
+      } else {
+        if (iVar == 0)      Paraview_File << "Density";
+        else if (iVar == 1) Paraview_File << "Momentum_X";
+        else if (iVar == 2) Paraview_File << "Momentum_Y";
+        else if (iVar == 3) Paraview_File << "Momentum_Z";
+        else if (iVar == 4) Paraview_File << "Density_Energy";
+        
+      }
+      
+      if (Kind_Solver == RANS) {
+        if (config->GetKind_Turb_Model() == SA) {
+          if (iVar == nDim+2) Paraview_File << "Nu_Tilde";
+        }
+        else if (config->GetKind_Turb_Model() == SST) {
+          if (iVar == nDim+2) Paraview_File << "Turbulent_KE";
+          if (iVar == nDim+3) Paraview_File << "Omega";
+        }
+      }
+      
+      Paraview_File << " float 1\n";
       Paraview_File << "LOOKUP_TABLE default\n";
       
       for (iPoint = 0; iPoint < nGlobal_Poin; iPoint++) {
@@ -496,7 +523,7 @@ void COutput::SetParaview_ASCII(CConfig *config, CGeometry *geometry, bool surf_
     
   }
   
-	Paraview_File.close();
+  Paraview_File.close();
   
   if (surf_sol) delete [] LocalIndex;
   

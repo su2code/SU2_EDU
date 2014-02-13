@@ -2,7 +2,7 @@
  * \file integration_time.cpp
  * \brief Time deppending numerical method.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -179,16 +179,16 @@ void CMultiGridIntegration::GetProlongated_Correction(unsigned short RunTime_EqS
       Area_Children = geo_fine->node[Point_Fine]->GetVolume();
       Solution_Fine = sol_fine->node[Point_Fine]->GetSolution();
       for (iVar = 0; iVar < nVar; iVar++)
-      Solution[iVar] -= Solution_Fine[iVar]*Area_Children/Area_Parent;
+        Solution[iVar] -= Solution_Fine[iVar]*Area_Children/Area_Parent;
     }
     
     Solution_Coarse = sol_coarse->node[Point_Coarse]->GetSolution();
     
     for (iVar = 0; iVar < nVar; iVar++)
-    Solution[iVar] += Solution_Coarse[iVar];
+      Solution[iVar] += Solution_Coarse[iVar];
     
     for (iVar = 0; iVar < nVar; iVar++)
-    sol_coarse->node[Point_Coarse]->SetSolution_Old(Solution);
+      sol_coarse->node[Point_Coarse]->SetSolution_Old(Solution);
     
   }
   
@@ -222,7 +222,7 @@ void CMultiGridIntegration::GetProlongated_Correction(unsigned short RunTime_EqS
 }
 
 void CMultiGridIntegration::SmoothProlongated_Correction(unsigned short RunTime_EqSystem, CSolver *solver, CGeometry *geometry,
-                                                          unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config) {
+                                                         unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config) {
   
   double *Residual_Old, *Residual_Sum, *Residual, *Residual_i, *Residual_j;
   unsigned short iVar, iSmooth, iMarker, nneigh;
@@ -243,7 +243,7 @@ void CMultiGridIntegration::SmoothProlongated_Correction(unsigned short RunTime_
     
     for (iSmooth = 0; iSmooth < val_nSmooth; iSmooth++) {
       for (iPoint = 0; iPoint < geometry->GetnPoint(); iPoint++)
-      solver->node[iPoint]->SetResidualSumZero();
+        solver->node[iPoint]->SetResidualSumZero();
       
       /*--- Loop over Interior edges ---*/
       
@@ -276,11 +276,11 @@ void CMultiGridIntegration::SmoothProlongated_Correction(unsigned short RunTime_
       /*--- Copy boundary values ---*/
       
       for(iMarker = 0; iMarker < geometry->GetnMarker(); iMarker++)
-      for(iVertex = 0; iVertex < geometry->GetnVertex(iMarker); iVertex++) {
-        iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
-        Residual_Old = solver->node[iPoint]->GetResidual_Old();
-        solver->LinSysRes.SetBlock(iPoint, Residual_Old);
-      }
+        for(iVertex = 0; iVertex < geometry->GetnVertex(iMarker); iVertex++) {
+          iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+          Residual_Old = solver->node[iPoint]->GetResidual_Old();
+          solver->LinSysRes.SetBlock(iPoint, Residual_Old);
+        }
     }
     
     delete [] Residual;
@@ -332,7 +332,7 @@ void CMultiGridIntegration::SetForcing_Term(CSolver *sol_fine, CSolver *sol_coar
       Point_Fine = geo_coarse->node[Point_Coarse]->GetChildren_CV(iChildren);
       Residual_Fine = sol_fine->LinSysRes.GetBlock(Point_Fine);
       for (iVar = 0; iVar < nVar; iVar++)
-      Residual[iVar] += config->GetDamp_Res_Restric()*Residual_Fine[iVar];
+        Residual[iVar] += config->GetDamp_Res_Restric()*Residual_Fine[iVar];
     }
     sol_coarse->node[Point_Coarse]->AddRes_TruncError(Residual);
   }
@@ -359,7 +359,7 @@ void CMultiGridIntegration::SetResidual_Term(CGeometry *geometry, CSolver *solve
   unsigned long iPoint;
   
   for (iPoint = 0; iPoint < geometry->GetnPointDomain(); iPoint++)
-  solver->LinSysRes.AddBlock(iPoint, solver->node[iPoint]->GetResTruncError());
+    solver->LinSysRes.AddBlock(iPoint, solver->node[iPoint]->GetResTruncError());
   
 }
 
@@ -498,7 +498,7 @@ void CSingleGridIntegration::SetRestricted_Solution(unsigned short RunTime_EqSys
       Area_Children = geo_fine->node[Point_Fine]->GetVolume();
       Solution_Fine = sol_fine[SolContainer_Position]->node[Point_Fine]->GetSolution();
       for (iVar = 0; iVar < nVar; iVar++)
-      Solution[iVar] += Solution_Fine[iVar]*Area_Children/Area_Parent;
+        Solution[iVar] += Solution_Fine[iVar]*Area_Children/Area_Parent;
     }
     
     sol_coarse[SolContainer_Position]->node[Point_Coarse]->SetSolution(Solution);

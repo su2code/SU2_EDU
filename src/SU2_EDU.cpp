@@ -2,7 +2,7 @@
  * \file SU2_EDU.cpp
  * \brief Main file of Computational Fluid Dynamics Code (SU2_EDU).
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
   cout <<"|   \\___ \\  | |  | |   / /    Forum: www.cfd-online.com/Forums/su2/     |" << endl;
   cout <<"|   ____) | | |__| |  / /_                                              |" << endl;
   cout <<"|  |_____/   \\____/  |____|   Educational Code                          |" << endl;
-  cout <<"|                             Release 1.0.0                             |" << endl;
+  cout <<"|                             Release 1.1.0                             |" << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
   cout << "| SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).       |" << endl;
   cout << "| SU2 is distributed in the hope that it will be useful,                |" << endl;
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
   geometry_container = new CGeometry*[config_container->GetMGLevels()+1];
   geometry_container[MESH_0] = new CPhysicalGeometry(config_container);
   
-    cout << endl <<"------------------------- Geometry Preprocessing ------------------------" << endl;
+  cout << endl <<"------------------------- Geometry Preprocessing ------------------------" << endl;
   
   /*--- Preprocessing of the geometry. In this routine, the edge-
    based data structure is constructed, i.e., node and cell neighbors are
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
   
   Geometrical_Preprocessing(geometry_container, config_container);
   
-    cout << endl <<"------------------------- Solver Preprocessing --------------------------" << endl;
+  cout << endl <<"------------------------- Solver Preprocessing --------------------------" << endl;
   
   /*--- Definition of the solver class: solver_container[#MG_GRIDS][#EQ_SYSTEMS].
    The solver classes are specific to a particular set of governing equations,
@@ -201,11 +201,11 @@ int main(int argc, char *argv[]) {
   
   /*--- Open the convergence history file ---*/
   
-    output->SetHistory_Header(&ConvHist_file, config_container);
+  output->SetHistory_Header(&ConvHist_file, config_container);
   
   /*--- Main external loop of the solver. Within this loop, each iteration ---*/
   
-    cout << endl <<"------------------------------ Begin Solver -----------------------------" << endl;
+  cout << endl <<"------------------------------ Begin Solver -----------------------------" << endl;
   
   StartTime = double(clock())/double(CLOCKS_PER_SEC);
   
@@ -264,15 +264,15 @@ int main(int argc, char *argv[]) {
   
   /*--- Close the convergence history file. ---*/
   
-    ConvHist_file.close();
-    cout << endl <<"History file, closed." << endl;
+  ConvHist_file.close();
+  cout << endl <<"History file, closed." << endl;
   
   StopTime = double(clock())/double(CLOCKS_PER_SEC);
   
   /*--- Compute/print the total time for performance benchmarking. ---*/
   
   UsedTime = StopTime-StartTime;
-    cout << "\nCompleted in " << fixed << UsedTime << " seconds on 1 core." << endl;
+  cout << "\nCompleted in " << fixed << UsedTime << " seconds on 1 core." << endl;
   
   /*--- Exit the solver cleanly ---*/
   

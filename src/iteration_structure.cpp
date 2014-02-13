@@ -2,7 +2,7 @@
  * \file iteration_structure.cpp
  * \brief Main subroutines used by SU2_CFD.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.0.0
+ * \version 1.1.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -45,7 +45,7 @@ void MeanFlowIteration(COutput *output, CIntegration **integration_container, CG
   /*--- Solve the Euler, Navier-Stokes or Reynolds-averaged Navier-Stokes (RANS) equations (one iteration) ---*/
   
   integration_container[FLOW_SOL]->MultiGrid_Iteration(geometry_container, solver_container, numerics_container,
-                                                               config_container, RUNTIME_FLOW_SYS, IntIter);
+                                                       config_container, RUNTIME_FLOW_SYS, IntIter);
   
   /*--- Solve the turbulence model ---*/
   
@@ -53,7 +53,7 @@ void MeanFlowIteration(COutput *output, CIntegration **integration_container, CG
     
     config_container->SetGlobalParam(RANS, RUNTIME_TURB_SYS, ExtIter);
     integration_container[TURB_SOL]->SingleGrid_Iteration(geometry_container, solver_container, numerics_container,
-                                                                  config_container, RUNTIME_TURB_SYS, IntIter);
+                                                          config_container, RUNTIME_TURB_SYS, IntIter);
     
   }
   
