@@ -2,7 +2,7 @@
   SU2 Educational Version (SU2_EDU) ver 1.1.0
 ---------------------------------------------------
 
-SU2_EDU is a new, educational version of the Euler/Navier-Stokes/RANS solver from the SU2 suite. The simplified structure of the code makes it suitable for students and beginners in CFD. By focusing on a handful of key numerical methods and capabilities, SU2_EDU is ideal for use in CFD courses, for independent studies, or just to learn about a new field! Due to their common class heirarchy and organization, SU2_EDU acts as a natural stepping stone to the more comprehensive, fully-featured SU2 suite.
+SU2_EDU is a new, educational version of the Euler/Navier-Stokes/RANS solver from the SU2 suite. The simplified structure of the code makes it suitable for students and beginners in CFD. By focusing on a handful of key numerical methods and capabilities, SU2_EDU is ideal for use in CFD courses, for independent studies, or just to learn about a new field! Due to their common class hierarchy and organization, SU2_EDU acts as a natural stepping stone to the more comprehensive, fully-featured SU2 suite.
 
 Lastly, SU2_EDU is also geared toward anyone interested in airfoil analysis. The initial version of SU2_EDU is an intuitive, easy to use tool for computing the performance of airfoils in inviscid, laminar, or turbulent flow, by simply supplying the airfoil coordinates.
 
