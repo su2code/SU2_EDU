@@ -762,16 +762,6 @@ void CConfig::SetPostprocessing(unsigned short val_software) {
     }
   }
   
-  /*--- Set default values for the grid based in the Reynolds number for SU2_EDU ---*/
-  
-  if (Kind_Solver == EULER) Mesh_FileName = "mesh_NACA0012_INV.su2";
-  else {
-    if (Reynolds < 1E5) Mesh_FileName = "mesh_NACA0012_1E-4m.su2";
-    if ((Reynolds >= 1E5) && (Reynolds < 1E6)) Mesh_FileName = "mesh_NACA0012_1E-5m.su2";
-    if ((Reynolds >= 1E6) && (Reynolds <= 1E7)) Mesh_FileName = "mesh_NACA0012_1E-6m.su2";
-    if (Reynolds > 1E7) Mesh_FileName = "mesh_NACA0012_1E-7m.su2";
-  }
-  
   /*--- Don't do any deformation if there is no Design variable information ---*/
   if (Design_Variable == NULL) {
     Design_Variable = new unsigned short [1];

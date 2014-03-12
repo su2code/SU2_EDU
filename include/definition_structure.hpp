@@ -34,6 +34,14 @@
 
 using namespace std;
 
+/*!
+ * \brief Gets the number of dimensions in the mesh file
+ * \param[in] val_mesh_filename - Name of the file with the grid information.
+ * \param[in] val_format - Format of the file with the grid information.
+ * \return Total number of domains in the grid file.
+ */
+unsigned short GetnDim(string val_mesh_filename, unsigned short val_format);
+
 /*! 
  * \brief Definition and allocation of all solution classes.
  * \param[in] solver_container - Container vector with all the solutions.

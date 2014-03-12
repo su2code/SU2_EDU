@@ -70,45 +70,18 @@ int main(int argc, char *argv[]) {
   cout << "| all located in the same directory (SU2_EDU/bin/ by default).          |" << endl;
   cout << "| For detailed use instructions, see the SU2_EDU/README file.           |" << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
-  
-  /*--- Get user input for the simulation type (viscous/inviscid) ---*/
+
+  /*--- Retrieve the config file name from the command line ---*/
   
   char config_file_name[200];
-  int SimType = 0;
-  string Input = "";
-  while(1) {
-    
-    cout << endl;
-    cout << "   [0] Inviscid (Euler)" << endl;
-    cout << "   [1] Viscous (RANS)"  << endl;
-    cout << "Select simulation type [0]: " ;
-    getline(cin, Input);
-    stringstream myStream(Input);
-    
-    /*-- Handle default option --*/
-    if (Input.empty())
-      myStream << "0";
-    
-    /*-- Check for valid input --*/
-    if (myStream >> SimType) {
-      if (SimType == 0) {
-        strcpy(config_file_name, "ConfigFile_INV.cfg");
-        break;
-      } else if(SimType == 1) {
-        strcpy(config_file_name, "ConfigFile_RANS.cfg");
-        break;
-      }
-    }
-  }
-  
-  /*--- The initial version of SU2_EDU assumes 2-D in a single mesh zone. ---*/
-  
-  nDim  = 2;
+  if (argc == 2){ strcpy(config_file_name,argv[1]); }
+  else{ strcpy(config_file_name, "default.cfg"); }
   
   /*--- Definition of the configuration option class. In this constructor,
    the input configuration file is parsed and all options are read and stored. ---*/
   
   config_container = new CConfig(config_file_name, SU2_EDU, VERB_HIGH);
+  nDim  = GetnDim(config_container->GetMesh_FileName(), config_container->GetMesh_FileFormat());
   
   /*--- Perform the non-dimensionalization for the flow equations using the
    specified reference values. ---*/
@@ -171,26 +144,6 @@ int main(int argc, char *argv[]) {
   
   numerics_container = new CNumerics***[config_container->GetMGLevels()+1];
   Numerics_Preprocessing(numerics_container, solver_container,geometry_container, config_container);
-  
-  /*--- Surface grid deformation using design variables ---*/
-  cout << endl << "------------------------- Surface grid deformation ----------------------" << endl;
-  
-  /*--- Definition and initialization of the surface deformation class ---*/
-  surface_movement->CopyBoundary(geometry_container[MESH_0], config_container);
-  
-  /*--- Surface grid deformation ---*/
-  cout << "Performing the deformation of the surface grid." << endl;
-  surface_movement->SetAirfoil(geometry_container[MESH_0], config_container);
-  
-  /*--- Volumetric grid deformation ---*/
-  cout << endl << "----------------------- Volumetric grid deformation ---------------------" << endl;
-  
-  /*--- Definition of the Class for grid movement ---*/
-  
-  cout << "Performing the deformation of the volumetric grid." << endl;
-  grid_movement = new CVolumetricMovement(geometry_container[MESH_0]);
-  grid_movement->SetVolume_Deformation(geometry_container[MESH_0], config_container, true);
-  grid_movement->UpdateMultiGrid(geometry_container, config_container);
   
   /*--- Definition of the output class. The output class
    manages the writing of all restart, volume solution, surface solution,

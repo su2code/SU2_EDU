@@ -22,6 +22,43 @@
 
 #include "../include/definition_structure.hpp"
 
+unsigned short GetnDim(string val_mesh_filename, unsigned short val_format) {
+  
+  string text_line, Marker_Tag;
+  ifstream mesh_file;
+  short nDim = 3;
+  bool isFound = false;
+  char cstr[200];
+  string::size_type position;
+  
+  switch (val_format) {
+    case SU2:
+      
+      /*--- Open grid file ---*/
+      strcpy (cstr, val_mesh_filename.c_str());
+      mesh_file.open(cstr, ios::in);
+      
+      /*--- Read SU2 mesh file ---*/
+      while (getline (mesh_file,text_line)) {
+        /*--- Search for the "NDIM" keyword to see if there are multiple Zones ---*/
+        position = text_line.find ("NDIME=",0);
+        if (position != string::npos) {
+          text_line.erase (0,6); nDim = atoi(text_line.c_str()); isFound = true;
+        }
+      }
+      break;
+      
+    case CGNS:
+      nDim = 3;
+      break;
+      
+    case NETCDF_ASCII:
+      nDim = 3;
+      break;
+  }
+  return (unsigned short) nDim;
+}
+
 void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   
   unsigned short iMGlevel;
