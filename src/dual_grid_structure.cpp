@@ -24,7 +24,7 @@
 
 unsigned short CDualGrid::nDim = 0;
 
-CDualGrid::CDualGrid(unsigned short val_nDim) { nDim = val_nDim;}
+CDualGrid::CDualGrid(unsigned short val_nDim) { nDim = val_nDim; Color = 0;}
 
 CDualGrid::~CDualGrid() {}
 
@@ -72,7 +72,7 @@ CPoint::CPoint(unsigned short val_nDim, unsigned long val_globalindex,
   
   /*--- Set the color for mesh partitioning ---*/
   
-  color = 0;
+  Color = 0;
   
   /*--- Arrays for smoothing the numerical grid coordinates ---*/
   
@@ -123,7 +123,7 @@ CPoint::CPoint(double val_coord_0, double val_coord_1,
   
   /*--- Set the color for mesh partitioning ---*/
   
-  color = 0;
+  Color = 0;
   
   /*--- Set the global index of this node for parallel simulations ---*/
   
@@ -179,7 +179,7 @@ CPoint::CPoint(double val_coord_0, double val_coord_1, double val_coord_2,
   
   /*--- Set the color for mesh partitioning ---*/
   
-  color = 0;
+  Color = 0;
   
   /*--- Set the global index of this node for parallel simulations ---*/
   
@@ -279,6 +279,10 @@ CEdge::CEdge(unsigned long val_iPoint, unsigned long val_jPoint,
   
   Nodes[0] = val_iPoint;
   Nodes[1] = val_jPoint;
+  
+  /*--- Initialize the edge color for METIS+OpenMP to zero ---*/
+  
+  Color = 0;
   
 }
 

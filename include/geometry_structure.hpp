@@ -32,6 +32,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef METIS
+extern "C" {
+#include "metis.h"
+}
+#endif
+
 #include "primal_grid_structure.hpp"
 #include "dual_grid_structure.hpp"
 #include "config_structure.hpp"
@@ -710,6 +716,12 @@ public:
    * \returns If the intersection has has been successful.
 	 */
   unsigned short ComputeSegmentPlane_Intersection(double *Segment_P0, double *Segment_P1, double *Plane_P0, double *Plane_Normal, double *Intersection);
+  
+  /*!
+	 * \brief A virtual member.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void Color_Edges(CConfig *config);
 
 };
 
@@ -791,6 +803,12 @@ public:
    * \param[in] config - Definition of the particular problem.
 	 */
 	void SetRCM(CConfig *config);
+  
+  /*!
+	 * \brief Color the edges using METIS for shared memory parallelization with OpenMP.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void Color_Edges(CConfig *config);
   
 	/*!
 	 * \brief Function declaration to avoid partially overridden classes.

@@ -1786,6 +1786,58 @@ void CPhysicalGeometry::SetEsuE(void) {
       }
 }
 
+void CPhysicalGeometry::Color_Edges(CConfig *config) {
+  
+#ifdef METIS
+  
+  unsigned long iPoint, iEdge, kPoint, jPoint, iVertex;
+  unsigned short iMarker, iMaxColor = 0, iColor, MaxColor = 0, iNode, jNode;
+  int ne = 0, nn, *elmnts = NULL, etype, *epart = NULL, *part = NULL, numflag, nparts, edgecut, *eptr, status, objval;
+  int rank = MASTER_NODE;
+  int size = SINGLE_NODE;
+  
+  unsigned short nDomain = size;
+  
+  /*--- Set up some structures for building the edge graph ---*/
+  
+  /*--- Total number of edges in the graph ---*/
+  int nvtxs = nEdge;
+  part = new int[nEdge];
+
+  /*--- Number of weights per edge. We'll set it to 1, as we are dealing
+   with unweighted graphs, and also set vwgt to null (each edge carries 
+   the same weight). ---*/
+  int ncon = 1;
+  
+  /*--- Build the adjacency arrays for the edge graph ---*/
+  int *xadj = new int[nEdge+1];
+  int *adjncy = new int[2*nPoint];
+  
+  
+  
+  /*--- Number of OpenMP threads (partitions) ---*/
+  nparts = 10;
+  
+  
+  /*--- Set some METIS options ---*/
+  
+  int options[METIS_NOPTIONS];
+  METIS_SetDefaultOptions(options);
+  options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;
+  
+  status = METIS_PartGraphKway(&nvtxs, &ncon, xadj, adjncy,
+                               NULL, NULL, NULL, &nparts, NULL, NULL, options, &objval, part);
+  
+  
+  for (iEdge = 0; iEdge < nEdge; iEdge++)
+    edge[iEdge]->SetColor(part[iEdge]);
+  
+  delete [] part;
+
+  
+#endif
+}
+
 void CPhysicalGeometry::SetBoundVolume(void) {
   unsigned short cont, iMarker, iElem, iNode_Domain, iNode_Surface;
   unsigned long Point_Domain, Point_Surface, Point, iElem_Surface, iElem_Domain;

@@ -42,7 +42,8 @@ using namespace std;
 class CDualGrid{
 protected:
 	static unsigned short nDim; /*!< \brief Number of dimensions of the problem. */
-	
+  unsigned long Color;	/*!< \brief Color of the element in the partitioning strategy. */
+
 public:
 	
 	/*! 
@@ -116,6 +117,20 @@ public:
 	 * \param[in] val_face_normal - Normal vector to be added.
 	 */	
 	virtual void AddNormal(double *val_face_normal) = 0;
+  
+  /*!
+	 * \brief Set a color to the elements that comes from the grid partitioning.
+	 * \note Each subgroup has a different color.
+	 * \param[in] val_color - Color of the point.
+	 */
+	void SetColor(unsigned long val_Color);
+  
+	/*!
+	 * \brief Get the color of an element, the color indicates to which subdomain the point belongs to.
+	 * \return Color of the point.
+	 */
+	unsigned long GetColor(void);
+  
 };
 
 /*! 
@@ -150,7 +165,6 @@ private:
 	bool Agglomerate_Indirect;					/*!< \brief This flag indicates if the indirect points can be agglomerated. */
 	bool Agglomerate;					/*!< \brief This flag indicates if the element has been agglomerated. */
 	bool Move;					/*!< \brief This flag indicates if the point is going to be move in the grid deformation process. */
-	unsigned short color;	/*!< \brief Color of the point in the partitioning strategy. */
 	double Wall_Distance;	/*!< \brief Distance to the nearest wall. */
   double SharpEdge_Distance;	/*!< \brief Distance to a sharp edge. */
 	unsigned long GlobalIndex;	/*!< \brief Global index in the parallel simulation. */
@@ -396,13 +410,6 @@ public:
 	bool GetPhysicalBoundary(void);
 	
 	/*! 
-	 * \brief Set a color to the point that comes from the grid partitioning.
-	 * \note Each domain has a different color.
-	 * \param[in] val_color - Color of the point.
-	 */
-	void SetColor(unsigned short val_color);
-	
-	/*! 
 	 * \brief Set the number of neighbor (artificial dissipation).
 	 * \param[in] val_nneighbor - Number of neighbors.
 	 */
@@ -413,12 +420,6 @@ public:
 	 * \return Number of neighbors.
 	 */
 	unsigned short GetnNeighbor(void);
-	
-	/*! 
-	 * \brief Get the color of a point, the color indicates to which subdomain the point belong to.
-	 * \return Color of the point.
-	 */
-	unsigned short GetColor(void);
 	
 	/*! 
 	 * \brief Get the global index in a parallel computation.

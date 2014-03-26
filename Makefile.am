@@ -9,7 +9,11 @@
 #
 ##########################
 
-ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
+#ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
+ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
+
+# build third-party optional dependencies first
+SUBDIRS = externals
 
 bin_PROGRAMS = bin/SU2_EDU
 
