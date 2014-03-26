@@ -9,7 +9,6 @@
 #
 ##########################
 
-#ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
 
 # build third-party optional dependencies first
@@ -54,3 +53,7 @@ bin_SU2_EDU_SOURCES = include/definition_structure.hpp \
 		src/linear_solvers_structure.cpp \
 		src/variable_structure.cpp \
 		src/vector_structure.cpp
+
+# always link to built dependencies from ./externals
+bin_SU2_EDU_CXXFLAGS = @su2_externals_INCLUDES@
+bin_SU2_EDU_LDADD = @su2_externals_LIBS@

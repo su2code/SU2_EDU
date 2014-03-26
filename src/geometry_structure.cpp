@@ -1790,50 +1790,135 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
 #ifdef METIS
   
-  unsigned long iPoint, iEdge, kPoint, jPoint, iVertex;
-  unsigned short iMarker, iMaxColor = 0, iColor, MaxColor = 0, iNode, jNode;
-  int ne = 0, nn, *elmnts = NULL, etype, *epart = NULL, *part = NULL, numflag, nparts, edgecut, *eptr, status, objval;
+  /*--- Set up some structures for building the edge graph ---*/
+  
+  unsigned long iPoint, jPoint, iEdge, adjPoint, adjEdge, maxNeighbors;
+  unsigned short iNode, jNode;
+  int *part = NULL, *xadj = NULL, *adjncy= NULL;
+  int nparts, status, objval, Edge_Counter;
   int rank = MASTER_NODE;
   int size = SINGLE_NODE;
   
-  unsigned short nDomain = size;
+  /*--- Number of OpenMP threads (partitions).. currently hard-coded...---*/
   
-  /*--- Set up some structures for building the edge graph ---*/
-  
-  /*--- Total number of edges in the graph ---*/
-  int nvtxs = nEdge;
-  part = new int[nEdge];
-
-  /*--- Number of weights per edge. We'll set it to 1, as we are dealing
-   with unweighted graphs, and also set vwgt to null (each edge carries 
-   the same weight). ---*/
-  int ncon = 1;
-  
-  /*--- Build the adjacency arrays for the edge graph ---*/
-  int *xadj = new int[nEdge+1];
-  int *adjncy = new int[2*nPoint];
-  
-  
-  
-  /*--- Number of OpenMP threads (partitions) ---*/
   nparts = 10;
   
+  /*--- Total number of edges in the graph and memory for the coloring ---*/
+  
+  int nvtxs = (int) nEdge;
+  part = new int[nEdge];
+  
+  /*--- Number of weights per edge. We'll set it to 1, as we are dealing
+   with unweighted graphs, and also set vwgt to null (each edge carries
+   the same weight). ---*/
+  
+  int ncon = 1;
+  
+  /*--- Build the adjacency arrays for the edge graph. Allocate memory. ---*/
+  
+  xadj = new int[nEdge+1];
+  
+  /*--- Get a measure of max neighbors for any one node in order to get a
+   reasonable amount of memory for the adjacency array ---*/
+  
+  maxNeighbors = 0;
+  for (iPoint = 0; iPoint < nPoint; iPoint++)
+    if (node[iPoint]->GetnNeighbor() > maxNeighbors)
+      maxNeighbors = node[iPoint]->GetnNeighbor();
+  
+  /*--- Allocate memory as if all edges have 2 end points with the maximum
+   number of neighbors for simplicity. However, you could compute the true
+   number of edges in the line graph as well. ---*/
+  
+  adjncy = new int[nEdge*maxNeighbors*2];
+  
+  /*--- Loop over all edges and build the edge graph ---*/
+  
+  Edge_Counter = 0; xadj[0] = 0;
+  for (iEdge = 0; iEdge < nEdge; iEdge++) {
+    
+    /*--- Each edge has two nodes that will connect with other edges ---*/
+    
+    iPoint = edge[iEdge]->GetNode(0);
+    jPoint = edge[iEdge]->GetNode(1);
+    
+    /*--- Loop over all neighbors for iPoint and add adjacent edges ---*/
+    
+    for (iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
+      adjPoint = node[iPoint]->GetPoint(iNode);
+      
+      /*--- Avoid jPoint during the search (we'll do jPoint next) ---*/
+      
+      if (adjPoint != jPoint) {
+        
+        /*--- Find the edge connecting these two nodes ---*/
+
+        adjEdge = FindEdge(iPoint, adjPoint);
+
+        /*--- Add the edge if different than iEdge (should already be
+         the case since we are avoiding jPoint) ---*/
+        
+        if (adjEdge != iEdge) {
+          adjncy[Edge_Counter] = (int) adjEdge;
+          Edge_Counter++;
+        }
+      }
+    }
+    
+    /*--- Loop over all neighbors for jPoint and add adjacent edges ---*/
+    
+    for (jNode = 0; jNode < node[jPoint]->GetnPoint(); jNode++) {
+      adjPoint = node[jPoint]->GetPoint(jNode);
+      
+      /*--- Avoid iPoint during the search ---*/
+      
+      if (adjPoint != iPoint) {
+        
+        /*--- Find the edge connecting these two nodes ---*/
+        
+        adjEdge = FindEdge(jPoint, adjPoint);
+        
+        /*--- Add the edge if different than iEdge (should already be
+         the case since we are avoiding jPoint) ---*/
+        
+        if (adjEdge != iEdge) {
+          adjncy[Edge_Counter] = (int) adjEdge;
+          Edge_Counter++;
+          
+        }
+      }
+    }
+    
+    /*--- Set xadj for the starting location in adjncy for the next edge. ---*/
+    
+    xadj[iEdge+1] = Edge_Counter;
+  }
   
   /*--- Set some METIS options ---*/
   
   int options[METIS_NOPTIONS];
   METIS_SetDefaultOptions(options);
   options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;
+  options[METIS_OPTION_NUMBERING] = 0;
   
-  status = METIS_PartGraphKway(&nvtxs, &ncon, xadj, adjncy,
-                               NULL, NULL, NULL, &nparts, NULL, NULL, options, &objval, part);
+  /*--- Call METIS to partition the edge graph ---*/
   
+  status = METIS_PartGraphKway(&nvtxs, &ncon, xadj, adjncy, NULL, NULL, NULL,
+                               &nparts, NULL, NULL, options, &objval, part);
+  
+  /*--- Store the new edge coloring into the edge data structure ---*/
   
   for (iEdge = 0; iEdge < nEdge; iEdge++)
     edge[iEdge]->SetColor(part[iEdge]);
   
+  /*--- Print some information, delete memory, and exit ---*/
+  
+  cout << "Colored "<< nEdge << " edges into "<< nparts << " groups with ";
+  cout << objval << " repeated points." << endl;
+  
   delete [] part;
-
+  delete [] xadj;
+  delete [] adjncy;
   
 #endif
 }
