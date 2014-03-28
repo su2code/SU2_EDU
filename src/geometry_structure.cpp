@@ -25,6 +25,7 @@
 CGeometry::CGeometry(void) {
   
   nEdge = 0;
+  nEdge_Color = new unsigned long[24];
   nPoint = 0;
   nElem = 0;
   
@@ -61,6 +62,8 @@ CGeometry::CGeometry(void) {
 CGeometry::~CGeometry(void) {
   unsigned long iElem, iElem_Bound, iPoint, iFace, iVertex, iEdge;
   unsigned short iMarker;
+  
+  delete [] nEdge_Color;
   
   if (elem != NULL) {
     for (iElem = 0; iElem < nElem; iElem++)
@@ -1792,16 +1795,19 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
   /*--- Set up some structures for building the edge graph ---*/
   
-  unsigned long iPoint, jPoint, iEdge, adjPoint, adjEdge, maxNeighbors;
+  unsigned long iPoint, jPoint, iEdge, adjPoint, adjEdge, maxNeighbors, iColor;
   unsigned short iNode, jNode;
-  int *part = NULL, *xadj = NULL, *adjncy= NULL;
+  int *part = NULL, *xadj = NULL, *adjncy= NULL, *EdgesPerColor;
   int nparts, status, objval, Edge_Counter;
   int rank = MASTER_NODE;
   int size = SINGLE_NODE;
   
-  /*--- Number of OpenMP threads (partitions).. currently hard-coded...---*/
+  /*--- Number of OpenMP threads (partitions) ---*/
   
-  nparts = 10;
+  //!!! Threads are currently hard-coded to 24 in multiple locations!!!
+  
+  nparts = 24;
+  EdgesPerColor = new int[nparts];
   
   /*--- Total number of edges in the graph and memory for the coloring ---*/
   
@@ -1892,6 +1898,7 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
     /*--- Set xadj for the starting location in adjncy for the next edge. ---*/
     
     xadj[iEdge+1] = Edge_Counter;
+    
   }
   
   /*--- Set some METIS options ---*/
@@ -1908,8 +1915,18 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
   /*--- Store the new edge coloring into the edge data structure ---*/
   
-  for (iEdge = 0; iEdge < nEdge; iEdge++)
+  for (iEdge = 0; iEdge < nEdge; iEdge++) {
     edge[iEdge]->SetColor(part[iEdge]);
+    EdgesPerColor[part[iEdge]]++;
+  }
+  
+  /*--- Some post-processing for number of edges by color ---*/
+  
+  for (iColor = 0; iColor < nparts; iColor++) {
+    SetnEdge_Color(iColor, EdgesPerColor[iColor]);
+    cout << "Edge color group "<< iColor << " contains ";
+    cout << EdgesPerColor[iColor] << " edges. "<< endl;
+  }
   
   /*--- Print some information, delete memory, and exit ---*/
   
@@ -1919,6 +1936,7 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   delete [] part;
   delete [] xadj;
   delete [] adjncy;
+  delete [] EdgesPerColor;
   
 #endif
 }

@@ -61,6 +61,7 @@ protected:
 	nElem,					/*!< \brief Number of elements of the mesh. */
   Global_nElem,	/*!< \brief Total number of elements in a simulation across all processors (all types). */
 	nEdge,					/*!< \brief Number of edges of the mesh. */
+  *nEdge_Color,					/*!< \brief Number of edges for each color in the mesh. */
 	nFace,					/*!< \brief Number of faces of the mesh. */
   nelem_edge,             /*!< \brief Number of edges in the mesh. */
   Global_nelem_edge,      /*!< \brief Total number of edges in the mesh across all processors. */
@@ -181,8 +182,19 @@ public:
 	 * \return Number of edges.
 	 */
 	unsigned long GetnEdge(void);
+  
+  /*!
+	 * \brief Get number of edges for each color in the mesh (function overload).
+	 * \return Number of edges.
+	 */
+	unsigned long GetnEdge(unsigned long val_color);
 
-	/*! 
+  /*!
+	 * \brief Set number of edges for each color in the mesh.
+	 */
+	void SetnEdge_Color(unsigned long val_color, unsigned long val_nEdges);
+  
+	/*!
 	 * \brief Get number of markers.
 	 * \return Number of markers.
 	 */

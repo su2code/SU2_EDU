@@ -124,6 +124,10 @@ inline unsigned long CGeometry::GetnVertex(unsigned short val_marker) { return n
 
 inline unsigned long CGeometry::GetnEdge(void) { return nEdge; }
 
+inline unsigned long CGeometry::GetnEdge(unsigned long val_color) { return nEdge_Color[val_color]; }
+
+inline void CGeometry::SetnEdge_Color(unsigned long val_color, unsigned long val_nEdges) { nEdge_Color[val_color] = val_nEdges; }
+
 inline bool CGeometry::FindFace(unsigned long first_elem, unsigned long second_elem, unsigned short &face_first_elem, unsigned short &face_second_elem) {return 0;}
 
 inline void CGeometry::SetBoundVolume(void) { }
