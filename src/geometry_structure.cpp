@@ -25,7 +25,9 @@
 CGeometry::CGeometry(void) {
   
   nEdge = 0;
-  nEdge_Color = new unsigned long[24];
+  nColor = 24;
+  nEdge_Color = new unsigned long[nColor];
+  Global_Edge = NULL;
   nPoint = 0;
   nElem = 0;
   
@@ -60,10 +62,15 @@ CGeometry::CGeometry(void) {
 }
 
 CGeometry::~CGeometry(void) {
-  unsigned long iElem, iElem_Bound, iPoint, iFace, iVertex, iEdge;
+  unsigned long iElem, iElem_Bound, iPoint, iFace, iVertex, iEdge, iColor;
   unsigned short iMarker;
   
   delete [] nEdge_Color;
+  if (Global_Edge != NULL) {
+    for (iColor = 0; iColor < nColor; iColor++)
+      if (Global_Edge[iColor] != NULL) delete Global_Edge[iColor];
+    delete [] Global_Edge;
+  }
   
   if (elem != NULL) {
     for (iElem = 0; iElem < nElem; iElem++)
@@ -1804,9 +1811,9 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
   /*--- Number of OpenMP threads (partitions) ---*/
   
-  //!!! Threads are currently hard-coded to 24 in multiple locations!!!
+  //!!! Threads are currently hard-coded to 24 !!!
   
-  nparts = 24;
+  nparts = nColor;
   EdgesPerColor = new int[nparts];
   
   /*--- Total number of edges in the graph and memory for the coloring ---*/
@@ -1922,10 +1929,24 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
   /*--- Some post-processing for number of edges by color ---*/
   
-  for (iColor = 0; iColor < nparts; iColor++) {
+  for (iColor = 0; iColor < nColor; iColor++) {
     SetnEdge_Color(iColor, EdgesPerColor[iColor]);
     cout << "Edge color group "<< iColor << " contains ";
     cout << EdgesPerColor[iColor] << " edges. "<< endl;
+  }
+  
+  /*--- Allocate memory and create local<->global edge mapping ---*/
+  
+  Global_Edge = new unsigned long*[nColor];
+  for (iColor = 0; iColor < nColor; iColor++) {
+    Global_Edge[iColor] = new unsigned long[GetnEdge(iColor)];
+    Edge_Counter = 0;
+    for (iEdge = 0; iEdge < nEdge; iEdge++) {
+      if (part[iEdge] == iColor) {
+        Global_Edge[iColor][Edge_Counter] = iEdge;
+        Edge_Counter++;
+      }
+    }
   }
   
   /*--- Print some information, delete memory, and exit ---*/

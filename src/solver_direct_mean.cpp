@@ -635,17 +635,26 @@ void CEulerSolver::SetTime_Step(CGeometry *geometry, CSolver **solver_container,
 void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
                                      CConfig *config, unsigned short iMesh, unsigned short iRKStep) {
   
-  unsigned long iEdge, iPoint, jPoint;
+  unsigned long iEdge, iEdge_Local, iPoint, jPoint, iColor;
   
   bool high_order_diss = ((config->GetKind_Centered_Flow() == JST) && (iMesh == MESH_0));
   
+  //  for (iColor = 0; iColor < geometry->GetnColor(); iColor++)
+  //    for (iEdge_Local = 0; iEdge_Local < geometry->GetnEdge(iColor); iEdge_Local++) {
+  
   for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
+    
+    /*--- Get the global edge number ---*/
+    
+    //      iEdge = geometry->GetGlobal_Edge(iEdge_Local, iColor);
     
     /*--- Points in edge, set normal vectors, and number of neighbors ---*/
     
-    iPoint = geometry->edge[iEdge]->GetNode(0); jPoint = geometry->edge[iEdge]->GetNode(1);
+    iPoint = geometry->edge[iEdge]->GetNode(0);
+    jPoint = geometry->edge[iEdge]->GetNode(1);
     numerics->SetNormal(geometry->edge[iEdge]->GetNormal());
-    numerics->SetNeighbor(geometry->node[iPoint]->GetnNeighbor(), geometry->node[jPoint]->GetnNeighbor());
+    numerics->SetNeighbor(geometry->node[iPoint]->GetnNeighbor(),
+                          geometry->node[jPoint]->GetnNeighbor());
     
     /*--- Set primitive variables w/o reconstruction ---*/
     
@@ -658,7 +667,8 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
     /*--- Set undivided laplacian an pressure based sensor ---*/
     
     if (high_order_diss) {
-      numerics->SetUndivided_Laplacian(node[iPoint]->GetUndivided_Laplacian(), node[jPoint]->GetUndivided_Laplacian());
+      numerics->SetUndivided_Laplacian(node[iPoint]->GetUndivided_Laplacian(),
+                                       node[jPoint]->GetUndivided_Laplacian());
       numerics->SetSensor(node[iPoint]->GetSensor(), node[jPoint]->GetSensor());
     }
     
@@ -678,7 +688,6 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
     Jacobian.SubtractBlock(jPoint,jPoint,Jacobian_j);
     
   }
-  
 }
 
 void CEulerSolver::Upwind_Residual(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
