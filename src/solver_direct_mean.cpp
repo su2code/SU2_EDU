@@ -507,6 +507,7 @@ void CEulerSolver::Preprocessing(CGeometry *geometry, CSolver **solver_container
   unsigned long iPoint;
   bool RightSol;
   
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
   bool upwind_2nd = ((config->GetKind_Upwind_Flow() == ROE_2ND)       ||
                      (config->GetKind_Upwind_Flow() == AUSM_2ND)      ||
                      (config->GetKind_Upwind_Flow() == HLLC_2ND)      ||
@@ -550,7 +551,7 @@ void CEulerSolver::Preprocessing(CGeometry *geometry, CSolver **solver_container
   }
   
   /*--- Initialize the jacobian matrices ---*/
-  Jacobian.SetValZero();
+  if (implicit) Jacobian.SetValZero();
   
 }
 
@@ -636,6 +637,7 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
                                      CConfig *config, unsigned short iMesh, unsigned short iRKStep) {
   
   unsigned long iEdge, iEdge_Local, iPoint, jPoint, iColor;
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
   
   bool high_order_diss = ((config->GetKind_Centered_Flow() == JST) && (iMesh == MESH_0));
   
@@ -682,11 +684,12 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
     LinSysRes.SubtractBlock(jPoint, Res_Conv);
     
     /*--- Set implicit computation ---*/
-    Jacobian.AddBlock(iPoint,iPoint,Jacobian_i);
-    Jacobian.AddBlock(iPoint,jPoint,Jacobian_j);
-    Jacobian.SubtractBlock(jPoint,iPoint,Jacobian_i);
-    Jacobian.SubtractBlock(jPoint,jPoint,Jacobian_j);
-    
+    if (implicit) {
+      Jacobian.AddBlock(iPoint,iPoint,Jacobian_i);
+      Jacobian.AddBlock(iPoint,jPoint,Jacobian_j);
+      Jacobian.SubtractBlock(jPoint,iPoint,Jacobian_i);
+      Jacobian.SubtractBlock(jPoint,jPoint,Jacobian_j);
+    }
   }
 }
 
@@ -696,9 +699,11 @@ void CEulerSolver::Upwind_Residual(CGeometry *geometry, CSolver **solver_contain
   *Limiter_j = NULL;
   unsigned long iEdge, iPoint, jPoint;
   unsigned short iDim, iVar;
-  
-  bool high_order_diss = (((config->GetKind_Upwind_Flow() == ROE_2ND) || (config->GetKind_Upwind_Flow() == AUSM_2ND)
-                           || (config->GetKind_Upwind_Flow() == HLLC_2ND) || (config->GetKind_Upwind_Flow() == ROE_TURKEL_2ND))
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
+  bool high_order_diss = (((config->GetKind_Upwind_Flow() == ROE_2ND)  ||
+                           (config->GetKind_Upwind_Flow() == AUSM_2ND) ||
+                           (config->GetKind_Upwind_Flow() == HLLC_2ND) ||
+                           (config->GetKind_Upwind_Flow() == ROE_TURKEL_2ND))
                           && (iMesh == MESH_0));
   bool limiter = (config->GetKind_SlopeLimit_Flow() != NONE);
   
@@ -763,11 +768,12 @@ void CEulerSolver::Upwind_Residual(CGeometry *geometry, CSolver **solver_contain
     LinSysRes.SubtractBlock(jPoint, Res_Conv);
     
     /*--- Set implicit jacobians ---*/
-    Jacobian.AddBlock(iPoint, iPoint, Jacobian_i);
-    Jacobian.AddBlock(iPoint, jPoint, Jacobian_j);
-    Jacobian.SubtractBlock(jPoint, iPoint, Jacobian_i);
-    Jacobian.SubtractBlock(jPoint, jPoint, Jacobian_j);
-    
+    if (implicit) {
+      Jacobian.AddBlock(iPoint, iPoint, Jacobian_i);
+      Jacobian.AddBlock(iPoint, jPoint, Jacobian_j);
+      Jacobian.SubtractBlock(jPoint, iPoint, Jacobian_i);
+      Jacobian.SubtractBlock(jPoint, jPoint, Jacobian_j);
+    }
   }
   
 }
@@ -1232,6 +1238,74 @@ void CEulerSolver::Inviscid_Forces(CGeometry *geometry, CConfig *config) {
   
 }
 
+void CEulerSolver::ExplicitRK_Iteration(CGeometry *geometry, CSolver **solver_container,
+                                        CConfig *config, unsigned short iRKStep) {
+  double *Residual, *Res_TruncError, Vol, Delta, Res;
+  unsigned short iVar;
+  unsigned long iPoint;
+  
+  double RK_AlphaCoeff = config->Get_Alpha_RKStep(iRKStep);
+  
+  for (iVar = 0; iVar < nVar; iVar++) {
+    SetRes_RMS(iVar, 0.0);
+    SetRes_Max(iVar, 0.0, 0);
+  }
+  
+  /*--- Update the solution ---*/
+  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    Vol = geometry->node[iPoint]->GetVolume();
+    Delta = node[iPoint]->GetDelta_Time() / Vol;
+    
+    Res_TruncError = node[iPoint]->GetResTruncError();
+    Residual = LinSysRes.GetBlock(iPoint);
+    
+    for (iVar = 0; iVar < nVar; iVar++) {
+      Res = Residual[iVar] + Res_TruncError[iVar];
+      node[iPoint]->AddSolution(iVar, -Res*Delta*RK_AlphaCoeff);
+      AddRes_RMS(iVar, Res*Res);
+      AddRes_Max(iVar, fabs(Res), geometry->node[iPoint]->GetGlobalIndex());
+    }
+    
+  }
+  
+  /*--- Compute the root mean square residual ---*/
+  SetResidual_RMS(geometry, config);
+  
+  
+}
+
+void CEulerSolver::ExplicitEuler_Iteration(CGeometry *geometry, CSolver **solver_container, CConfig *config) {
+  double *local_Residual, *local_Res_TruncError, Vol, Delta, Res;
+  unsigned short iVar;
+  unsigned long iPoint;
+  
+  for (iVar = 0; iVar < nVar; iVar++) {
+    SetRes_RMS(iVar, 0.0);
+    SetRes_Max(iVar, 0.0, 0);
+  }
+  
+  /*--- Update the solution ---*/
+  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    Vol = geometry->node[iPoint]->GetVolume();
+    Delta = node[iPoint]->GetDelta_Time() / Vol;
+    
+    local_Res_TruncError = node[iPoint]->GetResTruncError();
+    local_Residual = LinSysRes.GetBlock(iPoint);
+    
+    for (iVar = 0; iVar < nVar; iVar++) {
+      Res = local_Residual[iVar] + local_Res_TruncError[iVar];
+      node[iPoint]->AddSolution(iVar, -Res*Delta);
+      AddRes_RMS(iVar, Res*Res);
+      AddRes_Max(iVar, fabs(Res), geometry->node[iPoint]->GetGlobalIndex());
+    }
+    
+  }
+  
+  /*--- Compute the root mean square residual ---*/
+  SetResidual_RMS(geometry, config);
+  
+}
+
 void CEulerSolver::ImplicitEuler_Iteration(CGeometry *geometry, CSolver **solver_container, CConfig *config) {
   unsigned short iVar;
   unsigned long iPoint, total_index, IterLinSol = 0;
@@ -1613,6 +1687,7 @@ void CEulerSolver::BC_Euler_Wall(CGeometry *geometry, CSolver **solver_container
   unsigned short iDim, iVar, jVar, jDim;
   unsigned long iPoint, iVertex;
   double Pressure, *Normal = NULL, Area, UnitNormal[3], a2, phi;
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
   
   /*--- Loop over all the vertices on this boundary marker ---*/
   for (iVertex = 0; iVertex < geometry->nVertex[val_marker]; iVertex++) {
@@ -1642,26 +1717,26 @@ void CEulerSolver::BC_Euler_Wall(CGeometry *geometry, CSolver **solver_container
       LinSysRes.AddBlock(iPoint, Residual);
       
       /*--- Form Jacobians for implicit computations ---*/
-      
-      for (iVar = 0; iVar < nVar; iVar++) {
-        for (jVar = 0; jVar < nVar; jVar++)
-          Jacobian_i[iVar][jVar] = 0.0;
+      if (implicit) {
+        for (iVar = 0; iVar < nVar; iVar++) {
+          for (jVar = 0; jVar < nVar; jVar++)
+            Jacobian_i[iVar][jVar] = 0.0;
+        }
+        
+        a2 = Gamma-1.0;
+        phi = 0.5*a2*node[iPoint]->GetVelocity2();
+        for (iVar = 0; iVar < nVar; iVar++) {
+          Jacobian_i[0][iVar] = 0.0;
+          Jacobian_i[nDim+1][iVar] = 0.0;
+        }
+        for (iDim = 0; iDim < nDim; iDim++) {
+          Jacobian_i[iDim+1][0] = -phi*Normal[iDim];
+          for (jDim = 0; jDim < nDim; jDim++)
+            Jacobian_i[iDim+1][jDim+1] = a2*node[iPoint]->GetVelocity(jDim)*Normal[iDim];
+          Jacobian_i[iDim+1][nDim+1] = -a2*Normal[iDim];
+        }
+        Jacobian.AddBlock(iPoint,iPoint,Jacobian_i);
       }
-      
-      a2 = Gamma-1.0;
-      phi = 0.5*a2*node[iPoint]->GetVelocity2();
-      for (iVar = 0; iVar < nVar; iVar++) {
-        Jacobian_i[0][iVar] = 0.0;
-        Jacobian_i[nDim+1][iVar] = 0.0;
-      }
-      for (iDim = 0; iDim < nDim; iDim++) {
-        Jacobian_i[iDim+1][0] = -phi*Normal[iDim];
-        for (jDim = 0; jDim < nDim; jDim++)
-          Jacobian_i[iDim+1][jDim+1] = a2*node[iPoint]->GetVelocity(jDim)*Normal[iDim];
-        Jacobian_i[iDim+1][nDim+1] = -a2*Normal[iDim];
-      }
-      Jacobian.AddBlock(iPoint,iPoint,Jacobian_i);
-      
     }
   }
   
@@ -1685,6 +1760,7 @@ void CEulerSolver::BC_Far_Field(CGeometry *geometry, CSolver **solver_container,
   
   double Gas_Constant     = config->GetGas_ConstantND();
   
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
   bool viscous        = config->GetViscous();
   
   double *Normal = new double[nDim];
@@ -1854,7 +1930,7 @@ void CEulerSolver::BC_Far_Field(CGeometry *geometry, CSolver **solver_container,
       LinSysRes.AddBlock(iPoint, Residual);
       
       /*--- Convective Jacobian contribution for implicit integration ---*/
-      Jacobian.AddBlock(iPoint, iPoint, Jacobian_i);
+      if (implicit) Jacobian.AddBlock(iPoint, iPoint, Jacobian_i);
       
       /*--- Viscous residual contribution ---*/
       if (viscous) {
@@ -1883,7 +1959,7 @@ void CEulerSolver::BC_Far_Field(CGeometry *geometry, CSolver **solver_container,
         LinSysRes.SubtractBlock(iPoint, Residual);
         
         /*--- Viscous Jacobian contribution for implicit integration ---*/
-        Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
+        if (implicit) Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
         
       }
     }
@@ -1907,6 +1983,7 @@ void CEulerSolver::BC_Inlet(CGeometry *geometry, CSolver **solver_container,
   double Gas_Constant       = config->GetGas_ConstantND();
   unsigned short Kind_Inlet = config->GetKind_Inlet();
   string Marker_Tag         = config->GetMarker_All_Tag(val_marker);
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
   bool viscous              = config->GetViscous();
   
   double *Normal = new double[nDim];
@@ -2097,10 +2174,11 @@ void CEulerSolver::BC_Inlet(CGeometry *geometry, CSolver **solver_container,
       LinSysRes.AddBlock(iPoint, Residual);
       
       /*--- Jacobian contribution for implicit integration ---*/
-      Jacobian.AddBlock(iPoint, iPoint, Jacobian_i);
+      if (implicit) Jacobian.AddBlock(iPoint, iPoint, Jacobian_i);
       
       /*--- Roe Turkel preconditioning, set the value of beta ---*/
-      if ((config->GetKind_Upwind() == ROE_TURKEL_2ND) || (config->GetKind_Upwind() == ROE_TURKEL_1ST)) {
+      if ((config->GetKind_Upwind() == ROE_TURKEL_2ND) ||
+          (config->GetKind_Upwind() == ROE_TURKEL_1ST)) {
         node[iPoint]->SetPreconditioner_Beta(conv_numerics->GetPrecond_Beta());
       }
       
@@ -2113,22 +2191,25 @@ void CEulerSolver::BC_Inlet(CGeometry *geometry, CSolver **solver_container,
         
         /*--- Set the normal vector and the coordinates ---*/
         visc_numerics->SetNormal(Normal);
-        visc_numerics->SetCoord(geometry->node[iPoint]->GetCoord(), geometry->node[Point_Normal]->GetCoord());
+        visc_numerics->SetCoord(geometry->node[iPoint]->GetCoord(),
+                                geometry->node[Point_Normal]->GetCoord());
         
         /*--- Primitive variables, and gradient ---*/
         visc_numerics->SetPrimitive(V_domain, V_inlet);
-        visc_numerics->SetPrimVarGradient(node[iPoint]->GetGradient_Primitive(), node[iPoint]->GetGradient_Primitive());
+        visc_numerics->SetPrimVarGradient(node[iPoint]->GetGradient_Primitive(),
+                                          node[iPoint]->GetGradient_Primitive());
         
         /*--- Turbulent kinetic energy ---*/
         if (config->GetKind_Turb_Model() == SST)
-          visc_numerics->SetTurbKineticEnergy(solver_container[TURB_SOL]->node[iPoint]->GetSolution(0), solver_container[TURB_SOL]->node[iPoint]->GetSolution(0));
+          visc_numerics->SetTurbKineticEnergy(solver_container[TURB_SOL]->node[iPoint]->GetSolution(0),
+                                              solver_container[TURB_SOL]->node[iPoint]->GetSolution(0));
         
         /*--- Compute and update residual ---*/
         visc_numerics->ComputeResidual(Residual, Jacobian_i, Jacobian_j, config);
         LinSysRes.SubtractBlock(iPoint, Residual);
         
         /*--- Jacobian contribution for implicit integration ---*/
-        Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
+        if (implicit) Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
         
       }
       
@@ -2151,6 +2232,7 @@ void CEulerSolver::BC_Outlet(CGeometry *geometry, CSolver **solver_container,
   
   double Gas_Constant     = config->GetGas_ConstantND();
   string Marker_Tag       = config->GetMarker_All_Tag(val_marker);
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
   bool viscous              = config->GetViscous();
   
   double *Normal = new double[nDim];
@@ -2257,10 +2339,11 @@ void CEulerSolver::BC_Outlet(CGeometry *geometry, CSolver **solver_container,
       LinSysRes.AddBlock(iPoint, Residual);
       
       /*--- Jacobian contribution for implicit integration ---*/
-      Jacobian.AddBlock(iPoint, iPoint, Jacobian_i);
+      if (implicit) Jacobian.AddBlock(iPoint, iPoint, Jacobian_i);
       
       /*--- Roe Turkel preconditioning, set the value of beta ---*/
-      if ((config->GetKind_Upwind() == ROE_TURKEL_2ND) || (config->GetKind_Upwind() == ROE_TURKEL_1ST)) {
+      if ((config->GetKind_Upwind() == ROE_TURKEL_2ND) ||
+          (config->GetKind_Upwind() == ROE_TURKEL_1ST)) {
         node[iPoint]->SetPreconditioner_Beta(conv_numerics->GetPrecond_Beta());
       }
       
@@ -2273,22 +2356,25 @@ void CEulerSolver::BC_Outlet(CGeometry *geometry, CSolver **solver_container,
         
         /*--- Set the normal vector and the coordinates ---*/
         visc_numerics->SetNormal(Normal);
-        visc_numerics->SetCoord(geometry->node[iPoint]->GetCoord(), geometry->node[Point_Normal]->GetCoord());
+        visc_numerics->SetCoord(geometry->node[iPoint]->GetCoord(),
+                                geometry->node[Point_Normal]->GetCoord());
         
         /*--- Primitive variables, and gradient ---*/
         visc_numerics->SetPrimitive(V_domain, V_outlet);
-        visc_numerics->SetPrimVarGradient(node[iPoint]->GetGradient_Primitive(), node[iPoint]->GetGradient_Primitive());
+        visc_numerics->SetPrimVarGradient(node[iPoint]->GetGradient_Primitive(),
+                                          node[iPoint]->GetGradient_Primitive());
         
         /*--- Turbulent kinetic energy ---*/
         if (config->GetKind_Turb_Model() == SST)
-          visc_numerics->SetTurbKineticEnergy(solver_container[TURB_SOL]->node[iPoint]->GetSolution(0), solver_container[TURB_SOL]->node[iPoint]->GetSolution(0));
+          visc_numerics->SetTurbKineticEnergy(solver_container[TURB_SOL]->node[iPoint]->GetSolution(0),
+                                              solver_container[TURB_SOL]->node[iPoint]->GetSolution(0));
         
         /*--- Compute and update residual ---*/
         visc_numerics->ComputeResidual(Residual, Jacobian_i, Jacobian_j, config);
         LinSysRes.SubtractBlock(iPoint, Residual);
         
         /*--- Jacobian contribution for implicit integration ---*/
-        Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
+        if (implicit) Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
         
       }
       
@@ -2722,7 +2808,7 @@ void CNSSolver::Preprocessing(CGeometry *geometry, CSolver **solver_container, C
   
   unsigned long iPoint;
   bool RightSol;
-  
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
   bool center = (config->GetKind_ConvNumScheme_Flow() == SPACE_CENTERED);
   bool center_jst = center && config->GetKind_Centered_Flow() == JST;
   bool limiter_flow = (config->GetKind_SlopeLimit_Flow() != NONE);
@@ -2766,7 +2852,7 @@ void CNSSolver::Preprocessing(CGeometry *geometry, CSolver **solver_container, C
   if ((iMesh == MESH_0) && (limiter_flow || limiter_turb)) { SetPrimVar_Limiter(geometry, config); }
   
   /*--- Initialize the jacobian matrices ---*/
-  Jacobian.SetValZero();
+  if (implicit) Jacobian.SetValZero();
   
 }
 
@@ -2875,6 +2961,7 @@ void CNSSolver::SetTime_Step(CGeometry *geometry, CSolver **solver_container, CC
 void CNSSolver::Viscous_Residual(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
                                  CConfig *config, unsigned short iMesh, unsigned short iRKStep) {
   unsigned long iPoint, jPoint, iEdge;
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
   
   for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
     
@@ -2900,11 +2987,12 @@ void CNSSolver::Viscous_Residual(CGeometry *geometry, CSolver **solver_container
     LinSysRes.AddBlock(jPoint, Res_Visc);
     
     /*--- Implicit part ---*/
-    Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
-    Jacobian.SubtractBlock(iPoint, jPoint, Jacobian_j);
-    Jacobian.AddBlock(jPoint, iPoint, Jacobian_i);
-    Jacobian.AddBlock(jPoint, jPoint, Jacobian_j);
-    
+    if (implicit) {
+      Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
+      Jacobian.SubtractBlock(iPoint, jPoint, Jacobian_j);
+      Jacobian.AddBlock(jPoint, iPoint, Jacobian_i);
+      Jacobian.AddBlock(jPoint, jPoint, Jacobian_j);
+    }
   }
   
 }
@@ -3157,6 +3245,8 @@ void CNSSolver::BC_HeatFlux_Wall(CGeometry *geometry, CSolver **solver_container
   double *Normal, Area;
   double UnitNormal[3];
   
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
+  
   /*--- Identify the boundary by string name ---*/
   string Marker_Tag = config->GetMarker_All_Tag(val_marker);
   
@@ -3212,11 +3302,12 @@ void CNSSolver::BC_HeatFlux_Wall(CGeometry *geometry, CSolver **solver_container
       
       /*--- Enforce the no-slip boundary condition in a strong way by
        modifying the velocity-rows of the Jacobian (1 on the diagonal). ---*/
-      for (iVar = 1; iVar <= nDim; iVar++) {
-        total_index = iPoint*nVar+iVar;
-        Jacobian.DeleteValsRowi(total_index);
+      if (implicit) {
+        for (iVar = 1; iVar <= nDim; iVar++) {
+          total_index = iPoint*nVar+iVar;
+          Jacobian.DeleteValsRowi(total_index);
+        }
       }
-      
     }
   }
 }
@@ -3237,6 +3328,8 @@ void CNSSolver::BC_Isothermal_Wall(CGeometry *geometry, CSolver **solver_contain
   double Prandtl_Turb = config->GetPrandtl_Turb();
   double Gas_Constant = config->GetGas_ConstantND();
   double cp = (Gamma / Gamma_Minus_One) * Gas_Constant;
+  
+  bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
   
   Point_Normal = 0;
   
@@ -3311,33 +3404,34 @@ void CNSSolver::BC_Isothermal_Wall(CGeometry *geometry, CSolver **solver_contain
       Res_Visc[nDim+1] = thermal_conductivity * dTdn * Area;
       
       /*--- Calculate Jacobian for implicit time stepping ---*/
-      
-      for (iVar = 0; iVar < nVar; iVar ++)
-        for (jVar = 0; jVar < nVar; jVar ++)
-          Jacobian_i[iVar][jVar] = 0.0;
-      
-      /*--- Calculate useful quantities ---*/
-      Density = node[iPoint]->GetPrimVar(nDim+2);
-      Energy  = node[iPoint]->GetSolution(nDim+1);
-      Temperature = node[iPoint]->GetPrimVar(0);
-      Vel2 = 0.0;
-      for (iDim = 0; iDim < nDim; iDim++)
-        Vel2 += node[iPoint]->GetPrimVar(iDim+1) * node[iPoint]->GetPrimVar(iDim+1);
-      //dTdrho = (Gamma-1.0)/(Density*Gas_Constant) * (-Energy/Density + Vel2);
-      dTdrho = 1.0/Density * ( -Twall + (Gamma-1.0)/Gas_Constant*(Vel2/2.0) );
-      
-      /*--- Enforce the no-slip boundary condition in a strong way ---*/
-      for (iVar = 1; iVar <= nDim; iVar++) {
-        total_index = iPoint*nVar+iVar;
-        Jacobian.DeleteValsRowi(total_index);
+      if (implicit) {
+        for (iVar = 0; iVar < nVar; iVar ++)
+          for (jVar = 0; jVar < nVar; jVar ++)
+            Jacobian_i[iVar][jVar] = 0.0;
+        
+        /*--- Calculate useful quantities ---*/
+        Density = node[iPoint]->GetPrimVar(nDim+2);
+        Energy  = node[iPoint]->GetSolution(nDim+1);
+        Temperature = node[iPoint]->GetPrimVar(0);
+        Vel2 = 0.0;
+        for (iDim = 0; iDim < nDim; iDim++)
+          Vel2 += node[iPoint]->GetPrimVar(iDim+1) * node[iPoint]->GetPrimVar(iDim+1);
+        //dTdrho = (Gamma-1.0)/(Density*Gas_Constant) * (-Energy/Density + Vel2);
+        dTdrho = 1.0/Density * ( -Twall + (Gamma-1.0)/Gas_Constant*(Vel2/2.0) );
+        
+        /*--- Enforce the no-slip boundary condition in a strong way ---*/
+        for (iVar = 1; iVar <= nDim; iVar++) {
+          total_index = iPoint*nVar+iVar;
+          Jacobian.DeleteValsRowi(total_index);
+        }
+        
+        /*--- Add contributions to the Jacobian from the weak enforcement of the energy equations ---*/
+        Jacobian_i[nDim+1][0]      = -thermal_conductivity*theta2/dist_ij * dTdrho * Area;
+        Jacobian_i[nDim+1][nDim+1] = -thermal_conductivity*theta2/dist_ij * (Gamma-1.0)/(Gas_Constant*Density) * Area;
+        
+        /*--- Subtract the block from the Global Jacobian structure ---*/
+        Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
       }
-      
-      /*--- Add contributions to the Jacobian from the weak enforcement of the energy equations ---*/
-      Jacobian_i[nDim+1][0]      = -thermal_conductivity*theta2/dist_ij * dTdrho * Area;
-      Jacobian_i[nDim+1][nDim+1] = -thermal_conductivity*theta2/dist_ij * (Gamma-1.0)/(Gas_Constant*Density) * Area;
-      
-      /*--- Subtract the block from the Global Jacobian structure ---*/
-      Jacobian.SubtractBlock(iPoint, iPoint, Jacobian_i);
       
       /*--- Convective contribution to the residual at the wall ---*/
       LinSysRes.AddBlock(iPoint, Res_Conv);
@@ -3347,11 +3441,12 @@ void CNSSolver::BC_Isothermal_Wall(CGeometry *geometry, CSolver **solver_contain
       
       /*--- Enforce the no-slip boundary condition in a strong way by
        modifying the velocity-rows of the Jacobian (1 on the diagonal). ---*/
-      for (iVar = 1; iVar <= nDim; iVar++) {
-        total_index = iPoint*nVar+iVar;
-        Jacobian.DeleteValsRowi(total_index);
+      if (implicit) {
+        for (iVar = 1; iVar <= nDim; iVar++) {
+          total_index = iPoint*nVar+iVar;
+          Jacobian.DeleteValsRowi(total_index);
+        }
       }
-      
     }
   }
 }

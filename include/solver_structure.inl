@@ -137,6 +137,10 @@ inline void CSolver::Inviscid_Forces(CGeometry *geometry, CConfig *config) { }
 
 inline void CSolver::Viscous_Forces(CGeometry *geometry, CConfig *config) { }
 
+inline void CSolver::ExplicitEuler_Iteration(CGeometry *geometry, CSolver **solver_container, CConfig *config) { }
+
+inline void CSolver::ExplicitRK_Iteration(CGeometry *geometry, CSolver **solver_container, CConfig *config, unsigned short iRKStep) { }
+
 inline void CSolver::ImplicitEuler_Iteration(CGeometry *geometry, CSolver **solver_container, CConfig *config) { }
 
 inline void CSolver::SetRes_RMS(unsigned short val_var, double val_residual) { Residual_RMS[val_var] = val_residual; }
@@ -158,8 +162,8 @@ inline double CSolver::GetRes_Max(unsigned short val_var) { return Residual_Max[
 inline unsigned long CSolver::GetPoint_Max(unsigned short val_var) { return Point_Max[val_var]; }
 
 inline void CSolver::Set_OldSolution(CGeometry *geometry) {
-	for(unsigned long iPoint = 0; iPoint < geometry->GetnPoint(); iPoint++)
-  node[iPoint]->Set_OldSolution();
+  for(unsigned long iPoint = 0; iPoint < geometry->GetnPoint(); iPoint++)
+    node[iPoint]->Set_OldSolution();
 }
 
 inline unsigned short CSolver::GetnVar(void) { return nVar; }

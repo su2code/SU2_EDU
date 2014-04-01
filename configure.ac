@@ -55,9 +55,6 @@ AC_CONFIG_FILES([externals/metis/Makefile])
 AC_SUBST([su2_externals_INCLUDES])
 AC_SUBST([su2_externals_LIBS])
 
-AC_ARG_WITH(Metis-include,
-        AS_HELP_STRING([--with-Metis-include[=ARG]], [Metis include directory, ARG = path to metis.h]),
-        [with_Metis_include=$withval], [with_Metis_include="no"])
 
 ###########################
 # Force the NO_MPI directive and -O3 optimization

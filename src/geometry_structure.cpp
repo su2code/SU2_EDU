@@ -1800,36 +1800,39 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
 #ifdef METIS
   
+  cout << "Coloring the mesh edges using METIS." << endl;
+  
   /*--- Set up some structures for building the edge graph ---*/
   
   unsigned long iPoint, jPoint, iEdge, adjPoint, adjEdge, maxNeighbors, iColor;
   unsigned short iNode, jNode;
-  int *part = NULL, *xadj = NULL, *adjncy= NULL, *EdgesPerColor;
-  int nparts, status, objval, Edge_Counter;
+  idx_t nvtxs, *part = NULL, *xadj = NULL, *adjncy= NULL;
+  idx_t ncon, nparts, status, objval;
+  int *EdgesPerColor, Edge_Counter;
   int rank = MASTER_NODE;
   int size = SINGLE_NODE;
   
   /*--- Number of OpenMP threads (partitions) ---*/
   
-  //!!! Threads are currently hard-coded to 24 !!!
+  //!!! Threads are currently hard-coded to 24 on line 28 of this file !!!
   
   nparts = nColor;
   EdgesPerColor = new int[nparts];
   
   /*--- Total number of edges in the graph and memory for the coloring ---*/
   
-  int nvtxs = (int) nEdge;
-  part = new int[nEdge];
+  nvtxs = (idx_t) nEdge;
+  part = new idx_t[nEdge];
   
   /*--- Number of weights per edge. We'll set it to 1, as we are dealing
    with unweighted graphs, and also set vwgt to null (each edge carries
    the same weight). ---*/
   
-  int ncon = 1;
+  ncon = 1;
   
   /*--- Build the adjacency arrays for the edge graph. Allocate memory. ---*/
   
-  xadj = new int[nEdge+1];
+  xadj = new idx_t[nEdge+1];
   
   /*--- Get a measure of max neighbors for any one node in order to get a
    reasonable amount of memory for the adjacency array ---*/
@@ -1843,7 +1846,7 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
    number of neighbors for simplicity. However, you could compute the true
    number of edges in the line graph as well. ---*/
   
-  adjncy = new int[nEdge*maxNeighbors*2];
+  adjncy = new idx_t[nEdge*maxNeighbors*2];
   
   /*--- Loop over all edges and build the edge graph ---*/
   
@@ -1872,7 +1875,7 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
          the case since we are avoiding jPoint) ---*/
         
         if (adjEdge != iEdge) {
-          adjncy[Edge_Counter] = (int) adjEdge;
+          adjncy[Edge_Counter] = (idx_t) adjEdge;
           Edge_Counter++;
         }
       }
@@ -1895,7 +1898,7 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
          the case since we are avoiding jPoint) ---*/
         
         if (adjEdge != iEdge) {
-          adjncy[Edge_Counter] = (int) adjEdge;
+          adjncy[Edge_Counter] = (idx_t) adjEdge;
           Edge_Counter++;
           
         }
@@ -1910,7 +1913,7 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
   /*--- Set some METIS options ---*/
   
-  int options[METIS_NOPTIONS];
+  idx_t options[METIS_NOPTIONS];
   METIS_SetDefaultOptions(options);
   options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;
   options[METIS_OPTION_NUMBERING] = 0;

@@ -43,8 +43,6 @@ int main(int argc, char *argv[]) {
   CSolver ***solver_container          = NULL;
   CNumerics ****numerics_container     = NULL;
   CConfig *config_container            = NULL;
-  CSurfaceMovement *surface_movement   = NULL;
-  CVolumetricMovement *grid_movement   = NULL;
   
   /*--- Load in the number of zones and spatial dimensions in the mesh file (If no config
    file is specified, default.cfg is used) ---*/
@@ -70,7 +68,7 @@ int main(int argc, char *argv[]) {
   cout << "| all located in the same directory (SU2_EDU/bin/ by default).          |" << endl;
   cout << "| For detailed use instructions, see the SU2_EDU/README file.           |" << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
-
+  
   /*--- Retrieve the config file name from the command line ---*/
   
   char config_file_name[200];

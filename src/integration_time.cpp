@@ -70,37 +70,48 @@ void CMultiGridIntegration::MultiGrid_Iteration(CGeometry **geometry, CSolver **
 void CMultiGridIntegration::MultiGrid_Cycle(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container,
                                             CConfig *config, unsigned short iMesh, unsigned short mu, unsigned short RunTime_EqSystem,
                                             unsigned long Iteration) {
-  unsigned short iPreSmooth, iPostSmooth;
+  unsigned short iPreSmooth, iPostSmooth, iRKStep, iRKLimit = 1;
   unsigned short SolContainer_Position = config->GetContainerPosition(RunTime_EqSystem);
   
   /*--- Do a presmoothing on the grid iMesh to be restricted to the grid iMesh+1 ---*/
   
   for (iPreSmooth = 0; iPreSmooth < config->GetMG_PreSmooth(iMesh); iPreSmooth++) {
     
-    /*--- Send-Receive boundary conditions, and preprocessing ---*/
+    switch (config->GetKind_TimeIntScheme()) {
+      case RUNGE_KUTTA_EXPLICIT: iRKLimit = config->GetnRKStep(); break;
+      case EULER_EXPLICIT: case EULER_IMPLICIT: iRKLimit = 1; break; }
     
-    solver_container[iMesh][SolContainer_Position]->Preprocessing(geometry[iMesh], solver_container[iMesh], config, iMesh, NO_RK_ITER, RunTime_EqSystem);
-    
-    /*--- Set the old solution ---*/
-    
-    solver_container[iMesh][SolContainer_Position]->Set_OldSolution(geometry[iMesh]);
-    
-    /*--- Compute time step, max eigenvalue, and integration scheme (steady and unsteady problems) ---*/
-    
-    solver_container[iMesh][SolContainer_Position]->SetTime_Step(geometry[iMesh], solver_container[iMesh], config, iMesh, Iteration);
-    
-    
-    /*--- Space integration ---*/
-    
-    Space_Integration(geometry[iMesh], solver_container[iMesh], numerics_container[iMesh][SolContainer_Position], config, iMesh, NO_RK_ITER, RunTime_EqSystem);
-    
-    /*--- Time integration, update solution using the old solution plus the solution increment ---*/
-    
-    Time_Integration(geometry[iMesh], solver_container[iMesh], config, NO_RK_ITER, RunTime_EqSystem, Iteration);
-    
-    /*--- Send-Receive boundary conditions, and postprocessing ---*/
-    
-    solver_container[iMesh][SolContainer_Position]->Postprocessing(geometry[iMesh], solver_container[iMesh], config, iMesh);
+    /*--- Time and space integration ---*/
+    for (iRKStep = 0; iRKStep < iRKLimit; iRKStep++) {
+      
+      /*--- Send-Receive boundary conditions, and preprocessing ---*/
+      
+      solver_container[iMesh][SolContainer_Position]->Preprocessing(geometry[iMesh], solver_container[iMesh], config, iMesh, iRKStep, RunTime_EqSystem);
+      
+      if (iRKStep == 0) {
+        
+        /*--- Set the old solution ---*/
+        
+        solver_container[iMesh][SolContainer_Position]->Set_OldSolution(geometry[iMesh]);
+        
+        /*--- Compute time step, max eigenvalue, and integration scheme (steady and unsteady problems) ---*/
+        
+        solver_container[iMesh][SolContainer_Position]->SetTime_Step(geometry[iMesh], solver_container[iMesh], config, iMesh, Iteration);
+        
+      }
+      
+      /*--- Space integration ---*/
+      
+      Space_Integration(geometry[iMesh], solver_container[iMesh], numerics_container[iMesh][SolContainer_Position], config, iMesh, iRKStep, RunTime_EqSystem);
+      
+      /*--- Time integration, update solution using the old solution plus the solution increment ---*/
+      
+      Time_Integration(geometry[iMesh], solver_container[iMesh], config, iRKStep, RunTime_EqSystem, Iteration);
+      
+      /*--- Send-Receive boundary conditions, and postprocessing ---*/
+      
+      solver_container[iMesh][SolContainer_Position]->Postprocessing(geometry[iMesh], solver_container[iMesh], config, iMesh);
+    }
     
   }
   
@@ -143,19 +154,26 @@ void CMultiGridIntegration::MultiGrid_Cycle(CGeometry **geometry, CSolver ***sol
     
     for (iPostSmooth = 0; iPostSmooth < config->GetMG_PostSmooth(iMesh); iPostSmooth++) {
       
-      solver_container[iMesh][SolContainer_Position]->Preprocessing(geometry[iMesh], solver_container[iMesh], config, iMesh, NO_RK_ITER, RunTime_EqSystem);
+      switch (config->GetKind_TimeIntScheme()) {
+        case RUNGE_KUTTA_EXPLICIT: iRKLimit = config->GetnRKStep(); break;
+        case EULER_EXPLICIT: case EULER_IMPLICIT: iRKLimit = 1; break; }
       
-      solver_container[iMesh][SolContainer_Position]->Set_OldSolution(geometry[iMesh]);
-      solver_container[iMesh][SolContainer_Position]->SetTime_Step(geometry[iMesh], solver_container[iMesh], config, iMesh, Iteration);
-      
-      Space_Integration(geometry[iMesh], solver_container[iMesh], numerics_container[iMesh][SolContainer_Position], config, iMesh, NO_RK_ITER, RunTime_EqSystem);
-      Time_Integration(geometry[iMesh], solver_container[iMesh], config, NO_RK_ITER, RunTime_EqSystem, Iteration);
-      
-      solver_container[iMesh][SolContainer_Position]->Postprocessing(geometry[iMesh], solver_container[iMesh], config, iMesh);
-      
+      for (iRKStep = 0; iRKStep < iRKLimit; iRKStep++) {
+        
+        solver_container[iMesh][SolContainer_Position]->Preprocessing(geometry[iMesh], solver_container[iMesh], config, iMesh, iRKStep, RunTime_EqSystem);
+        
+        if (iRKStep == 0) {
+          solver_container[iMesh][SolContainer_Position]->Set_OldSolution(geometry[iMesh]);
+          solver_container[iMesh][SolContainer_Position]->SetTime_Step(geometry[iMesh], solver_container[iMesh], config, iMesh, Iteration);
+        }
+        Space_Integration(geometry[iMesh], solver_container[iMesh], numerics_container[iMesh][SolContainer_Position], config, iMesh, iRKStep, RunTime_EqSystem);
+        Time_Integration(geometry[iMesh], solver_container[iMesh], config, iRKStep, RunTime_EqSystem, Iteration);
+        
+        solver_container[iMesh][SolContainer_Position]->Postprocessing(geometry[iMesh], solver_container[iMesh], config, iMesh);
+        
+      }
     }
   }
-  
 }
 
 void CMultiGridIntegration::GetProlongated_Correction(unsigned short RunTime_EqSystem, CSolver *sol_fine, CSolver *sol_coarse, CGeometry *geo_fine,

@@ -606,6 +606,7 @@ S["su2_externals_LIBS"]="$(top_builddir)/externals/metis/libmetis.a "
 S["su2_externals_INCLUDES"]="-DMETIS -I$(top_srcdir)/externals/metis/include "
 S["BUILD_METIS_FALSE"]="#"
 S["BUILD_METIS_TRUE"]=""
+S["SU2_METIS_CPPFLAGS"]="-D_FILE_OFFSET_BITS=64 -DNDEBUG -DNDEBUG2 -DHAVE_EXECINFO_H -DHAVE_GETLINE"
 S["METIS_LIB"]="$(top_builddir)/externals/metis/libmetis.a"
 S["METIS_INCLUDE"]="-DMETIS -I$(top_srcdir)/externals/metis/include"
 S["EGREP"]="/usr/bin/grep -E"
@@ -650,11 +651,11 @@ S["MKDIR_P"]="./install-sh -c -d"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]=""
 S["install_sh"]="${SHELL} /Users/economon/SU2_EDU/install-sh"
-S["MAKEINFO"]="${SHELL} /Users/economon/SU2_EDU/missing --run makeinfo"
-S["AUTOHEADER"]="${SHELL} /Users/economon/SU2_EDU/missing --run autoheader"
-S["AUTOMAKE"]="${SHELL} /Users/economon/SU2_EDU/missing --run automake-1.12"
-S["AUTOCONF"]="${SHELL} /Users/economon/SU2_EDU/missing --run autoconf"
-S["ACLOCAL"]="${SHELL} /Users/economon/SU2_EDU/missing --run aclocal-1.12"
+S["MAKEINFO"]="${SHELL} /Users/economon/SU2_EDU/missing makeinfo"
+S["AUTOHEADER"]="${SHELL} /Users/economon/SU2_EDU/missing autoheader"
+S["AUTOMAKE"]="${SHELL} /Users/economon/SU2_EDU/missing automake-1.14"
+S["AUTOCONF"]="${SHELL} /Users/economon/SU2_EDU/missing autoconf"
+S["ACLOCAL"]="${SHELL} /Users/economon/SU2_EDU/missing aclocal-1.14"
 S["VERSION"]="1.1.0"
 S["PACKAGE"]="SU2_EDU"
 S["CYGPATH_W"]="echo"
@@ -983,7 +984,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
   case $ac_file$ac_mode in
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
-  # Autoconf 2.62 quotes --file arguments for eval, but not when files
+  # Older Autoconf quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval
   # if we detect the quoting.
   case $CONFIG_FILES in
@@ -1034,7 +1035,7 @@ $as_echo X"$mf" |
     DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
     test -z "$DEPDIR" && continue
     am__include=`sed -n 's/^am__include = //p' < "$mf"`
-    test -z "am__include" && continue
+    test -z "$am__include" && continue
     am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
     # Find all dependency output files, they are included files with
     # $(DEPDIR) in their names.  We invoke sed twice because it is the
