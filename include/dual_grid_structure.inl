@@ -75,6 +75,10 @@ inline void CPoint::SetPhysicalBoundary(bool val_boundary) { PhysicalBoundary = 
 
 inline bool CPoint::GetPhysicalBoundary(void) { return PhysicalBoundary; }
 
+inline void CPoint::SetRepeatedPoint(bool val_repeated) { RepeatedPoint = val_repeated; }
+
+inline bool CPoint::GetRepeatedPoint(void) { return RepeatedPoint; }
+
 inline void CPoint::AddVolume (double val_Volume) { Volume[0] += val_Volume; }
 
 inline void CPoint::SetVolume (double val_Volume) { Volume[0] = val_Volume; }

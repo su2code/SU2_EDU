@@ -166,7 +166,10 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
    the residuals and updating the solution (always needed even for
    explicit schemes). ---*/
   LinSysSol.Initialize(nPoint, nPointDomain, nVar, 0.0);
-  LinSysRes.Initialize(nPoint, nPointDomain, nVar, 0.0);
+  
+  /*--- Add some extra space for repeated points due to OpenMP edge loops ---*/
+  unsigned long nPointRepeated = geometry->GetnPointRepeated();
+  LinSysRes.Initialize(nPoint+nPointRepeated, nPointDomain, nVar, 0.0);
   
   /*--- Jacobians and vector structures for implicit computations ---*/
   if (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT) {
@@ -528,6 +531,13 @@ void CEulerSolver::Preprocessing(CGeometry *geometry, CSolver **solver_container
     
   }
   
+  //  /*--- Zero out the convective residual for this repeated point
+  //   before the next iteration. ---*/
+  //  for (unsigned long iPoint_Repeated = 0; iPoint_Repeated < geometry->GetnPointRepeated(); iPoint_Repeated ++) {
+  //
+  //  LinSysRes.SetBlock_Zero(nPointDomain+iPoint_Repeated);
+  //  }
+  
   /*--- Upwind second order reconstruction ---*/
   if ((upwind_2nd) && ((iMesh == MESH_0))) {
     
@@ -636,61 +646,93 @@ void CEulerSolver::SetTime_Step(CGeometry *geometry, CSolver **solver_container,
 void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
                                      CConfig *config, unsigned short iMesh, unsigned short iRKStep) {
   
-  unsigned long iEdge, iEdge_Local, iPoint, jPoint, iColor;
+  unsigned long iEdge, iEdge_Local, iPoint, jPoint, iColor, iPoint_Local, jPoint_Local;
   bool implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
-  
   bool high_order_diss = ((config->GetKind_Centered_Flow() == JST) && (iMesh == MESH_0));
+  double *local_Residual;
   
-  //  for (iColor = 0; iColor < geometry->GetnColor(); iColor++)
-  //    for (iEdge_Local = 0; iEdge_Local < geometry->GetnEdge(iColor); iEdge_Local++) {
+  for (iColor = 0; iColor < geometry->GetnColor(); iColor++)
+    for (iEdge_Local = 0; iEdge_Local < geometry->GetnEdge(iColor); iEdge_Local++) {
+      
+      //  for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
+      
+      /*--- Get the global edge number ---*/
+      
+      iEdge = geometry->GetGlobal_Edge(iEdge_Local, iColor);
+      
+      /*--- Points in edge, set normal vectors, and number of neighbors ---*/
+      
+      iPoint = geometry->edge[iEdge]->GetNode(0);
+      jPoint = geometry->edge[iEdge]->GetNode(1);
+      numerics->SetNormal(geometry->edge[iEdge]->GetNormal());
+      numerics->SetNeighbor(geometry->node[iPoint]->GetnNeighbor(),
+                            geometry->node[jPoint]->GetnNeighbor());
+      
+      /*--- Set primitive variables w/o reconstruction ---*/
+      
+      numerics->SetPrimitive(node[iPoint]->GetPrimVar(), node[jPoint]->GetPrimVar());
+      
+      /*--- Set the largest convective eigenvalue ---*/
+      
+      numerics->SetLambda(node[iPoint]->GetLambda(), node[jPoint]->GetLambda());
+      
+      /*--- Set undivided laplacian an pressure based sensor ---*/
+      
+      if (high_order_diss) {
+        numerics->SetUndivided_Laplacian(node[iPoint]->GetUndivided_Laplacian(),
+                                         node[jPoint]->GetUndivided_Laplacian());
+        numerics->SetSensor(node[iPoint]->GetSensor(), node[jPoint]->GetSensor());
+      }
+      
+      /*--- Compute residuals, and jacobians ---*/
+      
+      numerics->ComputeResidual(Res_Conv, Jacobian_i, Jacobian_j, config);
+      
+      /*--- Locate the block positions in the residual vector ---*/
+      
+      iPoint_Local = geometry->GetPointRepeated(iPoint,iColor);
+      jPoint_Local = geometry->GetPointRepeated(jPoint,iColor);
+      
+      /*--- Update convective and artificial dissipation residuals ---*/
+      
+      LinSysRes.AddBlock(iPoint_Local, Res_Conv);
+      LinSysRes.SubtractBlock(jPoint_Local, Res_Conv);
+      
+      //      LinSysRes.AddBlock(iPoint, Res_Conv);
+      //      LinSysRes.SubtractBlock(jPoint, Res_Conv);
+      
+      /*--- Set implicit computation ---*/
+      if (implicit) {
+        Jacobian.AddBlock(iPoint,iPoint,Jacobian_i);
+        Jacobian.AddBlock(iPoint,jPoint,Jacobian_j);
+        Jacobian.SubtractBlock(jPoint,iPoint,Jacobian_i);
+        Jacobian.SubtractBlock(jPoint,jPoint,Jacobian_j);
+      }
+    }
   
-  for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
+  /*--- Add a communication loop over the repeated points ---*/
+  
+  for (unsigned long iPoint_Repeated = 0; iPoint_Repeated < geometry->GetnPointRepeated(); iPoint_Repeated++) {
     
-    /*--- Get the global edge number ---*/
+    /*--- Get the residual for this repeated point ---*/
     
-    //      iEdge = geometry->GetGlobal_Edge(iEdge_Local, iColor);
+    local_Residual = LinSysRes.GetBlock(nPointDomain+iPoint_Repeated);
     
-    /*--- Points in edge, set normal vectors, and number of neighbors ---*/
+    /*--- Get the parent node for this repeated node ---*/
     
-    iPoint = geometry->edge[iEdge]->GetNode(0);
-    jPoint = geometry->edge[iEdge]->GetNode(1);
-    numerics->SetNormal(geometry->edge[iEdge]->GetNormal());
-    numerics->SetNeighbor(geometry->node[iPoint]->GetnNeighbor(),
-                          geometry->node[jPoint]->GetnNeighbor());
+    iPoint = geometry->GetParentRepeated(iPoint_Repeated);
     
-    /*--- Set primitive variables w/o reconstruction ---*/
+    /*--- Add the convective residual to the parent node ---*/
     
-    numerics->SetPrimitive(node[iPoint]->GetPrimVar(), node[jPoint]->GetPrimVar());
+    LinSysRes.AddBlock(iPoint, local_Residual);
     
-    /*--- Set the largest convective eigenvalue ---*/
+    /*--- Zero out the convective residual for this repeated point
+     before the next iteration. ---*/
     
-    numerics->SetLambda(node[iPoint]->GetLambda(), node[jPoint]->GetLambda());
+    LinSysRes.SetBlock_Zero(nPointDomain+iPoint_Repeated);
     
-    /*--- Set undivided laplacian an pressure based sensor ---*/
-    
-    if (high_order_diss) {
-      numerics->SetUndivided_Laplacian(node[iPoint]->GetUndivided_Laplacian(),
-                                       node[jPoint]->GetUndivided_Laplacian());
-      numerics->SetSensor(node[iPoint]->GetSensor(), node[jPoint]->GetSensor());
-    }
-    
-    /*--- Compute residuals, and jacobians ---*/
-    
-    numerics->ComputeResidual(Res_Conv, Jacobian_i, Jacobian_j, config);
-    
-    /*--- Update convective and artificial dissipation residuals ---*/
-    
-    LinSysRes.AddBlock(iPoint, Res_Conv);
-    LinSysRes.SubtractBlock(jPoint, Res_Conv);
-    
-    /*--- Set implicit computation ---*/
-    if (implicit) {
-      Jacobian.AddBlock(iPoint,iPoint,Jacobian_i);
-      Jacobian.AddBlock(iPoint,jPoint,Jacobian_j);
-      Jacobian.SubtractBlock(jPoint,iPoint,Jacobian_i);
-      Jacobian.SubtractBlock(jPoint,jPoint,Jacobian_j);
-    }
   }
+  
 }
 
 void CEulerSolver::Upwind_Residual(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,

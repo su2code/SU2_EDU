@@ -78,6 +78,8 @@ inline void CGeometry::SetRCM(CConfig *config) { }
 
 inline void CGeometry::Color_Edges(CConfig *config) { }
 
+inline void CGeometry::Write_EdgeColors(void) { }
+
 inline void CGeometry::SetCoord_Smoothing (unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config) { }
 
 inline void CGeometry::SetCoord(CGeometry *geometry) { }
@@ -89,6 +91,8 @@ inline void CGeometry::SetEsuE(void) { }
 inline unsigned long CGeometry::GetnPoint(void) { return nPoint; }
 
 inline unsigned long CGeometry::GetnPointDomain(void) { return nPointDomain; }
+
+inline unsigned long CGeometry::GetnPointRepeated(void) { return nPointRepeated; }
 
 inline unsigned long CGeometry::GetnElem(void) { return nElem; }
 
@@ -131,6 +135,14 @@ inline void CGeometry::SetnEdge_Color(unsigned long val_color, unsigned long val
 inline unsigned long CGeometry::GetnColor(void) { return nColor; }
 
 inline unsigned long CGeometry::GetGlobal_Edge(unsigned long val_edge_local, unsigned long val_color) { return Global_Edge[val_color][val_edge_local]; }
+
+inline void CGeometry::SetPointRepeated(unsigned long val_ipoint_repeated, unsigned long val_ipoint_parent, unsigned long val_icolor) { Repeated_Points[val_icolor][val_ipoint_parent] = val_ipoint_repeated; }
+
+inline unsigned long CGeometry::GetPointRepeated(unsigned long val_ipoint_parent, unsigned long val_icolor) { return Repeated_Points[val_icolor][val_ipoint_parent]; }
+
+inline void CGeometry::SetParentRepeated(unsigned long val_ipoint_repeated, unsigned long val_ipoint_parent) { Repeated_Parent[val_ipoint_repeated] = val_ipoint_parent; }
+
+inline unsigned long CGeometry::GetParentRepeated(unsigned long val_ipoint_repeated) { return Repeated_Parent[val_ipoint_repeated]; }
 
 inline bool CGeometry::FindFace(unsigned long first_elem, unsigned long second_elem, unsigned short &face_first_elem, unsigned short &face_second_elem) {return 0;}
 

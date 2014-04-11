@@ -65,6 +65,7 @@ CPoint::CPoint(unsigned short val_nDim, unsigned long val_globalindex,
   Boundary = false;
   PhysicalBoundary = false;
   Domain = true;
+  RepeatedPoint = false;
   
   /*--- Set the global index of this node for parallel simulations ---*/
   
@@ -120,7 +121,8 @@ CPoint::CPoint(double val_coord_0, double val_coord_1,
   Boundary = false;
   PhysicalBoundary = false;
   Domain = true;
-  
+  RepeatedPoint = false;
+
   /*--- Set the color for mesh partitioning ---*/
   
   Color = 0;
@@ -176,7 +178,8 @@ CPoint::CPoint(double val_coord_0, double val_coord_1, double val_coord_2,
   Boundary = false;
   PhysicalBoundary = false;
   Domain = true;
-  
+  RepeatedPoint = false;
+
   /*--- Set the color for mesh partitioning ---*/
   
   Color = 0;

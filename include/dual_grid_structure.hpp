@@ -149,6 +149,7 @@ private:
 	double *Volume;	/*!< \brief Volume or Area of the control volume in 3D and 2D. */
 	bool Domain,		/*!< \brief Indicates if a point must be computed or belong to another boundary */
 	Boundary,       /*!< \brief To see if a point belong to the boundary (including MPI). */
+    RepeatedPoint,			/*!< \brief To see if a point is repeated due to edge coloring. */
   PhysicalBoundary;			/*!< \brief To see if a point belong to the physical boundary (without includin MPI). */
 	long *vertex; /*!< \brief Index of the vertex that correspond which the control volume (we need one for each marker in the same node). */
 	double *coord,	/*!< \brief vector with the coordinates of the node. */
@@ -409,6 +410,18 @@ public:
 	 */
 	bool GetPhysicalBoundary(void);
 	
+  /*!
+	 * \brief Set if a point is repeated due to edge coloring.
+	 * \param[in] val_repeated - <code>TRUE</code> if the point is repeated due to edge coloring; otherwise <code>FALSE</code>.
+	 */
+	void SetRepeatedPoint(bool val_repeated);
+  
+  /*!
+	 * \brief Provides information about whether a point is repeated due to edge coloring.
+	 * \return <code>TRUE</code> if the point is repeated due to edge coloring; otherwise <code>FALSE</code>.
+	 */
+	bool GetRepeatedPoint(void);
+  
 	/*! 
 	 * \brief Set the number of neighbor (artificial dissipation).
 	 * \param[in] val_nneighbor - Number of neighbors.

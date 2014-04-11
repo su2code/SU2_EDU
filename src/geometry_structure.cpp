@@ -28,6 +28,10 @@ CGeometry::CGeometry(void) {
   nColor = 24;
   nEdge_Color = new unsigned long[nColor];
   Global_Edge = NULL;
+  nPointRepeated = 0;
+  Repeated_Parent = NULL;
+  Repeated_Points = NULL;
+  
   nPoint = 0;
   nElem = 0;
   
@@ -70,6 +74,14 @@ CGeometry::~CGeometry(void) {
     for (iColor = 0; iColor < nColor; iColor++)
       if (Global_Edge[iColor] != NULL) delete Global_Edge[iColor];
     delete [] Global_Edge;
+  }
+  
+  if (Repeated_Parent != NULL) delete [] Repeated_Parent;
+  
+  if (Repeated_Points != NULL) {
+    for (iColor = 0; iColor < nColor; iColor++)
+      if (Repeated_Points[iColor] != NULL) delete Repeated_Points[iColor];
+    delete [] Repeated_Points;
   }
   
   if (elem != NULL) {
@@ -1804,13 +1816,16 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
   /*--- Set up some structures for building the edge graph ---*/
   
-  unsigned long iPoint, jPoint, iEdge, adjPoint, adjEdge, maxNeighbors, iColor;
+  unsigned long iPoint, jPoint, adjPoint, maxNeighbors;
+  unsigned long iEdge, iEdge_Local, adjEdge, iColor, jColor;
   unsigned short iNode, jNode;
   idx_t nvtxs, *part = NULL, *xadj = NULL, *adjncy= NULL;
   idx_t ncon, nparts, status, objval;
   int *EdgesPerColor, Edge_Counter;
   int rank = MASTER_NODE;
   int size = SINGLE_NODE;
+  vector<unsigned long> Node_Colors_Vec;
+  vector<unsigned long>::iterator it;
   
   /*--- Number of OpenMP threads (partitions) ---*/
   
@@ -1868,9 +1883,9 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
       if (adjPoint != jPoint) {
         
         /*--- Find the edge connecting these two nodes ---*/
-
+        
         adjEdge = FindEdge(iPoint, adjPoint);
-
+        
         /*--- Add the edge if different than iEdge (should already be
          the case since we are avoiding jPoint) ---*/
         
@@ -1952,17 +1967,286 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
     }
   }
   
+  /*--- Set up some structure for repeated points ---*/
+  
+  unsigned long **Node_Colors = new unsigned long*[nColor];
+  for (iColor = 0; iColor < nColor; iColor++) {
+    Node_Colors[iColor] = new unsigned long[nPointDomain];
+  }
+  unsigned long *ColorsPerNode = new unsigned long[nPointDomain];
+  bool *FoundNode = new bool[nPointDomain];
+  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    ColorsPerNode[iPoint] = 0;
+  }
+  
+  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    
+    /*--- Loop over all neighbor points ---*/
+    
+    Node_Colors_Vec.clear();
+    for (iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
+      adjPoint = node[iPoint]->GetPoint(iNode);
+      
+      /*--- Find the edge connecting these two nodes ---*/
+      
+      adjEdge = FindEdge(iPoint, adjPoint);
+      
+      /*--- Add the color of this edge to the vector ---*/
+      
+      iColor = edge[adjEdge]->GetColor();
+      Node_Colors_Vec.push_back(iColor);
+      
+    }
+    
+    /*--- Sort the colors and remove duplicates ---*/
+    
+    sort(Node_Colors_Vec.begin(), Node_Colors_Vec.end());
+    it = unique(Node_Colors_Vec.begin(), Node_Colors_Vec.end());
+    Node_Colors_Vec.resize(it - Node_Colors_Vec.begin());
+    
+    /*--- Store the unique colors for this node. ---*/
+    
+    ColorsPerNode[iPoint] = Node_Colors_Vec.size();
+    for (iColor = 0; iColor <	Node_Colors_Vec.size(); iColor++) {
+      Node_Colors[iColor][iPoint] = Node_Colors_Vec[iColor];
+    }
+    
+  }
+  
+  /*--- Compute total number of repeated points due to edge coloring ---*/
+  
+  nPointRepeated = 0;
+  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    nPointRepeated += ColorsPerNode[iPoint] - 1;
+  }
+  
+  /*--- Allocate memory to store the mapping between parent<->repeated nodes ---*/
+  
+  Repeated_Points = new unsigned long*[nColor];
+  for (iColor = 0; iColor < nColor; iColor++) {
+    Repeated_Points[iColor] = new unsigned long[nPointDomain];
+  }
+  Repeated_Parent = new unsigned long[nPointRepeated];
+  
+  /*--- Create the mapping between parent<->repeated nodes ---*/
+  
+  unsigned long nRepeats, iPoint_Repeated = 0;
+  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    
+    /*--- The first color becomes the parent of the node, any additional
+     colors will be associated with a repeated node. ---*/
+    
+    nRepeats = ColorsPerNode[iPoint] - 1;
+    
+    if (nRepeats > 0) {
+      
+      /*--- This point is repeated, so set the flag to true, store the
+       mappings, and increment our repeated node counters. ---*/
+      
+      node[iPoint]->SetRepeatedPoint(true);
+      
+      /*--- Store the point to its own index for all colors by default ---*/
+      
+      for (iColor = 0; iColor < nColor; iColor++) {
+        Repeated_Points[iColor][iPoint] = iPoint;
+      }
+      
+      /*--- For any additional colors (repeats) overwrite with a new index ---*/
+      
+      for (jColor = 1; jColor < ColorsPerNode[iPoint]; jColor++) {
+        Repeated_Parent[iPoint_Repeated] = iPoint;
+        iColor = Node_Colors[jColor][iPoint];
+        Repeated_Points[iColor][iPoint] = nPointDomain+iPoint_Repeated;
+        iPoint_Repeated++;
+      }
+      
+    } else {
+      
+      /*--- This point is not repeated, so set the flag to false. ---*/
+      
+      node[iPoint]->SetRepeatedPoint(false);
+      for (iColor = 0; iColor < nColor; iColor++) {
+        Repeated_Points[iColor][iPoint] = iPoint;
+      }
+      
+    }
+    
+  }
+  
+  /*--- Write a Tecplot file for visualizing the edge coloring. We will
+   store the color at the nodes, so it will only be approximate. ---*/
+  
+  Write_EdgeColors();
+  
   /*--- Print some information, delete memory, and exit ---*/
   
   cout << "Colored "<< nEdge << " edges into "<< nparts << " groups with ";
-  cout << objval << " repeated points." << endl;
+  cout << nPointRepeated << " repeated points." << endl;
   
   delete [] part;
   delete [] xadj;
   delete [] adjncy;
   delete [] EdgesPerColor;
+  delete [] ColorsPerNode;
+  delete [] FoundNode;
+  for (iColor = 0; iColor < nColor; iColor++) {
+    delete [] Node_Colors[iColor];
+  }
+  delete [] Node_Colors;
+  
+#else
+  
+  /*--- METIS is not available for the grid coloring. Set all edges to
+   a single color so that the various loops operate as normal. ---*/
+  
+  cout << "No edge coloring strategy employed." << endl;
+  
+  nColor = 1;
+  unsigned long iColor = 0, iEdge, iPoint;
+  
+  /*--- Set all edges to the same color ---*/
+  
+  for (iEdge = 0; iEdge < nEdge; iEdge++) edge[iEdge]->SetColor(iColor);
+  
+  /*--- Some post-processing for number of edges by color ---*/
+  
+  SetnEdge_Color(iColor, nEdge);
+  
+  /*--- Allocate memory and create local<->global edge mapping ---*/
+  
+  Global_Edge = new unsigned long*[nColor];
+  for (iColor = 0; iColor < nColor; iColor++) {
+    Global_Edge[iColor] = new unsigned long[GetnEdge(iColor)];
+    for (iEdge = 0; iEdge < nEdge; iEdge++) {
+      Global_Edge[iColor][iEdge] = iEdge;
+    }
+  }
+  
+  /*--- Set total number of repeated points to zero. ---*/
+  
+  nPointRepeated = 0;
+  
+  /*--- Allocate memory to store the mapping between parent<->repeated nodes ---*/
+  
+  Repeated_Points = new unsigned long*[nColor];
+  for (iColor = 0; iColor < nColor; iColor++) {
+    Repeated_Points[iColor] = new unsigned long[nPointDomain];
+  }
+  
+  /*--- Create the mapping between parent<->repeated nodes ---*/
+  
+  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    
+    /*--- This point is not repeated, so set the flag to false. ---*/
+    
+    node[iPoint]->SetRepeatedPoint(false);
+    Repeated_Points[0][iPoint] = iPoint;
+    
+  }
   
 #endif
+}
+
+void CPhysicalGeometry::Write_EdgeColors(void) {
+  unsigned long iElem, iPoint, iColor, Min_Color, adjPoint, adjEdge;
+  unsigned short iDim, iNode;
+  ofstream Tecplot_File;
+  
+  Tecplot_File.open("Edge_Colors.dat", ios::out);
+  Tecplot_File << "TITLE = \"Visualization of the volumetric grid\"" << endl;
+  
+  if (nDim == 2) {
+    Tecplot_File << "VARIABLES = \"x\",\"y\",\"Colors\" " << endl;
+    Tecplot_File << "ZONE NODES= "<< nPoint <<", ELEMENTS= "<< nElem <<", DATAPACKING=POINT, ZONETYPE=FEQUADRILATERAL"<< endl;
+  }
+  if (nDim == 3) {
+    Tecplot_File << "VARIABLES = \"x\",\"y\",\"z\",\"Colors\" " << endl;
+    Tecplot_File << "ZONE NODES= "<< nPoint <<", ELEMENTS= "<< nElem <<", DATAPACKING=POINT, ZONETYPE=FEBRICK"<< endl;
+  }
+  
+  /*--- Add a loop to retrieve and write the edge (node) colors ---*/
+  
+  long *Node_Colors = new long[nPointDomain];
+  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    
+    /*--- Loop over all neighbor points ---*/
+    Min_Color = 10e10;
+    for (iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
+      adjPoint = node[iPoint]->GetPoint(iNode);
+      
+      /*--- Find the edge connecting these two nodes ---*/
+      
+      adjEdge = FindEdge(iPoint, adjPoint);
+      
+      /*--- Add the color of this edge to the vector ---*/
+      
+      iColor = edge[adjEdge]->GetColor();
+      
+      /*--- Check if this is the smallest color ---*/
+      
+      if (iColor < Min_Color) Min_Color = iColor;
+      
+    }
+    if (node[iPoint]->GetRepeatedPoint()) Min_Color = -1;
+    
+    /*--- Write the min color for this node ---*/
+    
+    Node_Colors[iPoint] = Min_Color;
+    
+  }
+  
+  for(iPoint = 0; iPoint < nPoint; iPoint++) {
+    for(iDim = 0; iDim < nDim; iDim++)
+      Tecplot_File << scientific << node[iPoint]->GetCoord(iDim) << "\t";
+    Tecplot_File << Node_Colors[iPoint] << "\n";
+  }
+  
+  for(iElem = 0; iElem < nElem; iElem++) {
+    if (elem[iElem]->GetVTK_Type() == TRIANGLE) {
+      Tecplot_File <<
+      elem[iElem]->GetNode(0)+1 <<" "<< elem[iElem]->GetNode(1)+1 <<" "<<
+      elem[iElem]->GetNode(2)+1 <<" "<< elem[iElem]->GetNode(2)+1 << endl;
+    }
+    if (elem[iElem]->GetVTK_Type() == RECTANGLE) {
+      Tecplot_File <<
+      elem[iElem]->GetNode(0)+1 <<" "<< elem[iElem]->GetNode(1)+1 <<" "<<
+      elem[iElem]->GetNode(2)+1 <<" "<< elem[iElem]->GetNode(3)+1 << endl;
+    }
+    if (elem[iElem]->GetVTK_Type() == TETRAHEDRON) {
+      Tecplot_File <<
+      elem[iElem]->GetNode(0)+1 <<" "<< elem[iElem]->GetNode(1)+1 <<" "<<
+      elem[iElem]->GetNode(2)+1 <<" "<< elem[iElem]->GetNode(2)+1 <<" "<<
+      elem[iElem]->GetNode(3)+1 <<" "<< elem[iElem]->GetNode(3)+1 <<" "<<
+      elem[iElem]->GetNode(3)+1 <<" "<< elem[iElem]->GetNode(3)+1 << endl;
+    }
+    if (elem[iElem]->GetVTK_Type() == HEXAHEDRON) {
+      Tecplot_File <<
+      elem[iElem]->GetNode(0)+1 <<" "<< elem[iElem]->GetNode(1)+1 <<" "<<
+      elem[iElem]->GetNode(2)+1 <<" "<< elem[iElem]->GetNode(3)+1 <<" "<<
+      elem[iElem]->GetNode(4)+1 <<" "<< elem[iElem]->GetNode(5)+1 <<" "<<
+      elem[iElem]->GetNode(6)+1 <<" "<< elem[iElem]->GetNode(7)+1 << endl;
+    }
+    if (elem[iElem]->GetVTK_Type() == PYRAMID) {
+      Tecplot_File <<
+      elem[iElem]->GetNode(0)+1 <<" "<< elem[iElem]->GetNode(1)+1 <<" "<<
+      elem[iElem]->GetNode(2)+1 <<" "<< elem[iElem]->GetNode(3)+1 <<" "<<
+      elem[iElem]->GetNode(4)+1 <<" "<< elem[iElem]->GetNode(4)+1 <<" "<<
+      elem[iElem]->GetNode(4)+1 <<" "<< elem[iElem]->GetNode(4)+1 << endl;
+    }
+    if (elem[iElem]->GetVTK_Type() == WEDGE) {
+      Tecplot_File <<
+      elem[iElem]->GetNode(0)+1 <<" "<< elem[iElem]->GetNode(1)+1 <<" "<<
+      elem[iElem]->GetNode(1)+1 <<" "<< elem[iElem]->GetNode(2)+1 <<" "<<
+      elem[iElem]->GetNode(3)+1 <<" "<< elem[iElem]->GetNode(4)+1 <<" "<<
+      elem[iElem]->GetNode(4)+1 <<" "<< elem[iElem]->GetNode(5)+1 << endl;
+    }
+  }
+  
+  Tecplot_File.close();
+  delete [] Node_Colors;
+  
+  cout << "Wrote Tecplot file for visualizing edge coloring."<< endl;
+  
 }
 
 void CPhysicalGeometry::SetBoundVolume(void) {
