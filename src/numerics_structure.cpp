@@ -36,174 +36,23 @@ CNumerics::CNumerics(unsigned short val_nDim, unsigned short val_nVar,
   //U_jd = new double [nVar];
   
   UnitNormal = new double [nDim];
-  UnitNormald = new double [nDim];
   
   Normal = new double [nDim];
-  Flux_Tensor = new double* [nVar];
-  for (unsigned short iVar = 0; iVar < (nVar); iVar++)
-    Flux_Tensor[iVar] = new double [nDim];
-  
-  tau = new double* [nDim];
-  delta = new double* [nDim];
-  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
-    tau[iDim] = new double [nDim];
-    delta[iDim] = new double [nDim];
-  }
-  
-  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
-    for (unsigned short jDim = 0; jDim < nDim; jDim++) {
-      if (iDim==jDim) delta[iDim][jDim]=1.0;
-      else delta[iDim][jDim]=0.0;
-    }
-  }
-  
-  U_n = new double [nVar];
-  U_nM1 = new double [nVar];
-  U_nP1 = new double [nVar];
-  
-  Proj_Flux_Tensor = new double [nVar];
-  
+
   turb_ke_i = 0.0;
   turb_ke_j = 0.0;
   
-  Diffusion_Coeff_i = NULL;
-  Diffusion_Coeff_j = NULL;
-  
   Vector = new double[nDim];
-  
-  l = new double [nDim];
-  m = new double [nDim];
+
 }
 
 CNumerics::~CNumerics(void) {
   
   delete [] Normal;
   delete [] UnitNormal;
-  
-  delete [] U_n;
-  delete [] U_nM1;
-  delete [] U_nP1;
-  
-  // visc
-  delete [] Proj_Flux_Tensor;
-  
-  for (unsigned short iVar = 0; iVar < nDim+3; iVar++) {
-    delete [] Flux_Tensor[iVar];
-  }
-  delete [] Flux_Tensor;
-  
-  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
-    delete [] tau[iDim];
-    delete [] delta[iDim];
-  }
-  delete [] tau;
-  delete [] delta;
+
   delete [] Normal;
-  delete [] Theta_v;
-  if (Ys != NULL) delete [] Ys;
-  if (dFdYi != NULL) {
-    delete [] dFdYi;
-  }
-  if (dFdYj != NULL) {
-    delete [] dFdYj;
-  }
-  if (sumdFdYih != NULL) delete [] sumdFdYih;
-  if (sumdFdYjh != NULL) delete [] sumdFdYjh;
-  if (sumdFdYieve != NULL) delete [] sumdFdYieve;
-  if (sumdFdYjeve != NULL) delete [] sumdFdYjeve;
-  if (Diffusion_Coeff_i != NULL) delete [] Diffusion_Coeff_i;
-  if (Diffusion_Coeff_j != NULL) delete [] Diffusion_Coeff_j;
   if (Vector != NULL) delete [] Vector;
-  
-  unsigned short iVar;
-  for (iVar = 0; iVar < nVar; iVar++) {
-    delete [] dVdU[iVar];
-  }
-  delete [] dVdU;
-  
-}
-
-void CNumerics::GetInviscidFlux(double val_density, double *val_velocity,
-                                double val_pressure, double val_enthalpy) {
-  if (nDim == 3) {
-    Flux_Tensor[0][0] = val_density*val_velocity[0];
-    Flux_Tensor[1][0] = Flux_Tensor[0][0]*val_velocity[0]+val_pressure;
-    Flux_Tensor[2][0] = Flux_Tensor[0][0]*val_velocity[1];
-    Flux_Tensor[3][0] = Flux_Tensor[0][0]*val_velocity[2];
-    Flux_Tensor[4][0] = Flux_Tensor[0][0]*val_enthalpy;
-    
-    Flux_Tensor[0][1] = val_density*val_velocity[1];
-    Flux_Tensor[1][1] = Flux_Tensor[0][1]*val_velocity[0];
-    Flux_Tensor[2][1] = Flux_Tensor[0][1]*val_velocity[1]+val_pressure;
-    Flux_Tensor[3][1] = Flux_Tensor[0][1]*val_velocity[2];
-    Flux_Tensor[4][1] = Flux_Tensor[0][1]*val_enthalpy;
-    
-    Flux_Tensor[0][2] = val_density*val_velocity[2];
-    Flux_Tensor[1][2] = Flux_Tensor[0][2]*val_velocity[0];
-    Flux_Tensor[2][2] = Flux_Tensor[0][2]*val_velocity[1];
-    Flux_Tensor[3][2] = Flux_Tensor[0][2]*val_velocity[2]+val_pressure;
-    Flux_Tensor[4][2] = Flux_Tensor[0][2]*val_enthalpy;
-    
-  }
-  if(nDim == 2) {
-    Flux_Tensor[0][0] = val_density*val_velocity[0];
-    Flux_Tensor[1][0] = Flux_Tensor[0][0]*val_velocity[0]+val_pressure;
-    Flux_Tensor[2][0] = Flux_Tensor[0][0]*val_velocity[1];
-    Flux_Tensor[3][0] = Flux_Tensor[0][0]*val_enthalpy;
-    
-    Flux_Tensor[0][1] = val_density*val_velocity[1];
-    Flux_Tensor[1][1] = Flux_Tensor[0][1]*val_velocity[0];
-    Flux_Tensor[2][1] = Flux_Tensor[0][1]*val_velocity[1]+val_pressure;
-    Flux_Tensor[3][1] = Flux_Tensor[0][1]*val_enthalpy;
-  }
-}
-
-void CNumerics::GetInviscidProjFlux(double *val_density,
-                                    double *val_velocity,
-                                    double *val_pressure,
-                                    double *val_enthalpy,
-                                    double *val_normal,
-                                    double *val_Proj_Flux) {
-  double rhou, rhov, rhow;
-  
-  
-  if (nDim == 2) {
-    rhou = (*val_density)*val_velocity[0];
-    rhov = (*val_density)*val_velocity[1];
-    
-    val_Proj_Flux[0] = rhou*val_normal[0];
-    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
-    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
-    val_Proj_Flux[3] = rhou*(*val_enthalpy)*val_normal[0];
-    
-    val_Proj_Flux[0] += rhov*val_normal[1];
-    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
-    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
-    val_Proj_Flux[3] += rhov*(*val_enthalpy)*val_normal[1];
-  }
-  else {
-    rhou = (*val_density)*val_velocity[0];
-    rhov = (*val_density)*val_velocity[1];
-    rhow = (*val_density)*val_velocity[2];
-    
-    val_Proj_Flux[0] = rhou*val_normal[0];
-    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
-    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
-    val_Proj_Flux[3] = rhou*val_velocity[2]*val_normal[0];
-    val_Proj_Flux[4] = rhou*(*val_enthalpy)*val_normal[0];
-    
-    val_Proj_Flux[0] += rhov*val_normal[1];
-    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
-    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
-    val_Proj_Flux[3] += rhov*val_velocity[2]*val_normal[1];
-    val_Proj_Flux[4] += rhov*(*val_enthalpy)*val_normal[1];
-    
-    val_Proj_Flux[0] += rhow*val_normal[2];
-    val_Proj_Flux[1] += rhow*val_velocity[0]*val_normal[2];
-    val_Proj_Flux[2] += rhow*val_velocity[1]*val_normal[2];
-    val_Proj_Flux[3] += (rhow*val_velocity[2]+(*val_pressure))*val_normal[2];
-    val_Proj_Flux[4] += rhow*(*val_enthalpy)*val_normal[2];
-  }
   
 }
 
@@ -241,23 +90,6 @@ void CNumerics::GetInviscidProjJac(double *val_velocity, double *val_energy,
     val_Proj_Jac_Tensor[nDim+1][iDim+1] = val_scale*(val_normal[iDim]*a1-a2*val_velocity[iDim]*proj_vel);
   val_Proj_Jac_Tensor[nDim+1][nDim+1] = val_scale*Gamma*proj_vel;
 }
-
-void CNumerics::SetPastSol (double *val_u_nM1, double *val_u_n, double *val_u_nP1) {
-  unsigned short iVar;
-  
-  for(iVar = 0; iVar < nVar; iVar++) {
-    U_nM1[iVar] = val_u_nM1[iVar];
-    U_n[iVar] = val_u_n[iVar];
-    U_nP1[iVar] = val_u_nP1[iVar];
-  }
-  
-}
-void CNumerics::SetPastVolume (double val_volume_nM1, double val_volume_n, double val_volume_nP1) {
-  Volume_nM1 = val_volume_nM1;
-  Volume_n = val_volume_n;
-  Volume_nP1 = val_volume_nP1;
-}
-
 
 void CNumerics::GetPMatrix(double *val_density, double *val_velocity,
                            double *val_soundspeed, double *val_normal, double **val_p_tensor) {
@@ -633,131 +465,6 @@ void CNumerics::GetJacInviscidLambda_fabs(double *val_velocity, double val_sound
   }
 }
 
-void CNumerics::GetViscousFlux(double *val_primvar, double **val_gradprimvar,
-                               double val_laminar_viscosity, double val_eddy_viscosity, double val_mach_inf) {
-  
-  double total_viscosity = val_laminar_viscosity + val_eddy_viscosity;
-  double cp = (Gamma / Gamma_Minus_One) * Gas_Constant;
-  double heat_flux_factor = cp * (val_laminar_viscosity/PRANDTL + val_eddy_viscosity/PRANDTL_TURB);
-  
-  double div_vel = 0.0;
-  for (unsigned short iDim = 0 ; iDim < nDim; iDim++)
-    div_vel += val_gradprimvar[iDim+1][iDim];
-  
-  for (unsigned short iDim = 0 ; iDim < nDim; iDim++) {
-    for (unsigned short jDim = 0 ; jDim < nDim; jDim++) {
-      tau[iDim][jDim] = total_viscosity*( val_gradprimvar[jDim+1][iDim] +
-                                         val_gradprimvar[iDim+1][jDim] )
-      -TWO3*total_viscosity*div_vel*delta[iDim][jDim];
-    }
-  }
-  
-  // Gradient of primitive variables -> [Temp vel_x vel_y vel_z Pressure]
-  if (nDim == 3) {
-    Flux_Tensor[0][0] = 0.0;
-    Flux_Tensor[1][0] = tau[0][0];
-    Flux_Tensor[2][0] = tau[0][1];
-    Flux_Tensor[3][0] = tau[0][2];
-    Flux_Tensor[4][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2] + tau[0][2]*val_primvar[3] +
-    heat_flux_factor*val_gradprimvar[0][0];
-    
-    Flux_Tensor[0][1] = 0.0;
-    Flux_Tensor[1][1] = tau[1][0];
-    Flux_Tensor[2][1] = tau[1][1];
-    Flux_Tensor[3][1] = tau[1][2];
-    Flux_Tensor[4][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2] + tau[1][2]*val_primvar[3] +
-    heat_flux_factor*val_gradprimvar[0][1];
-    
-    Flux_Tensor[0][2] = 0.0;
-    Flux_Tensor[1][2] = tau[2][0];
-    Flux_Tensor[2][2] = tau[2][1];
-    Flux_Tensor[3][2] = tau[2][2];
-    Flux_Tensor[4][2] = tau[2][0]*val_primvar[1] + tau[2][1]*val_primvar[2] + tau[2][2]*val_primvar[3] +
-    heat_flux_factor*val_gradprimvar[0][2];
-  }
-  if (nDim == 2) {
-    Flux_Tensor[0][0] = 0.0;
-    Flux_Tensor[1][0] = tau[0][0];
-    Flux_Tensor[2][0] = tau[0][1];
-    Flux_Tensor[3][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2]+
-    heat_flux_factor*val_gradprimvar[0][0];
-    
-    Flux_Tensor[0][1] = 0.0;
-    Flux_Tensor[1][1] = tau[1][0];
-    Flux_Tensor[2][1] = tau[1][1];
-    Flux_Tensor[3][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2]+
-    heat_flux_factor*val_gradprimvar[0][1];
-  }
-}
-
-void CNumerics::GetViscousProjFlux(double *val_primvar,
-                                   double **val_gradprimvar, double val_turb_ke,
-                                   double *val_normal,
-                                   double val_laminar_viscosity,
-                                   double val_eddy_viscosity) {
-  
-  unsigned short iVar, iDim, jDim;
-  double total_viscosity, heat_flux_factor, div_vel, cp, Density;
-  Density = val_primvar[nDim+2];
-  
-  total_viscosity = val_laminar_viscosity + val_eddy_viscosity;
-  cp = (Gamma / Gamma_Minus_One) * Gas_Constant;
-  heat_flux_factor = cp * (val_laminar_viscosity/PRANDTL + val_eddy_viscosity/PRANDTL_TURB);
-  
-  div_vel = 0.0;
-  for (iDim = 0 ; iDim < nDim; iDim++)
-    div_vel += val_gradprimvar[iDim+1][iDim];
-  
-  for (iDim = 0 ; iDim < nDim; iDim++)
-    for (jDim = 0 ; jDim < nDim; jDim++)
-      tau[iDim][jDim] = total_viscosity*( val_gradprimvar[jDim+1][iDim] + val_gradprimvar[iDim+1][jDim] )
-      - TWO3*total_viscosity*div_vel*delta[iDim][jDim]
-      - TWO3*Density*val_turb_ke*delta[iDim][jDim];
-  
-  
-  /*--- Gradient of primitive variables -> [Temp vel_x vel_y vel_z Pressure] ---*/
-  if (nDim == 2) {
-    Flux_Tensor[0][0] = 0.0;
-    Flux_Tensor[1][0] = tau[0][0];
-    Flux_Tensor[2][0] = tau[0][1];
-    Flux_Tensor[3][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2]+
-    heat_flux_factor*val_gradprimvar[0][0];
-    
-    Flux_Tensor[0][1] = 0.0;
-    Flux_Tensor[1][1] = tau[1][0];
-    Flux_Tensor[2][1] = tau[1][1];
-    Flux_Tensor[3][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2]+
-    heat_flux_factor*val_gradprimvar[0][1];
-  } else {
-    Flux_Tensor[0][0] = 0.0;
-    Flux_Tensor[1][0] = tau[0][0];
-    Flux_Tensor[2][0] = tau[0][1];
-    Flux_Tensor[3][0] = tau[0][2];
-    Flux_Tensor[4][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2] + tau[0][2]*val_primvar[3] +
-    heat_flux_factor*val_gradprimvar[0][0];
-    
-    Flux_Tensor[0][1] = 0.0;
-    Flux_Tensor[1][1] = tau[1][0];
-    Flux_Tensor[2][1] = tau[1][1];
-    Flux_Tensor[3][1] = tau[1][2];
-    Flux_Tensor[4][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2] + tau[1][2]*val_primvar[3] +
-    heat_flux_factor*val_gradprimvar[0][1];
-    
-    Flux_Tensor[0][2] = 0.0;
-    Flux_Tensor[1][2] = tau[2][0];
-    Flux_Tensor[2][2] = tau[2][1];
-    Flux_Tensor[3][2] = tau[2][2];
-    Flux_Tensor[4][2] = tau[2][0]*val_primvar[1] + tau[2][1]*val_primvar[2] + tau[2][2]*val_primvar[3] +
-    heat_flux_factor*val_gradprimvar[0][2];
-  }
-  
-  for (iVar = 0; iVar < nVar; iVar++) {
-    Proj_Flux_Tensor[iVar] = 0.0;
-    for (iDim = 0; iDim < nDim; iDim++)
-      Proj_Flux_Tensor[iVar] += Flux_Tensor[iVar][iDim] * val_normal[iDim];
-  }
-  
-}
 
 void CNumerics::GetViscousProjJacs(double *val_Mean_PrimVar, double val_laminar_viscosity,
                                    double val_eddy_viscosity, double val_dist_ij, double *val_normal, double val_dS,
@@ -888,41 +595,6 @@ void CNumerics::GetViscousProjJacs(double *val_Mean_PrimVar, double val_laminar_
     
   }
   
-}
-
-void CNumerics::CreateBasis(double *val_Normal) {
-  unsigned short iDim;
-  double modm, modl;
-  
-  /*--- Define l as a vector in the plane normal to the supplied vector ---*/
-  l[0] = 0.0;
-  l[1] = -val_Normal[2];
-  l[2] = val_Normal[1];
-  
-  /*--- Check for the zero vector and re-assign if needed ---*/
-  if (l[0] == 0.0 && l[1] == 0.0 && l[2] == 0.0) {
-    l[0] = -val_Normal[2];
-    l[1] = 0.0;
-    l[2] = val_Normal[0];
-  }
-  
-  /*--- Take vector product of n * l to make m ---*/
-  m[0] = val_Normal[1]*l[2] - val_Normal[2]*l[1];
-  m[1] = val_Normal[2]*l[0] - val_Normal[0]*l[2];
-  m[2] = val_Normal[0]*l[1] - val_Normal[1]*l[0];
-  
-  /*--- Normalize ---*/
-  modm =0 ; modl = 0;
-  for (iDim =0 ; iDim < nDim; iDim++) {
-    modm += m[iDim]*m[iDim];
-    modl += l[iDim]*l[iDim];
-  }
-  modm = sqrt(modm);
-  modl = sqrt(modl);
-  for (iDim =0 ; iDim < nDim; iDim++) {
-    l[iDim] = l[iDim]/modl;
-    m[iDim] = m[iDim]/modm;
-  }
 }
 
 CSourceNothing::CSourceNothing(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics(val_nDim, val_nVar, config) { }

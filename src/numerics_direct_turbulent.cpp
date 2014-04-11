@@ -89,6 +89,11 @@ CAvgGrad_TurbSA::~CAvgGrad_TurbSA(void) {
   
 }
 
+void CAvgGrad_TurbSA::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
+	Laminar_Viscosity_i = val_lam_viscosity_i;
+	Laminar_Viscosity_j = val_lam_viscosity_j;
+}
+
 void CAvgGrad_TurbSA::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
   
   Density_i = V_i[nDim+2];            Density_j = V_j[nDim+2];
@@ -163,6 +168,11 @@ CAvgGradCorrected_TurbSA::~CAvgGradCorrected_TurbSA(void) {
     delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
   
+}
+
+void CAvgGradCorrected_TurbSA::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
+	Laminar_Viscosity_i = val_lam_viscosity_i;
+	Laminar_Viscosity_j = val_lam_viscosity_j;
 }
 
 void CAvgGradCorrected_TurbSA::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
@@ -393,6 +403,11 @@ CAvgGrad_TurbSST::~CAvgGrad_TurbSST(void) {
   
 }
 
+void CAvgGrad_TurbSST::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
+	Laminar_Viscosity_i = val_lam_viscosity_i;
+	Laminar_Viscosity_j = val_lam_viscosity_j;
+}
+
 void CAvgGrad_TurbSST::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
   
   double sigma_kine_i, sigma_kine_j, sigma_omega_i, sigma_omega_j;
@@ -486,6 +501,11 @@ CAvgGradCorrected_TurbSST::~CAvgGradCorrected_TurbSST(void) {
     delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
   
+}
+
+void CAvgGradCorrected_TurbSST::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
+	Laminar_Viscosity_i = val_lam_viscosity_i;
+	Laminar_Viscosity_j = val_lam_viscosity_j;
 }
 
 void CAvgGradCorrected_TurbSST::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {

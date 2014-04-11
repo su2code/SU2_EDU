@@ -177,6 +177,55 @@ void CCentJST_Flow::ComputeResidual(double *val_residual, double **val_Jacobian_
   
 }
 
+void CCentJST_Flow::GetInviscidProjFlux(double *val_density,
+                                    double *val_velocity,
+                                    double *val_pressure,
+                                    double *val_enthalpy,
+                                    double *val_normal,
+                                    double *val_Proj_Flux) {
+  double rhou, rhov, rhow;
+  
+  
+  if (nDim == 2) {
+    rhou = (*val_density)*val_velocity[0];
+    rhov = (*val_density)*val_velocity[1];
+    
+    val_Proj_Flux[0] = rhou*val_normal[0];
+    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
+    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
+    val_Proj_Flux[3] = rhou*(*val_enthalpy)*val_normal[0];
+    
+    val_Proj_Flux[0] += rhov*val_normal[1];
+    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
+    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
+    val_Proj_Flux[3] += rhov*(*val_enthalpy)*val_normal[1];
+  }
+  else {
+    rhou = (*val_density)*val_velocity[0];
+    rhov = (*val_density)*val_velocity[1];
+    rhow = (*val_density)*val_velocity[2];
+    
+    val_Proj_Flux[0] = rhou*val_normal[0];
+    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
+    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
+    val_Proj_Flux[3] = rhou*val_velocity[2]*val_normal[0];
+    val_Proj_Flux[4] = rhou*(*val_enthalpy)*val_normal[0];
+    
+    val_Proj_Flux[0] += rhov*val_normal[1];
+    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
+    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
+    val_Proj_Flux[3] += rhov*val_velocity[2]*val_normal[1];
+    val_Proj_Flux[4] += rhov*(*val_enthalpy)*val_normal[1];
+    
+    val_Proj_Flux[0] += rhow*val_normal[2];
+    val_Proj_Flux[1] += rhow*val_velocity[0]*val_normal[2];
+    val_Proj_Flux[2] += rhow*val_velocity[1]*val_normal[2];
+    val_Proj_Flux[3] += (rhow*val_velocity[2]+(*val_pressure))*val_normal[2];
+    val_Proj_Flux[4] += rhow*(*val_enthalpy)*val_normal[2];
+  }
+  
+}
+
 CCentLax_Flow::CCentLax_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
   Gamma = config->GetGamma();
@@ -317,6 +366,55 @@ void CCentLax_Flow::ComputeResidual(double *val_residual, double **val_Jacobian_
       val_Jacobian_j[nVar-1][iDim+1] += cte*Gamma_Minus_One*Velocity_j[iDim];
     val_Jacobian_j[nVar-1][nVar-1] -= cte*Gamma;
     
+  }
+  
+}
+
+void CCentLax_Flow::GetInviscidProjFlux(double *val_density,
+                                        double *val_velocity,
+                                        double *val_pressure,
+                                        double *val_enthalpy,
+                                        double *val_normal,
+                                        double *val_Proj_Flux) {
+  double rhou, rhov, rhow;
+  
+  
+  if (nDim == 2) {
+    rhou = (*val_density)*val_velocity[0];
+    rhov = (*val_density)*val_velocity[1];
+    
+    val_Proj_Flux[0] = rhou*val_normal[0];
+    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
+    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
+    val_Proj_Flux[3] = rhou*(*val_enthalpy)*val_normal[0];
+    
+    val_Proj_Flux[0] += rhov*val_normal[1];
+    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
+    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
+    val_Proj_Flux[3] += rhov*(*val_enthalpy)*val_normal[1];
+  }
+  else {
+    rhou = (*val_density)*val_velocity[0];
+    rhov = (*val_density)*val_velocity[1];
+    rhow = (*val_density)*val_velocity[2];
+    
+    val_Proj_Flux[0] = rhou*val_normal[0];
+    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
+    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
+    val_Proj_Flux[3] = rhou*val_velocity[2]*val_normal[0];
+    val_Proj_Flux[4] = rhou*(*val_enthalpy)*val_normal[0];
+    
+    val_Proj_Flux[0] += rhov*val_normal[1];
+    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
+    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
+    val_Proj_Flux[3] += rhov*val_velocity[2]*val_normal[1];
+    val_Proj_Flux[4] += rhov*(*val_enthalpy)*val_normal[1];
+    
+    val_Proj_Flux[0] += rhow*val_normal[2];
+    val_Proj_Flux[1] += rhow*val_velocity[0]*val_normal[2];
+    val_Proj_Flux[2] += rhow*val_velocity[1]*val_normal[2];
+    val_Proj_Flux[3] += (rhow*val_velocity[2]+(*val_pressure))*val_normal[2];
+    val_Proj_Flux[4] += rhow*(*val_enthalpy)*val_normal[2];
   }
   
 }
@@ -910,6 +1008,55 @@ void CUpwRoe_Flow::ComputeResidual(double *val_residual, double **val_Jacobian_i
   
 }
 
+void CUpwRoe_Flow::GetInviscidProjFlux(double *val_density,
+                                        double *val_velocity,
+                                        double *val_pressure,
+                                        double *val_enthalpy,
+                                        double *val_normal,
+                                        double *val_Proj_Flux) {
+  double rhou, rhov, rhow;
+  
+  
+  if (nDim == 2) {
+    rhou = (*val_density)*val_velocity[0];
+    rhov = (*val_density)*val_velocity[1];
+    
+    val_Proj_Flux[0] = rhou*val_normal[0];
+    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
+    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
+    val_Proj_Flux[3] = rhou*(*val_enthalpy)*val_normal[0];
+    
+    val_Proj_Flux[0] += rhov*val_normal[1];
+    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
+    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
+    val_Proj_Flux[3] += rhov*(*val_enthalpy)*val_normal[1];
+  }
+  else {
+    rhou = (*val_density)*val_velocity[0];
+    rhov = (*val_density)*val_velocity[1];
+    rhow = (*val_density)*val_velocity[2];
+    
+    val_Proj_Flux[0] = rhou*val_normal[0];
+    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
+    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
+    val_Proj_Flux[3] = rhou*val_velocity[2]*val_normal[0];
+    val_Proj_Flux[4] = rhou*(*val_enthalpy)*val_normal[0];
+    
+    val_Proj_Flux[0] += rhov*val_normal[1];
+    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
+    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
+    val_Proj_Flux[3] += rhov*val_velocity[2]*val_normal[1];
+    val_Proj_Flux[4] += rhov*(*val_enthalpy)*val_normal[1];
+    
+    val_Proj_Flux[0] += rhow*val_normal[2];
+    val_Proj_Flux[1] += rhow*val_velocity[0]*val_normal[2];
+    val_Proj_Flux[2] += rhow*val_velocity[1]*val_normal[2];
+    val_Proj_Flux[3] += (rhow*val_velocity[2]+(*val_pressure))*val_normal[2];
+    val_Proj_Flux[4] += rhow*(*val_enthalpy)*val_normal[2];
+  }
+  
+}
+
 CUpwRoeTurkel_Flow::CUpwRoeTurkel_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
   implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
@@ -1102,9 +1249,78 @@ void CUpwRoeTurkel_Flow::ComputeResidual(double *val_residual, double **val_Jaco
   
 }
 
+void CUpwRoeTurkel_Flow::GetInviscidProjFlux(double *val_density,
+                                        double *val_velocity,
+                                        double *val_pressure,
+                                        double *val_enthalpy,
+                                        double *val_normal,
+                                        double *val_Proj_Flux) {
+  double rhou, rhov, rhow;
+  
+  
+  if (nDim == 2) {
+    rhou = (*val_density)*val_velocity[0];
+    rhov = (*val_density)*val_velocity[1];
+    
+    val_Proj_Flux[0] = rhou*val_normal[0];
+    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
+    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
+    val_Proj_Flux[3] = rhou*(*val_enthalpy)*val_normal[0];
+    
+    val_Proj_Flux[0] += rhov*val_normal[1];
+    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
+    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
+    val_Proj_Flux[3] += rhov*(*val_enthalpy)*val_normal[1];
+  }
+  else {
+    rhou = (*val_density)*val_velocity[0];
+    rhov = (*val_density)*val_velocity[1];
+    rhow = (*val_density)*val_velocity[2];
+    
+    val_Proj_Flux[0] = rhou*val_normal[0];
+    val_Proj_Flux[1] = (rhou*val_velocity[0]+(*val_pressure))*val_normal[0];
+    val_Proj_Flux[2] = rhou*val_velocity[1]*val_normal[0];
+    val_Proj_Flux[3] = rhou*val_velocity[2]*val_normal[0];
+    val_Proj_Flux[4] = rhou*(*val_enthalpy)*val_normal[0];
+    
+    val_Proj_Flux[0] += rhov*val_normal[1];
+    val_Proj_Flux[1] += rhov*val_velocity[0]*val_normal[1];
+    val_Proj_Flux[2] += (rhov*val_velocity[1]+(*val_pressure))*val_normal[1];
+    val_Proj_Flux[3] += rhov*val_velocity[2]*val_normal[1];
+    val_Proj_Flux[4] += rhov*(*val_enthalpy)*val_normal[1];
+    
+    val_Proj_Flux[0] += rhow*val_normal[2];
+    val_Proj_Flux[1] += rhow*val_velocity[0]*val_normal[2];
+    val_Proj_Flux[2] += rhow*val_velocity[1]*val_normal[2];
+    val_Proj_Flux[3] += (rhow*val_velocity[2]+(*val_pressure))*val_normal[2];
+    val_Proj_Flux[4] += rhow*(*val_enthalpy)*val_normal[2];
+  }
+  
+}
+
 CAvgGrad_Flow::CAvgGrad_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
   implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
+  
+  Flux_Tensor = new double* [nVar];
+  for (unsigned short iVar = 0; iVar < (nVar); iVar++)
+    Flux_Tensor[iVar] = new double [nDim];
+  
+  Proj_Flux_Tensor = new double [nVar];
+
+  tau = new double* [nDim];
+  delta = new double* [nDim];
+  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
+    tau[iDim] = new double [nDim];
+    delta[iDim] = new double [nDim];
+  }
+  
+  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
+    for (unsigned short jDim = 0; jDim < nDim; jDim++) {
+      if (iDim==jDim) delta[iDim][jDim]=1.0;
+      else delta[iDim][jDim]=0.0;
+    }
+  }
   
   /*--- Compressible flow, primitive variables nDim+3, (T,vx,vy,vz,P,rho) ---*/
   PrimVar_i = new double [nDim+3];
@@ -1126,6 +1342,20 @@ CAvgGrad_Flow::~CAvgGrad_Flow(void) {
   for (iVar = 0; iVar < nDim+1; iVar++)
     delete [] Mean_GradPrimVar[iVar];
   delete [] Mean_GradPrimVar;
+  
+  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
+    delete [] tau[iDim];
+    delete [] delta[iDim];
+  }
+  delete [] tau;
+  delete [] delta;
+  
+  delete [] Proj_Flux_Tensor;
+  
+  for (unsigned short iVar = 0; iVar < nDim+3; iVar++) {
+    delete [] Flux_Tensor[iVar];
+  }
+  delete [] Flux_Tensor;
   
 }
 
@@ -1194,9 +1424,154 @@ void CAvgGrad_Flow::ComputeResidual(double *val_residual, double **val_Jacobian_
   
 }
 
+
+void CAvgGrad_Flow::GetViscousFlux(double *val_primvar, double **val_gradprimvar,
+                               double val_laminar_viscosity, double val_eddy_viscosity, double val_mach_inf) {
+  
+  double total_viscosity = val_laminar_viscosity + val_eddy_viscosity;
+  double cp = (Gamma / Gamma_Minus_One) * Gas_Constant;
+  double heat_flux_factor = cp * (val_laminar_viscosity/PRANDTL + val_eddy_viscosity/PRANDTL_TURB);
+  
+  double div_vel = 0.0;
+  for (unsigned short iDim = 0 ; iDim < nDim; iDim++)
+    div_vel += val_gradprimvar[iDim+1][iDim];
+  
+  for (unsigned short iDim = 0 ; iDim < nDim; iDim++) {
+    for (unsigned short jDim = 0 ; jDim < nDim; jDim++) {
+      tau[iDim][jDim] = total_viscosity*( val_gradprimvar[jDim+1][iDim] +
+                                         val_gradprimvar[iDim+1][jDim] )
+      -TWO3*total_viscosity*div_vel*delta[iDim][jDim];
+    }
+  }
+  
+  // Gradient of primitive variables -> [Temp vel_x vel_y vel_z Pressure]
+  if (nDim == 3) {
+    Flux_Tensor[0][0] = 0.0;
+    Flux_Tensor[1][0] = tau[0][0];
+    Flux_Tensor[2][0] = tau[0][1];
+    Flux_Tensor[3][0] = tau[0][2];
+    Flux_Tensor[4][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2] + tau[0][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][0];
+    
+    Flux_Tensor[0][1] = 0.0;
+    Flux_Tensor[1][1] = tau[1][0];
+    Flux_Tensor[2][1] = tau[1][1];
+    Flux_Tensor[3][1] = tau[1][2];
+    Flux_Tensor[4][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2] + tau[1][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][1];
+    
+    Flux_Tensor[0][2] = 0.0;
+    Flux_Tensor[1][2] = tau[2][0];
+    Flux_Tensor[2][2] = tau[2][1];
+    Flux_Tensor[3][2] = tau[2][2];
+    Flux_Tensor[4][2] = tau[2][0]*val_primvar[1] + tau[2][1]*val_primvar[2] + tau[2][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][2];
+  }
+  if (nDim == 2) {
+    Flux_Tensor[0][0] = 0.0;
+    Flux_Tensor[1][0] = tau[0][0];
+    Flux_Tensor[2][0] = tau[0][1];
+    Flux_Tensor[3][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2]+
+    heat_flux_factor*val_gradprimvar[0][0];
+    
+    Flux_Tensor[0][1] = 0.0;
+    Flux_Tensor[1][1] = tau[1][0];
+    Flux_Tensor[2][1] = tau[1][1];
+    Flux_Tensor[3][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2]+
+    heat_flux_factor*val_gradprimvar[0][1];
+  }
+}
+
+void CAvgGrad_Flow::GetViscousProjFlux(double *val_primvar,
+                                   double **val_gradprimvar, double val_turb_ke,
+                                   double *val_normal,
+                                   double val_laminar_viscosity,
+                                   double val_eddy_viscosity) {
+  
+  unsigned short iVar, iDim, jDim;
+  double total_viscosity, heat_flux_factor, div_vel, cp, Density;
+  Density = val_primvar[nDim+2];
+  
+  total_viscosity = val_laminar_viscosity + val_eddy_viscosity;
+  cp = (Gamma / Gamma_Minus_One) * Gas_Constant;
+  heat_flux_factor = cp * (val_laminar_viscosity/PRANDTL + val_eddy_viscosity/PRANDTL_TURB);
+  
+  div_vel = 0.0;
+  for (iDim = 0 ; iDim < nDim; iDim++)
+    div_vel += val_gradprimvar[iDim+1][iDim];
+  
+  for (iDim = 0 ; iDim < nDim; iDim++)
+    for (jDim = 0 ; jDim < nDim; jDim++)
+      tau[iDim][jDim] = total_viscosity*( val_gradprimvar[jDim+1][iDim] + val_gradprimvar[iDim+1][jDim] )
+      - TWO3*total_viscosity*div_vel*delta[iDim][jDim]
+      - TWO3*Density*val_turb_ke*delta[iDim][jDim];
+  
+  
+  /*--- Gradient of primitive variables -> [Temp vel_x vel_y vel_z Pressure] ---*/
+  if (nDim == 2) {
+    Flux_Tensor[0][0] = 0.0;
+    Flux_Tensor[1][0] = tau[0][0];
+    Flux_Tensor[2][0] = tau[0][1];
+    Flux_Tensor[3][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2]+
+    heat_flux_factor*val_gradprimvar[0][0];
+    
+    Flux_Tensor[0][1] = 0.0;
+    Flux_Tensor[1][1] = tau[1][0];
+    Flux_Tensor[2][1] = tau[1][1];
+    Flux_Tensor[3][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2]+
+    heat_flux_factor*val_gradprimvar[0][1];
+  } else {
+    Flux_Tensor[0][0] = 0.0;
+    Flux_Tensor[1][0] = tau[0][0];
+    Flux_Tensor[2][0] = tau[0][1];
+    Flux_Tensor[3][0] = tau[0][2];
+    Flux_Tensor[4][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2] + tau[0][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][0];
+    
+    Flux_Tensor[0][1] = 0.0;
+    Flux_Tensor[1][1] = tau[1][0];
+    Flux_Tensor[2][1] = tau[1][1];
+    Flux_Tensor[3][1] = tau[1][2];
+    Flux_Tensor[4][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2] + tau[1][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][1];
+    
+    Flux_Tensor[0][2] = 0.0;
+    Flux_Tensor[1][2] = tau[2][0];
+    Flux_Tensor[2][2] = tau[2][1];
+    Flux_Tensor[3][2] = tau[2][2];
+    Flux_Tensor[4][2] = tau[2][0]*val_primvar[1] + tau[2][1]*val_primvar[2] + tau[2][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][2];
+  }
+  
+  for (iVar = 0; iVar < nVar; iVar++) {
+    Proj_Flux_Tensor[iVar] = 0.0;
+    for (iDim = 0; iDim < nDim; iDim++)
+      Proj_Flux_Tensor[iVar] += Flux_Tensor[iVar][iDim] * val_normal[iDim];
+  }
+  
+}
+
+void CAvgGrad_Flow::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
+	Laminar_Viscosity_i = val_lam_viscosity_i;
+	Laminar_Viscosity_j = val_lam_viscosity_j;
+}
+
 CAvgGradCorrected_Flow::CAvgGradCorrected_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
   implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
+
+  Flux_Tensor = new double* [nVar];
+  for (unsigned short iVar = 0; iVar < (nVar); iVar++)
+    Flux_Tensor[iVar] = new double [nDim];
+  
+  Proj_Flux_Tensor = new double [nVar];
+  
+  tau = new double* [nDim];
+  delta = new double* [nDim];
+  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
+    tau[iDim] = new double [nDim];
+    delta[iDim] = new double [nDim];
+  }
   
   /*--- Compressible flow, primitive variables nDim+3, (T,vx,vy,vz,P,rho) ---*/
   PrimVar_i = new double [nDim+3];
@@ -1224,6 +1599,20 @@ CAvgGradCorrected_Flow::~CAvgGradCorrected_Flow(void) {
   for (iVar = 0; iVar < nDim+1; iVar++)
     delete [] Mean_GradPrimVar[iVar];
   delete [] Mean_GradPrimVar;
+  
+  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
+    delete [] tau[iDim];
+    delete [] delta[iDim];
+  }
+  delete [] tau;
+  delete [] delta;
+  
+  delete [] Proj_Flux_Tensor;
+  
+  for (unsigned short iVar = 0; iVar < nDim+3; iVar++) {
+    delete [] Flux_Tensor[iVar];
+  }
+  delete [] Flux_Tensor;
   
 }
 
@@ -1300,4 +1689,136 @@ void CAvgGradCorrected_Flow::ComputeResidual(double *val_residual, double **val_
     
   }
   
+}
+
+
+void CAvgGradCorrected_Flow::GetViscousFlux(double *val_primvar, double **val_gradprimvar,
+                               double val_laminar_viscosity, double val_eddy_viscosity, double val_mach_inf) {
+  
+  double total_viscosity = val_laminar_viscosity + val_eddy_viscosity;
+  double cp = (Gamma / Gamma_Minus_One) * Gas_Constant;
+  double heat_flux_factor = cp * (val_laminar_viscosity/PRANDTL + val_eddy_viscosity/PRANDTL_TURB);
+  
+  double div_vel = 0.0;
+  for (unsigned short iDim = 0 ; iDim < nDim; iDim++)
+    div_vel += val_gradprimvar[iDim+1][iDim];
+  
+  for (unsigned short iDim = 0 ; iDim < nDim; iDim++) {
+    for (unsigned short jDim = 0 ; jDim < nDim; jDim++) {
+      tau[iDim][jDim] = total_viscosity*( val_gradprimvar[jDim+1][iDim] +
+                                         val_gradprimvar[iDim+1][jDim] )
+      -TWO3*total_viscosity*div_vel*delta[iDim][jDim];
+    }
+  }
+  
+  // Gradient of primitive variables -> [Temp vel_x vel_y vel_z Pressure]
+  if (nDim == 3) {
+    Flux_Tensor[0][0] = 0.0;
+    Flux_Tensor[1][0] = tau[0][0];
+    Flux_Tensor[2][0] = tau[0][1];
+    Flux_Tensor[3][0] = tau[0][2];
+    Flux_Tensor[4][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2] + tau[0][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][0];
+    
+    Flux_Tensor[0][1] = 0.0;
+    Flux_Tensor[1][1] = tau[1][0];
+    Flux_Tensor[2][1] = tau[1][1];
+    Flux_Tensor[3][1] = tau[1][2];
+    Flux_Tensor[4][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2] + tau[1][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][1];
+    
+    Flux_Tensor[0][2] = 0.0;
+    Flux_Tensor[1][2] = tau[2][0];
+    Flux_Tensor[2][2] = tau[2][1];
+    Flux_Tensor[3][2] = tau[2][2];
+    Flux_Tensor[4][2] = tau[2][0]*val_primvar[1] + tau[2][1]*val_primvar[2] + tau[2][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][2];
+  }
+  if (nDim == 2) {
+    Flux_Tensor[0][0] = 0.0;
+    Flux_Tensor[1][0] = tau[0][0];
+    Flux_Tensor[2][0] = tau[0][1];
+    Flux_Tensor[3][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2]+
+    heat_flux_factor*val_gradprimvar[0][0];
+    
+    Flux_Tensor[0][1] = 0.0;
+    Flux_Tensor[1][1] = tau[1][0];
+    Flux_Tensor[2][1] = tau[1][1];
+    Flux_Tensor[3][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2]+
+    heat_flux_factor*val_gradprimvar[0][1];
+  }
+}
+
+void CAvgGradCorrected_Flow::GetViscousProjFlux(double *val_primvar,
+                                   double **val_gradprimvar, double val_turb_ke,
+                                   double *val_normal,
+                                   double val_laminar_viscosity,
+                                   double val_eddy_viscosity) {
+  
+  unsigned short iVar, iDim, jDim;
+  double total_viscosity, heat_flux_factor, div_vel, cp, Density;
+  Density = val_primvar[nDim+2];
+  
+  total_viscosity = val_laminar_viscosity + val_eddy_viscosity;
+  cp = (Gamma / Gamma_Minus_One) * Gas_Constant;
+  heat_flux_factor = cp * (val_laminar_viscosity/PRANDTL + val_eddy_viscosity/PRANDTL_TURB);
+  
+  div_vel = 0.0;
+  for (iDim = 0 ; iDim < nDim; iDim++)
+    div_vel += val_gradprimvar[iDim+1][iDim];
+  
+  for (iDim = 0 ; iDim < nDim; iDim++)
+    for (jDim = 0 ; jDim < nDim; jDim++)
+      tau[iDim][jDim] = total_viscosity*( val_gradprimvar[jDim+1][iDim] + val_gradprimvar[iDim+1][jDim] )
+      - TWO3*total_viscosity*div_vel*delta[iDim][jDim]
+      - TWO3*Density*val_turb_ke*delta[iDim][jDim];
+  
+  
+  /*--- Gradient of primitive variables -> [Temp vel_x vel_y vel_z Pressure] ---*/
+  if (nDim == 2) {
+    Flux_Tensor[0][0] = 0.0;
+    Flux_Tensor[1][0] = tau[0][0];
+    Flux_Tensor[2][0] = tau[0][1];
+    Flux_Tensor[3][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2]+
+    heat_flux_factor*val_gradprimvar[0][0];
+    
+    Flux_Tensor[0][1] = 0.0;
+    Flux_Tensor[1][1] = tau[1][0];
+    Flux_Tensor[2][1] = tau[1][1];
+    Flux_Tensor[3][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2]+
+    heat_flux_factor*val_gradprimvar[0][1];
+  } else {
+    Flux_Tensor[0][0] = 0.0;
+    Flux_Tensor[1][0] = tau[0][0];
+    Flux_Tensor[2][0] = tau[0][1];
+    Flux_Tensor[3][0] = tau[0][2];
+    Flux_Tensor[4][0] = tau[0][0]*val_primvar[1] + tau[0][1]*val_primvar[2] + tau[0][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][0];
+    
+    Flux_Tensor[0][1] = 0.0;
+    Flux_Tensor[1][1] = tau[1][0];
+    Flux_Tensor[2][1] = tau[1][1];
+    Flux_Tensor[3][1] = tau[1][2];
+    Flux_Tensor[4][1] = tau[1][0]*val_primvar[1] + tau[1][1]*val_primvar[2] + tau[1][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][1];
+    
+    Flux_Tensor[0][2] = 0.0;
+    Flux_Tensor[1][2] = tau[2][0];
+    Flux_Tensor[2][2] = tau[2][1];
+    Flux_Tensor[3][2] = tau[2][2];
+    Flux_Tensor[4][2] = tau[2][0]*val_primvar[1] + tau[2][1]*val_primvar[2] + tau[2][2]*val_primvar[3] +
+    heat_flux_factor*val_gradprimvar[0][2];
+  }
+  
+  for (iVar = 0; iVar < nVar; iVar++) {
+    Proj_Flux_Tensor[iVar] = 0.0;
+    for (iDim = 0; iDim < nDim; iDim++)
+      Proj_Flux_Tensor[iVar] += Flux_Tensor[iVar][iDim] * val_normal[iDim];
+  }
+  
+}
+
+void CAvgGradCorrected_Flow::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
+	Laminar_Viscosity_i = val_lam_viscosity_i;
+	Laminar_Viscosity_j = val_lam_viscosity_j;
 }
