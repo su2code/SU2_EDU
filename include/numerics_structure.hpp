@@ -41,550 +41,161 @@ using namespace std;
  * \version 1.1.0
  */
 class CNumerics {
-protected:
-	unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
-	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
-	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
-	double Gas_Constant;		 		/*!< \brief Gas constant. */
-  double *Vector; /*!< \brief Auxiliary vector. */
   
 public:
-	
-	double Eddy_Viscosity_i,	/*!< \brief Eddy viscosity at point i. */
-	Eddy_Viscosity_j;			/*!< \brief Eddy viscosity at point j. */
-	double turb_ke_i,	/*!< \brief Turbulent kinetic energy at point i. */
-	turb_ke_j;			/*!< \brief Turbulent kinetic energy at point j. */
-	double Density_i,	/*!< \brief Density at point i. */
-	Density_j;			/*!< \brief Density at point j. */
-	double Lambda_i,	/*!< \brief Spectral radius at point i. */
-	Lambda_j;			/*!< \brief Spectral radius at point j. */
-	double SoundSpeed_i,	/*!< \brief Sound speed at point i. */
-	SoundSpeed_j;			/*!< \brief Sound speed at point j. */
-	double Enthalpy_i,	/*!< \brief Enthalpy at point i. */
-	Enthalpy_j;			/*!< \brief Enthalpy at point j. */
-	double dist_i,	/*!< \brief Distance of point i to the nearest wall. */
-	dist_j;			/*!< \brief Distance of point j to the nearest wall. */
-	double *Und_Lapl_i, /*!< \brief Undivided laplacians at point i. */
-	*Und_Lapl_j;		/*!< \brief Undivided laplacians at point j. */
-	double Sensor_i,	/*!< \brief Pressure sensor at point i. */
-	Sensor_j;			/*!< \brief Pressure sensor at point j. */
-	double *U_i,		/*!< \brief Vector of conservative variables at point i. */
-	*U_j;				/*!< \brief Vector of conservative variables at node 3. */
-	double *V_i,		/*!< \brief Vector of primitive variables at point i. */
-	*V_j;				/*!< \brief Vector of primitive variables at point j. */
-	double *TurbVar_i,	/*!< \brief Vector of turbulent variables at point i. */
-	*TurbVar_j;	/*!< \brief Vector of derivative of turbulent variables at point j. */
-	double **ConsVar_Grad_i,	/*!< \brief Gradient of conservative variables at point i. */
-	**ConsVar_Grad_j,			/*!< \brief Gradient of conservative variables at point j. */
-  **ConsVar_Grad;				/*!< \brief Gradient of conservative variables which is a scalar. */
-	double **PrimVar_Grad_i,	/*!< \brief Gradient of primitive variables at point i. */
-	**PrimVar_Grad_j;			/*!< \brief Gradient of primitive variables at point j. */
-	double **TurbVar_Grad_i,	/*!< \brief Gradient of turbulent variables at point i. */
-	**TurbVar_Grad_j;			/*!< \brief Gradient of turbulent variables at point j. */
-	double *AuxVar_Grad_i,		/*!< \brief Gradient of an auxiliary variable at point i. */
-	*AuxVar_Grad_j;				/*!< \brief Gradient of an auxiliary variable at point i. */
-	double *Coord_i,	/*!< \brief Cartesians coordinates of point i. */
-	*Coord_j;			/*!< \brief Cartesians coordinates of point j. */
-	unsigned short Neighbor_i,	/*!< \brief Number of neighbors of the point i. */
-	Neighbor_j;					/*!< \brief Number of neighbors of the point j. */
-	double *Normal,	/*!< \brief Normal vector, it norm is the area of the face. */
-	*UnitNormal;		/*!< \brief Unitary normal vector. */
-	double TimeStep,		/*!< \brief Time step useful in dual time method. */
-	Area,				/*!< \brief Area of the face i-j. */
-	Volume;				/*!< \brief Volume of the control volume around point i. */
-	double Volume_n,	/*!< \brief Volume of the control volume at time n. */
-	Volume_nM1,		/*!< \brief Volume of the control volume at time n-1. */
-	Volume_nP1;		/*!< \brief Volume of the control volume at time n+1. */
-  
+    
 	/*!
 	 * \brief Constructor of the class.
 	 */
 	CNumerics(void);
   
 	/*!
-	 * \overload
-	 * \param[in] val_nDim - Number of dimensions of the problem.
-	 * \param[in] val_nVar - Number of variables of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CNumerics(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
-  
-	/*!
 	 * \brief Destructor of the class.
 	 */
 	virtual ~CNumerics(void);
   
-	/*!
-	 * \brief Set the time step.
-	 * \param[in] val_timestep - Value of the time step.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetTimeStep(double val_timestep);
-  
-	/*!
-	 * \brief Get the Preconditioning Beta.
-	 * \return val_Beta - Value of the low Mach Preconditioner.
+  virtual void SetLambda(double val_lambda_i, double val_lambda_j) {/* empty */};
+
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	virtual double GetPrecond_Beta();
-  
-	/*!
-	 * \brief Set the freestream velocity square.
-	 * \param[in] SetVelocity2_Inf - Value of the square of the freestream velocity.
-	 */
-	void SetVelocity2_Inf(double val_velocity2);
-  
-	/*!
-	 * \brief Set the value of the conservative variables.
-	 * \param[in] val_u_i - Value of the conservative variable at point i.
-	 * \param[in] val_u_j - Value of the conservative variable at point j.
-	 */
-	void SetConservative(double *val_u_i, double *val_u_j);
+  virtual void SetTurbKineticEnergy(double val_turb_ke_i, double val_turb_ke_j) {/* empty */};
   
   /*!
-	 * \brief Set the value of the conservative variables withour reconstruction.
-	 * \param[in] val_u_i - Value of the conservative variable at point i.
-	 * \param[in] val_u_j - Value of the conservative variable at point j.
+	 * \brief A pure virtual member.
 	 */
-	void SetConservative_ZeroOrder(double *val_u_i, double *val_u_j);
+  virtual	void SetDistance(double val_dist_i, double val_dist_j) {/* empty */};
   
-	/*!
-	 * \brief Set the value of the primitive variables.
-	 * \param[in] val_v_i - Value of the primitive variable at point i.
-	 * \param[in] val_v_j - Value of the primitive variable at point j.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetPrimitive(double *val_v_i, double *val_v_j);
+  virtual	void SetUndivided_Laplacian(double *val_und_lapl_i, double *val_und_lapl_j) {/* empty */};
   
-	/*!
-	 * \brief Set the value of the conservative variables.
-	 * \param[in] val_u_0 - Value of the conservative variable at point 0.
-	 * \param[in] val_u_1 - Value of the conservative variable at point 1.
-	 * \param[in] val_u_2 - Value of the conservative variable at point 2.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetConservative(double *val_u_0, double *val_u_1, double *val_u_2);
-  
-	/*!
-	 * \brief Set the value of the conservative variables.
-	 * \param[in] val_u_0 - Value of the conservative variable at point 0.
-	 * \param[in] val_u_1 - Value of the conservative variable at point 1.
-	 * \param[in] val_u_2 - Value of the conservative variable at point 2.
-	 * \param[in] val_u_3 - Value of the conservative variable at point 3.
+  virtual	void SetSensor(double val_sensor_i, double val_sensor_j) {/* empty */};
+
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetConservative(double *val_u_0, double *val_u_1, double *val_u_2, double *val_u_3);
+  virtual	void SetPrimitive(double *val_v_i, double *val_v_j) {/* empty */};
   
-	/*!
-	 * \brief Set the gradient of the conservative variables.
-	 * \param[in] val_consvar_grad_i - Gradient of the conservative variable at point i.
-	 * \param[in] val_consvar_grad_j - Gradient of the conservative variable at point j.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetConsVarGradient(double **val_consvar_grad_i, double **val_consvar_grad_j);
-  
-	/*!
-	 * \brief Set the gradient of the conservative variables.
-	 * \param[in] val_consvar_grad_0 - Gradient of the conservative variable at point 0.
-	 * \param[in] val_consvar_grad_1 - Gradient of the conservative variable at point 1.
-	 * \param[in] val_consvar_grad_2 - Gradient of the conservative variable at point 2.
+  virtual	void SetNormal(double *val_normal) {/* empty */};
+
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetConsVarGradient(double **val_consvar_grad_0,
-                          double **val_consvar_grad_1,
-                          double **val_consvar_grad_2);
+  virtual	void SetCoord(double *val_coord_i, double *val_coord_j) {/* empty */};
   
-	/*!
-	 * \brief Set the gradient of the conservative variables.
-	 * \param[in] val_consvar_grad_0 - Gradient of the conservative variable at point 0.
-	 * \param[in] val_consvar_grad_1 - Gradient of the conservative variable at point 1.
-	 * \param[in] val_consvar_grad_2 - Gradient of the conservative variable at point 2.
-	 * \param[in] val_consvar_grad_3 - Gradient of the conservative variable at point 3.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetConsVarGradient(double **val_consvar_grad_0,
-                          double **val_consvar_grad_1,
-                          double **val_consvar_grad_2,
-                          double **val_consvar_grad_3);
+  virtual	void SetNeighbor(unsigned short val_neighbor_i, unsigned short val_neighbor_j) {/* empty */};
   
-	/*!
-	 * \brief Set the gradient of the conservative variables.
-	 * \param[in] val_consvar_grad - Gradient of the conservative variable which is a scalar.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetConsVarGradient(double **val_consvar_grad);
-  
-	/*!
-	 * \brief Set the gradient of the primitive variables.
-	 * \param[in] val_primvar_grad_i - Gradient of the primitive variable at point i.
-	 * \param[in] val_primvar_grad_j - Gradient of the primitive variable at point j.
+  virtual	void SetTurbVar(double *val_turbvar_i, double *val_turbvar_j) {/* empty */};
+
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetPrimVarGradient(double **val_primvar_grad_i,
-                          double **val_primvar_grad_j);
+  virtual	void SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j) {/* empty */};
   
-	/*!
-	 * \brief Set the value of the adjoint variable.
-	 * \param[in] val_psi_i - Value of the adjoint variable at point i.
-	 * \param[in] val_psi_j - Value of the adjoint variable at point j.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetAdjointVar(double *val_psi_i, double *val_psi_j);
+  virtual	void SetPrimVarGradient(double **val_primvar_grad_i, double **val_primvar_grad_j) {/* empty */};
   
-	/*!
-	 * \brief Set the value of the linearized conservative variables.
-	 * \param[in] val_deltau_i - Value of the linearized conservative variable at point i.
-	 * \param[in] val_deltau_j - Value of the linearized conservative variable at point j.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetLinearizedVar(double *val_deltau_i, double *val_deltau_j);
+  virtual	void SetVolume(double val_volume) {/* empty */};
   
-	/*!
-	 * \brief Set the gradient of the adjoint variables.
-	 * \param[in] val_psivar_grad_i - Gradient of the adjoint variable at point i.
-	 * \param[in] val_psivar_grad_j - Gradient of the adjoint variable at point j.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetAdjointVarGradient(double **val_psivar_grad_i, double **val_psivar_grad_j);
+	virtual void SetF1blending(double val_F1_i, double val_F1_j) {/* empty */};
   
-	/*!
-	 * \brief Set the value of the turbulent variable.
-	 * \param[in] val_turbvar_i - Value of the turbulent variable at point i.
-	 * \param[in] val_turbvar_j - Value of the turbulent variable at point j.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetTurbVar(double *val_turbvar_i, double *val_turbvar_j);
-  
-	/*!
-	 * \brief Set the value of the turbulent variable.
-	 * \param[in] val_transvar_i - Value of the turbulent variable at point i.
-	 * \param[in] val_transvar_j - Value of the turbulent variable at point j.
+  virtual void SetF2blending(double val_F2_i, double val_F2_j) {/* empty */};
+
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetTransVar(double *val_transvar_i, double *val_transvar_j);
-  
-	/*!
-	 * \brief Set the gradient of the turbulent variables.
-	 * \param[in] val_turbvar_grad_i - Gradient of the turbulent variable at point i.
-	 * \param[in] val_turbvar_grad_j - Gradient of the turbulent variable at point j.
-	 */
-	void SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j);
-  
-	/*!
-	 * \brief Set the gradient of the turbulent variables.
-	 * \param[in] val_turbvar_grad_i - Gradient of the turbulent variable at point i.
-	 * \param[in] val_turbvar_grad_j - Gradient of the turbulent variable at point j.
-	 */
-	void SetTransVarGradient(double **val_transvar_grad_i, double **val_transvar_grad_j);
-  
-	/*!
-	 * \brief Set the value of the level set variable.
-	 * \param[in] val_levelsetvar_i - Value of the level set variable at point i.
-	 * \param[in] val_levelsetvar_j - Value of the level set variable at point j.
-	 */
-	void SetLevelSetVar(double *val_levelsetvar_i, double *val_levelsetvar_j);
-  
-	/*!
-	 * \brief Set the gradient of the level set variables.
-	 * \param[in] val_levelsetvar_grad_i - Gradient of the level set variable at point i.
-	 * \param[in] val_levelsetvar_grad_j - Gradient of the level set variable at point j.
-	 */
-	void SetLevelSetVarGradient(double **val_levelsetvar_grad_i, double **val_levelsetvar_grad_j);
-  
-	/*!
-	 * \brief Set the value of the adjoint turbulent variable.
-	 * \param[in] val_turbpsivar_i - Value of the adjoint turbulent variable at point i.
-	 * \param[in] val_turbpsivar_j - Value of the adjoint turbulent variable at point j.
-	 */
-	void SetTurbAdjointVar(double *val_turbpsivar_i, double *val_turbpsivar_j);
-  
-	/*!
-	 * \brief Set the gradient of the adjoint turbulent variables.
-	 * \param[in] val_turbpsivar_grad_i - Gradient of the adjoint turbulent variable at point i.
-	 * \param[in] val_turbpsivar_grad_j - Gradient of the adjoint turbulent variable at point j.
-	 */
-	void SetTurbAdjointGradient (double **val_turbpsivar_grad_i, double **val_turbpsivar_grad_j);
-  
-	/*!
-	 * \brief Set the value of the first blending function.
-	 * \param[in] val_F1_i - Value of the first Menter blending function at point i.
-	 * \param[in] val_F1_j - Value of the first Menter blending function at point j.
-	 */
-	virtual void SetF1blending(double val_F1_i, double val_F1_j){/* empty */};
-  
-	/*!
-	 * \brief Set the value of the second blending function.
-	 * \param[in] val_F1_i - Value of the second Menter blending function at point i.
-	 * \param[in] val_F1_j - Value of the second Menter blending function at point j.
-	 */
-	virtual void SetF2blending(double val_F1_i, double val_F1_j){/* empty */};
-  
-	/*!
-	 * \brief Set the value of the rate of strain magnitude.
-	 * \param[in] val_StrainMag_i - Value of the magnitude of rate of strain at point i.
-	 * \param[in] val_StrainMag_j - Value of the magnitude of rate of strain at point j.
-	 */
-	virtual void SetStrainMag(double val_StrainMag_i, double val_StrainMag_j){/* empty */};
-  
-	/*!
-	 * \brief Set the value of the cross diffusion for the SST model.
-	 * \param[in] val_CDkw_i - Value of the cross diffusion at point i.
-	 * \param[in] val_CDkw_j - Value of the cross diffusion at point j.
+	virtual void SetStrainMag(double val_StrainMag_i, double val_StrainMag_j) {/* empty */};
+
+  /*!
+	 * \brief A pure virtual member.
 	 */
 	virtual void SetCrossDiff(double val_CDkw_i, double val_CDkw_j){/* empty */};
-  
-	/*!
-	 * \brief Set the gradient of the auxiliary variables.
-	 * \param[in] val_auxvargrad_i - Gradient of the auxiliary variable at point i.
-	 * \param[in] val_auxvargrad_j - Gradient of the auxiliary variable at point j.
-	 */
-	void SetAuxVarGrad(double *val_auxvargrad_i, double *val_auxvargrad_j);
-  
-  /*!
-	 * \brief Set the diffusion coefficient
-	 * \param[in] val_diffusioncoeff_i - Value of the diffusion coefficients at i.
-	 * \param[in] val_diffusioncoeff_j - Value of the diffusion coefficients at j
-	 */
-	void SetDiffusionCoeff(double* val_diffusioncoeff_i,
-                         double* val_diffusioncoeff_j);
 
-	/*!
-	 * \brief Set the eddy viscosity.
-	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
-	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
+  /*!
+	 * \brief A pure virtual member.
 	 */
-	void SetEddyViscosity(double val_eddy_viscosity_i,
-                        double val_eddy_viscosity_j);
-  
-	/*!
-	 * \brief Set the turbulent kinetic energy.
-	 * \param[in] val_turb_ke_i - Value of the turbulent kinetic energy at point i.
-	 * \param[in] val_turb_ke_j - Value of the turbulent kinetic energy at point j.
-	 */
-	void SetTurbKineticEnergy(double val_turb_ke_i, double val_turb_ke_j);
-  
-	/*!
-	 * \brief Set the value of the distance from the nearest wall.
-	 * \param[in] val_dist_i - Value of of the distance from point i to the nearest wall.
-	 * \param[in] val_dist_j - Value of of the distance from point j to the nearest wall.
-	 */
-	void SetDistance(double val_dist_i, double val_dist_j);
-  
-	/*!
-	 * \brief Set coordinates of the points.
-	 * \param[in] val_coord_i - Coordinates of the point i.
-	 * \param[in] val_coord_j - Coordinates of the point j.
-	 */
-	void SetCoord(double *val_coord_i, double *val_coord_j);
-  
-	/*!
-	 * \overload
-	 * \param[in] val_coord_0 - Coordinates of the point 0.
-	 * \param[in] val_coord_1 - Coordinates of the point 1.
-	 * \param[in] val_coord_2 - Coordinates of the point 2.
-	 */
-	void SetCoord(double *val_coord_0, double *val_coord_1, double *val_coord_2);
-  
-	/*!
-	 * \overload
-	 * \param[in] val_coord_0 - Coordinates of the point 0.
-	 * \param[in] val_coord_1 - Coordinates of the point 1.
-	 * \param[in] val_coord_2 - Coordinates of the point 2.
-	 * \param[in] val_coord_3 - Coordinates of the point 3.
-	 */
-	void SetCoord(double *val_coord_0, double *val_coord_1, double *val_coord_2,
-                double *val_coord_3);
+	virtual void ComputeResidual(double *val_residual, double **val_Jacobian_i,
+                               double **val_Jacobian_j, CConfig *config) {/* empty */};
   
   /*!
-	 * \brief Set the value of the pressure.
-	 * \param[in] val_pressure_i - Value of the pressure at point i.
-	 * \param[in] val_pressure_j - Value of the pressure at point j.
+	 * \brief A pure virtual member.
 	 */
-	void SetPressure(double val_pressure_i, double val_pressure_j);
+  virtual double GetPrecond_Beta(void) { return 0; };
+  
+};
+
+/*!
+ * \class CUpwRoe_Flow
+ * \brief Class for solving an approximate Riemann solver of Roe for the flow equations.
+ * \ingroup ConvDiscr
+ * \author F. Palacios
+ * \version 1.1.0
+ */
+class CUpwRoe_Flow : public CNumerics {
+private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double Area;				/*!< \brief Area of the face i-j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *UnitNormal;		/*!< \brief Unitary normal vector. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+	bool implicit, grid_movement;
+	double *Diff_U;
+	double *Velocity_i, *Velocity_j, *RoeVelocity;
+	double *Proj_flux_tensor_i, *Proj_flux_tensor_j;
+	double *delta_wave, *delta_vel;
+	double *Lambda, *Epsilon;
+	double **P_Tensor, **invP_Tensor;
+	double sq_vel, Proj_ModJac_Tensor_ij, Density_i, Energy_i, SoundSpeed_i, Pressure_i, Enthalpy_i,
+	Density_j, Energy_j, SoundSpeed_j, Pressure_j, Enthalpy_j, R, RoeDensity, RoeEnthalpy, RoeSoundSpeed,
+	ProjVelocity, ProjVelocity_i, ProjVelocity_j, proj_delta_vel, delta_p, delta_rho;
+	unsigned short iDim, iVar, jVar, kVar;
+  
+public:
   
 	/*!
-	 * \brief Set the value of the sound speed.
-	 * \param[in] val_soundspeed_i - Value of the sound speed at point i.
-	 * \param[in] val_soundspeed_j - Value of the sound speed at point j.
+	 * \brief Constructor of the class.
+	 * \param[in] val_nDim - Number of dimensions of the problem.
+	 * \param[in] val_nVar - Number of variables of the problem.
+	 * \param[in] config - Definition of the particular problem.
 	 */
-	void SetSoundSpeed(double val_soundspeed_i, double val_soundspeed_j);
+	CUpwRoe_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
   
 	/*!
-	 * \brief Set the value of the species pressures.
-	 * \param[in] val_pressure_i - Value of the pressure at point i.
-	 * \param[in] val_pressure_j - Value of the pressure at point j.
+	 * \brief Destructor of the class.
 	 */
-	void SetPressure(double* val_pressure_i, double* val_pressure_j);
-  
-	/*!
-	 * \brief Set the value of the enthalpy.
-	 * \param[in] val_enthalpy_i - Value of the enthalpy at point i.
-	 * \param[in] val_enthalpy_j - Value of the enthalpy at point j.
-	 */
-	void SetEnthalpy(double val_enthalpy_i, double val_enthalpy_j);
-  
-	/*!
-	 * \brief Set the value of the spectral radius.
-	 * \param[in] val_lambda_i - Value of the spectral radius at point i.
-	 * \param[in] val_lambda_j - Value of the spectral radius at point j.
-	 */
-	void SetLambda(double val_lambda_i, double val_lambda_j);
-  
-	/*!
-	 * \brief Set the value of undivided laplacian.
-	 * \param[in] val_und_lapl_i Undivided laplacian at point i.
-	 * \param[in] val_und_lapl_j Undivided laplacian at point j.
-	 */
-	void SetUndivided_Laplacian(double *val_und_lapl_i, double *val_und_lapl_j);
-  
-	/*!
-	 * \brief Set the value of the pressure sensor.
-	 * \param[in] val_sensor_i Pressure sensor at point i.
-	 * \param[in] val_sensor_j Pressure sensor at point j.
-	 */
-	void SetSensor(double val_sensor_i, double val_sensor_j);
-  
-	/*!
-	 * \brief Set the number of neighbor to a point.
-	 * \param[in] val_neighbor_i - Number of neighbor to point i.
-	 * \param[in] val_neighbor_j - Number of neighbor to point j.
-	 */
-	void SetNeighbor(unsigned short val_neighbor_i, unsigned short val_neighbor_j);
-  
-	/*!
-	 * \brief Set the value of the normal vector to the face between two points.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 */
-	void SetNormal(double *val_normal);
-  
-	/*!
-	 * \brief Set the value of the volume of the control volume.
-	 * \param[in] val_volume Volume of the control volume.
-	 */
-	void SetVolume(double val_volume);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  void SetRhosIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  void SetRhoIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  void SetPIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  void SetTIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  void SetTveIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Retrieves the value of the velocity index in the primitive variable vector.
-	 * \param[in] i(rho*u)
-	 */
-  void SetVelIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  void SetHIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  void SetAIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  void SetRhoCvtrIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Retrieves the value of the species density in the primitive variable vector.
-	 * \param[in] iRho_s
-	 */
-  void SetRhoCvveIndex(unsigned short val_Index);
-  
-  /*!
-	 * \brief Sets the value of the derivative of pressure w.r.t. species density.
-	 * \param[in] iRho_s
-	 */
-  void SetdPdU(double *val_dPdU_i, double *val_dPdU_j);
-  
-  /*!
-	 * \brief Sets the value of the derivative of temperature w.r.t. species density.
-	 * \param[in] iRho_s
-	 */
-  void SetdTdU(double *val_dTdU_i, double *val_dTdU_j);
-  
-  /*!
-	 * \brief Sets the value of the derivative of vib-el. temperature w.r.t. species density.
-	 * \param[in] iRho_s
-	 */
-  void SetdTvedU(double *val_dTvedU_i, double *val_dTvedU_j);
-  
-	/*!
-	 * \brief Compute the projection of the inviscid Jacobian matrices.
-	 * \param[in] val_velocity Pointer to the velocity.
-	 * \param[in] val_energy Value of the energy.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[in] val_scale - Scale of the projection.
-	 * \param[out] val_Proj_Jac_tensor - Pointer to the projected inviscid Jacobian.
-	 */
-	void GetInviscidProjJac(double *val_velocity, double *val_energy,
-                          double *val_normal, double val_scale,
-                          double **val_Proj_Jac_tensor);
-  
-	/*!
-	 * \overload
-	 * \brief Compute the projection of the inviscid Jacobian matrices.
-	 * \param[in] val_velocity Pointer to the velocity.
-	 * \param[in] val_energy Value of the energy.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[in] val_scale - Scale of the projection.
-	 * \param[out] val_Proj_Jac_tensor - Pointer to the projected inviscid Jacobian.
-	 */
-	void GetInviscidProjJac(double **val_velocity, double *val_energy,
-                          double *val_normal, double val_scale,
-                          double **val_Proj_Jac_tensor);
-  
-	/*!
-	 * \overload
-	 * \brief Compute the projection of the inviscid Jacobian matrices for the two-temperature model.
-   * \param[in] val_U - Vector conserved variables.
-	 * \param[in] val_V - Vector of primitive variables.
-   * \param[in] val_dPdU - Vector of partial derivatives of pressure w.r.t. conserved vars.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[in] val_scale - Scale of the projection.
-	 * \param[out] val_Proj_Jac_tensor - Pointer to the projected inviscid Jacobian.
-	 */
-  void GetInviscidProjJac(double *val_U, double *val_V, double *val_dPdU,
-                          double *val_normal, double val_scale,
-                          double **val_Proj_Jac_Tensor);
-  
-	/*!
-	 * \brief TSL-Approximation of Viscous NS Jacobians.
-	 * \param[in] val_Mean_PrimVar - Mean value of the primitive variables.
-	 * \param[in] val_laminar_viscosity - Value of the laminar viscosity.
-	 * \param[in] val_eddy_viscosity - Value of the eddy viscosity.
-	 * \param[in] val_dist_ij - Distance between the points.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[in] val_dS - Area of the face between two nodes.
-	 * \param[in] val_Proj_Visc_Flux - Pointer to the projected viscous flux.
-	 * \param[out] val_Proj_Jac_Tensor_i - Pointer to the projected viscous Jacobian at point i.
-	 * \param[out] val_Proj_Jac_Tensor_j - Pointer to the projected viscous Jacobian at point j.
-	 */
-	void GetViscousProjJacs(double *val_Mean_PrimVar,
-                          double val_laminar_viscosity,
-                          double val_eddy_viscosity,
-                          double val_dist_ij,
-                          double *val_normal, double val_dS,
-                          double *val_Proj_Visc_Flux,
-                          double **val_Proj_Jac_Tensor_i,
-                          double **val_Proj_Jac_Tensor_j);
+	~CUpwRoe_Flow(void);
   
 	/*!
 	 * \brief Computation of the matrix P, this matrix diagonalize the conservative Jacobians in
@@ -600,34 +211,151 @@ public:
                   double **val_p_tensor);
   
 	/*!
-	 * \overload
-	 * \brief Computation of the matrix P, this matrix diagonalize the conservative Jacobians in
-	 *        the form $P^{-1}(A.Normal)P=Lambda$.
+	 * \brief Computation of the matrix P^{-1}, this matrix diagonalize the conservative Jacobians
+	 *        in the form $P^{-1}(A.Normal)P=Lambda$.
 	 * \param[in] val_density - Value of the density.
 	 * \param[in] val_velocity - Value of the velocity.
 	 * \param[in] val_soundspeed - Value of the sound speed.
 	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[out] val_p_tensor - Pointer to the P matrix.
-	 */
-	void GetPMatrix(double *val_density, double **val_velocity,
-                  double *val_soundspeed, double *val_normal,
-                  double **val_p_tensor);
-  
-  /*!
-	 * \overload
-	 * \brief Computation of the matrix P, this matrix diagonalizes the conservative Jacobians
-	 *        in the form $P^{-1}(A.Normal)P=Lambda$.
-	 * \param[in] U - Vector of conserved variables (really only need rhoEve)
-	 * \param[in] V - Vector of primitive variables
-   * \param[in] val_dPdU - Vector of derivatives of pressure w.r.t. conserved vars.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-   * \param[in] l - Tangential vector to face.
-   * \param[in] m - Tangential vector to face (mutually orthogonal to val_normal & l).
 	 * \param[out] val_invp_tensor - Pointer to inverse of the P matrix.
 	 */
-  void GetPMatrix(double *U, double *V, double *val_dPdU,
-                  double *val_normal, double *l, double *m,
-                  double **val_p_tensor) ;
+	void GetPMatrix_inv(double *val_density, double *val_velocity,
+                      double *val_soundspeed, double *val_normal,
+                      double **val_invp_tensor);
+  
+  /*!
+	 * \brief Compute the projection of the inviscid Jacobian matrices.
+	 * \param[in] val_velocity Pointer to the velocity.
+	 * \param[in] val_energy Value of the energy.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[in] val_scale - Scale of the projection.
+	 * \param[out] val_Proj_Jac_tensor - Pointer to the projected inviscid Jacobian.
+	 */
+	void GetInviscidProjJac(double *val_velocity, double *val_energy,
+                          double *val_normal, double val_scale,
+                          double **val_Proj_Jac_tensor);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+  /*!
+	 * \brief Compute the projected inviscid flux vector.
+	 * \param[in] val_density - Pointer to the density.
+	 * \param[in] val_velocity - Pointer to the velocity.
+	 * \param[in] val_pressure - Pointer to the pressure.
+	 * \param[in] val_enthalpy - Pointer to the enthalpy.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[out] val_Proj_Flux - Pointer to the projected flux.
+	 */
+	void GetInviscidProjFlux(double *val_density, double *val_velocity,
+                           double *val_pressure, double *val_enthalpy,
+                           double *val_normal, double *val_Proj_Flux);
+  
+	/*!
+	 * \brief Compute the Roe's flux between two nodes i and j.
+	 * \param[out] val_residual - Pointer to the total residual.
+	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
+	 * \param[out] val_Jacobian_j - Jacobian of the numerical method at node j (implicit computation).
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config);
+};
+
+/*!
+ * \class CUpwRoeTurkel_Flow
+ * \brief Class for solving an approximate Riemann solver of Roe with Turkel Preconditioning for the flow equations.
+ * \ingroup ConvDiscr
+ * \author A. K. Lonkar (Stanford University)
+ * \version 1.1.0
+ */
+class CUpwRoeTurkel_Flow : public CNumerics {
+private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double Area;				/*!< \brief Area of the face i-j. */
+  double *UnitNormal;		/*!< \brief Unitary normal vector. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+	bool implicit, grid_movement;
+	double *Diff_U;
+	double *Velocity_i, *Velocity_j, *RoeVelocity;
+	double *Proj_flux_tensor_i, *Proj_flux_tensor_j;
+	double *Lambda, *Epsilon;
+	double **absPeJac,**invRinvPe,**R_Tensor,**Matrix,**Art_Visc;
+	double sq_vel, Proj_ModJac_Tensor_ij, Density_i, Energy_i, SoundSpeed_i, Pressure_i, Enthalpy_i,
+	Density_j, Energy_j, SoundSpeed_j, Pressure_j, Enthalpy_j, R, RoePressure, RoeDensity, RoeEnthalpy, RoeSoundSpeed,
+	ProjVelocity, ProjVelocity_i, ProjVelocity_j;
+	unsigned short iDim, iVar, jVar, kVar;
+	double Beta, Beta_min, Beta_max;
+  double r_hat, s_hat, t_hat, rhoB2a2, sqr_one_m_Betasqr_Lam1;
+	double Beta2, one_m_Betasqr, one_p_Betasqr, sqr_two_Beta_c_Area;
+	double local_Mach;
+  
+public:
+  
+	/*!
+	 * \brief Constructor of the class.
+	 * \param[in] val_nDim - Number of dimensions of the problem.
+	 * \param[in] val_nVar - Number of variables of the problem.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	CUpwRoeTurkel_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
+  
+	/*!
+	 * \brief Destructor of the class.
+	 */
+	~CUpwRoeTurkel_Flow(void);
+  
+  /*!
+	 * \brief Compute the projection of the inviscid Jacobian matrices.
+	 * \param[in] val_velocity Pointer to the velocity.
+	 * \param[in] val_energy Value of the energy.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[in] val_scale - Scale of the projection.
+	 * \param[out] val_Proj_Jac_tensor - Pointer to the projected inviscid Jacobian.
+	 */
+	void GetInviscidProjJac(double *val_velocity, double *val_energy,
+                          double *val_normal, double val_scale,
+                          double **val_Proj_Jac_tensor);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+  /*!
+	 * \brief Compute the projected inviscid flux vector.
+	 * \param[in] val_density - Pointer to the density.
+	 * \param[in] val_velocity - Pointer to the velocity.
+	 * \param[in] val_pressure - Pointer to the pressure.
+	 * \param[in] val_enthalpy - Pointer to the enthalpy.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[out] val_Proj_Flux - Pointer to the projected flux.
+	 */
+	void GetInviscidProjFlux(double *val_density, double *val_velocity,
+                           double *val_pressure, double *val_enthalpy,
+                           double *val_normal, double *val_Proj_Flux);
   
 	/*!
 	 * \brief Computation of the matrix Rinv*Pe.
@@ -669,356 +397,6 @@ public:
 	void GetPrecondJacobian(double Beta2, double r_hat, double s_hat, double t_hat, double rB2a2, double* val_Lambda, double* val_normal, double** val_absPeJac);
   
 	/*!
-	 * \brief Computation of the matrix P^{-1}, this matrix diagonalize the conservative Jacobians
-	 *        in the form $P^{-1}(A.Normal)P=Lambda$.
-	 * \param[in] val_density - Value of the density.
-	 * \param[in] val_velocity - Value of the velocity.
-	 * \param[in] val_soundspeed - Value of the sound speed.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[out] val_invp_tensor - Pointer to inverse of the P matrix.
-	 */
-	void GetPMatrix_inv(double *val_density, double *val_velocity,
-                      double *val_soundspeed, double *val_normal,
-                      double **val_invp_tensor);
-  
-	/*!
-	 * \overload
-	 * \brief Computation of the matrix P^{-1}, this matrix diagonalize the conservative Jacobians
-	 *        in the form $P^{-1}(A.Normal)P=Lambda$.
-	 * \param[in] val_density - Value of the density.
-	 * \param[in] val_velocity - Value of the velocity.
-	 * \param[in] val_soundspeed - Value of the sound speed.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[out] val_invp_tensor - Pointer to inverse of the P matrix.
-	 */
-	void GetPMatrix_inv(double *val_density, double **val_velocity,
-                      double *val_soundspeed, double *val_normal,
-                      double **val_invp_tensor);
-  
-  /*!
-	 * \overload
-	 * \brief Computation of the matrix P^{-1}, this matrix diagonalizes the conservative Jacobians
-   *        in the form $P^{-1}(A.Normal)P=Lambda$.
-   * \param[in] U - Vector of conserved variables.
-   * \param[in] V - Vector of primitive variables.
-   * \param[in] val_dPdU - Vector of derivatives of pressure w.r.t. conserved variables
-   * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-   * \param[in] l - Tangential vector to face.
-   * \param[in] m - Tangential vector to face (mutually orthogonal to val_normal & l).
-   * \param[out] val_invp_tensor - Pointer to inverse of the P matrix.
-	 */
-  void GetPMatrix_inv(double *U, double *V, double *val_dPdU,
-                      double *val_normal, double *l, double *m,
-                      double **val_invp_tensor) ;
-  
-	/*!
-	 * \brief Computation of the projected inviscid lambda (eingenvalues).
-	 * \param[in] val_velocity - Value of the velocity.
-	 * \param[in] val_soundspeed - Value of the sound speed.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[in] val_Lambda_Vector - Pointer to Lambda matrix.
-	 */
-	void GetJacInviscidLambda_fabs(double *val_velocity, double val_soundspeed,
-                                 double *val_normal, double *val_Lambda_Vector);
-  
-	/*!
-	 * \brief Compute the numerical residual.
-	 * \param[out] val_residual - Pointer to the total residual.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double *val_residual, CConfig *config);
-  
-	/*!
-	 * \overload
-	 * \param[out] val_residual_i - Pointer to the total residual at point i.
-	 * \param[out] val_residual_j - Pointer to the total residual at point j.
-	 */
-	virtual void ComputeResidual(double *val_residual_i, double *val_residual_j);
-
-	/*!
-	 * \overload
-	 * \param[out] val_residual_i - Pointer to the total residual at point i.
-	 * \param[out] val_residual_j - Pointer to the total residual at point j.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double *val_residual_i,
-                               double *val_residual_j, CConfig *config);
-  
-	/*!
-	 * \overload
-	 * \param[out] val_residual - Pointer to the total residual.
-	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
-	 * \param[out] val_Jacobian_j - Jacobian of the numerical method at node j (implicit computation).
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double *val_residual, double **val_Jacobian_i,
-                               double **val_Jacobian_j, CConfig *config);
-  
-  /*!
-	 * \overload
-	 * \param[out] val_residual - Pointer to the total residual.
-	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
-	 * \param[out] val_Jacobian_j - Jacobian of the numerical method at node j (implicit computation).
-   * \param[out] val_JacobianMeanFlow_i - Jacobian of the numerical method at node i (implicit computation).
-	 * \param[out] val_JacobianMeanFlow_j - Jacobian of the numerical method at node j (implicit computation).
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  virtual void ComputeResidual(double *val_residual, double **val_Jacobian_i,
-                               double **val_Jacobian_j,
-                               double **val_JacobianMeanFlow_i,
-                               double **val_JacobianMeanFlow_j,
-                               CConfig *config);
-  
-	/*!
-	 * \overload
-	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
-	 * \param[out] val_Jacobian_j - Jacobian of the numerical method at node j (implicit computation).
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double **val_Jacobian_i, double **val_Jacobian_j,
-                               CConfig *config);
-  
-	/*!
-	 * \overload
-	 * \param[out] val_resconv - Pointer to the convective residual.
-	 * \param[out] val_resvisc - Pointer to the artificial viscosity residual.
-	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
-	 * \param[out] val_Jacobian_j - Jacobian of the numerical method at node j (implicit computation).
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double *val_resconv, double *val_resvisc,
-                               double **val_Jacobian_i, double **val_Jacobian_j,
-                               CConfig *config);
-  
-	/*!
-	 * \overload
-	 * \param[out] val_residual_i - Pointer to the total residual at point i.
-	 * \param[out] val_residual_j - Pointer to the total viscosity residual at point j.
-	 * \param[out] val_Jacobian_ii - Jacobian of the numerical method at node i (implicit computation) from node i.
-	 * \param[out] val_Jacobian_ij - Jacobian of the numerical method at node i (implicit computation) from node j.
-	 * \param[out] val_Jacobian_ji - Jacobian of the numerical method at node j (implicit computation) from node i.
-	 * \param[out] val_Jacobian_jj - Jacobian of the numerical method at node j (implicit computation) from node j.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double *val_residual_i, double *val_residual_j,
-                               double **val_Jacobian_ii,
-                               double **val_Jacobian_ij,
-                               double **val_Jacobian_ji,
-                               double **val_Jacobian_jj, CConfig *config);
-  
-	/*!
-	 * \overload
-	 * \param[out] val_resconv_i - Pointer to the convective residual at point i.
-	 * \param[out] val_resvisc_i - Pointer to the artificial viscosity residual at point i.
-	 * \param[out] val_resconv_j - Pointer to the convective residual at point j.
-	 * \param[out] val_resvisc_j - Pointer to the artificial viscosity residual at point j.
-	 * \param[out] val_Jacobian_ii - Jacobian of the numerical method at node i (implicit computation) from node i.
-	 * \param[out] val_Jacobian_ij - Jacobian of the numerical method at node i (implicit computation) from node j.
-	 * \param[out] val_Jacobian_ji - Jacobian of the numerical method at node j (implicit computation) from node i.
-	 * \param[out] val_Jacobian_jj - Jacobian of the numerical method at node j (implicit computation) from node j.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double *val_resconv_i, double *val_resvisc_i,
-                               double *val_resconv_j, double *val_resvisc_j,
-                               double **val_Jacobian_ii,
-                               double **val_Jacobian_ij,
-                               double **val_Jacobian_ji,
-                               double **val_Jacobian_jj, CConfig *config);
-  
-	/*!
-	 * \overload
-	 * \param[out] val_stiffmatrix_elem - Stiffness matrix for Galerkin computation.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double **val_stiffmatrix_elem, CConfig *config);
-  
-	/*!
-	 * \overload
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[out] val_residual - residual of the source terms
-	 * \param[out] val_Jacobian_i - Jacobian of the source terms
-	 */
-	virtual void ComputeResidual(double *val_residual, double **val_Jacobian_i,
-                               CConfig *config);
-  
-  /*!
-	 * \brief Computes the viscous source term for the TNE2 adjoint problem
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[out] val_residual - residual of the source terms
-	 */
-  virtual void ComputeSourceViscous(double *val_residual, CConfig *config);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_production - Value of the Production.
-	 */
-  virtual void SetProduction(double val_production);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_destruction - Value of the Destruction.
-	 */
-  virtual void SetDestruction(double val_destruction);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_crossproduction - Value of the CrossProduction.
-	 */
-  virtual void SetCrossProduction(double val_crossproduction);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_production - Value of the Production.
-	 */
-  virtual double GetProduction(void);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_destruction - Value of the Destruction.
-	 */
-  virtual double GetDestruction(void);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_crossproduction - Value of the CrossProduction.
-	 */
-  virtual double GetCrossProduction(void);
-  
-	/*!
-	 * \overload
-	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double **val_Jacobian_i,
-                               double *val_Jacobian_mui,
-                               double ***val_Jacobian_gradi, CConfig *config);
-  
-	/*!
-	 * \overload
-	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void ComputeResidual(double **val_Jacobian_i,
-                               double *val_Jacobian_mui,
-                               double ***val_Jacobian_gradi,
-                               double **val_Jacobian_j,
-                               double *val_Jacobian_muj,
-                               double ***val_Jacobian_gradj, CConfig *config);
-  
-};
-
-/*!
- * \class CUpwRoe_Flow
- * \brief Class for solving an approximate Riemann solver of Roe for the flow equations.
- * \ingroup ConvDiscr
- * \author A. Bueno (UPM) & F. Palacios (Stanford University).
- * \version 1.1.0
- */
-class CUpwRoe_Flow : public CNumerics {
-private:
-	bool implicit, grid_movement;
-	double *Diff_U;
-	double *Velocity_i, *Velocity_j, *RoeVelocity;
-	double *Proj_flux_tensor_i, *Proj_flux_tensor_j;
-	double *delta_wave, *delta_vel;
-	double *Lambda, *Epsilon;
-	double **P_Tensor, **invP_Tensor;
-	double sq_vel, Proj_ModJac_Tensor_ij, Density_i, Energy_i, SoundSpeed_i, Pressure_i, Enthalpy_i,
-	Density_j, Energy_j, SoundSpeed_j, Pressure_j, Enthalpy_j, R, RoeDensity, RoeEnthalpy, RoeSoundSpeed,
-	ProjVelocity, ProjVelocity_i, ProjVelocity_j, proj_delta_vel, delta_p, delta_rho;
-	unsigned short iDim, iVar, jVar, kVar;
-  
-public:
-  
-	/*!
-	 * \brief Constructor of the class.
-	 * \param[in] val_nDim - Number of dimensions of the problem.
-	 * \param[in] val_nVar - Number of variables of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CUpwRoe_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	~CUpwRoe_Flow(void);
-  
-  /*!
-	 * \brief Compute the projected inviscid flux vector.
-	 * \param[in] val_density - Pointer to the density.
-	 * \param[in] val_velocity - Pointer to the velocity.
-	 * \param[in] val_pressure - Pointer to the pressure.
-	 * \param[in] val_enthalpy - Pointer to the enthalpy.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[out] val_Proj_Flux - Pointer to the projected flux.
-	 */
-	void GetInviscidProjFlux(double *val_density, double *val_velocity,
-                           double *val_pressure, double *val_enthalpy,
-                           double *val_normal, double *val_Proj_Flux);
-  
-	/*!
-	 * \brief Compute the Roe's flux between two nodes i and j.
-	 * \param[out] val_residual - Pointer to the total residual.
-	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
-	 * \param[out] val_Jacobian_j - Jacobian of the numerical method at node j (implicit computation).
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config);
-};
-
-/*!
- * \class CUpwRoeTurkel_Flow
- * \brief Class for solving an approximate Riemann solver of Roe with Turkel Preconditioning for the flow equations.
- * \ingroup ConvDiscr
- * \author A. K. Lonkar (Stanford University)
- * \version 1.1.0
- */
-class CUpwRoeTurkel_Flow : public CNumerics {
-private:
-	bool implicit, grid_movement;
-	double *Diff_U;
-	double *Velocity_i, *Velocity_j, *RoeVelocity;
-	double *Proj_flux_tensor_i, *Proj_flux_tensor_j;
-	double *Lambda, *Epsilon;
-	double **absPeJac,**invRinvPe,**R_Tensor,**Matrix,**Art_Visc;
-	double sq_vel, Proj_ModJac_Tensor_ij, Density_i, Energy_i, SoundSpeed_i, Pressure_i, Enthalpy_i,
-	Density_j, Energy_j, SoundSpeed_j, Pressure_j, Enthalpy_j, R, RoePressure, RoeDensity, RoeEnthalpy, RoeSoundSpeed,
-	ProjVelocity, ProjVelocity_i, ProjVelocity_j;
-	unsigned short iDim, iVar, jVar, kVar;
-	double Beta, Beta_min, Beta_max;
-  double r_hat, s_hat, t_hat, rhoB2a2, sqr_one_m_Betasqr_Lam1;
-	double Beta2, one_m_Betasqr, one_p_Betasqr, sqr_two_Beta_c_Area;
-	double local_Mach;
-  
-public:
-  
-	/*!
-	 * \brief Constructor of the class.
-	 * \param[in] val_nDim - Number of dimensions of the problem.
-	 * \param[in] val_nVar - Number of variables of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CUpwRoeTurkel_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	~CUpwRoeTurkel_Flow(void);
-  
-  /*!
-	 * \brief Compute the projected inviscid flux vector.
-	 * \param[in] val_density - Pointer to the density.
-	 * \param[in] val_velocity - Pointer to the velocity.
-	 * \param[in] val_pressure - Pointer to the pressure.
-	 * \param[in] val_enthalpy - Pointer to the enthalpy.
-	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
-	 * \param[out] val_Proj_Flux - Pointer to the projected flux.
-	 */
-	void GetInviscidProjFlux(double *val_density, double *val_velocity,
-                           double *val_pressure, double *val_enthalpy,
-                           double *val_normal, double *val_Proj_Flux);
-  
-	/*!
 	 * \brief Compute the Roe's flux between two nodes i and j.
 	 * \param[out] val_residual - Pointer to the total residual.
 	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
@@ -1031,7 +409,7 @@ public:
 	 * \brief Get the Preconditioning Beta.
 	 * \return Beta - Value of the low Mach Preconditioner.
 	 */
-	double GetPrecond_Beta();
+	double GetPrecond_Beta(void);
 };
 
 /*!
@@ -1043,6 +421,15 @@ public:
  */
 class CUpwAUSM_Flow : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double Area;				/*!< \brief Area of the face i-j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *UnitNormal;		/*!< \brief Unitary normal vector. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
 	bool implicit;
 	double *Diff_U;
 	double *Velocity_i, *Velocity_j, *RoeVelocity;
@@ -1072,6 +459,57 @@ public:
 	~CUpwAUSM_Flow(void);
   
 	/*!
+	 * \brief Computation of the matrix P, this matrix diagonalize the conservative Jacobians in
+	 *        the form $P^{-1}(A.Normal)P=Lambda$.
+	 * \param[in] val_density - Value of the density.
+	 * \param[in] val_velocity - Value of the velocity.
+	 * \param[in] val_soundspeed - Value of the sound speed.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[out] val_p_tensor - Pointer to the P matrix.
+	 */
+	void GetPMatrix(double *val_density, double *val_velocity,
+                  double *val_soundspeed, double *val_normal,
+                  double **val_p_tensor);
+  
+	/*!
+	 * \brief Computation of the matrix P^{-1}, this matrix diagonalize the conservative Jacobians
+	 *        in the form $P^{-1}(A.Normal)P=Lambda$.
+	 * \param[in] val_density - Value of the density.
+	 * \param[in] val_velocity - Value of the velocity.
+	 * \param[in] val_soundspeed - Value of the sound speed.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[out] val_invp_tensor - Pointer to inverse of the P matrix.
+	 */
+	void GetPMatrix_inv(double *val_density, double *val_velocity,
+                      double *val_soundspeed, double *val_normal,
+                      double **val_invp_tensor);
+  
+  /*!
+	 * \brief Compute the projection of the inviscid Jacobian matrices.
+	 * \param[in] val_velocity Pointer to the velocity.
+	 * \param[in] val_energy Value of the energy.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[in] val_scale - Scale of the projection.
+	 * \param[out] val_Proj_Jac_tensor - Pointer to the projected inviscid Jacobian.
+	 */
+	void GetInviscidProjJac(double *val_velocity, double *val_energy,
+                          double *val_normal, double val_scale,
+                          double **val_Proj_Jac_tensor);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+	/*!
 	 * \brief Compute the Roe's flux between two nodes i and j.
 	 * \param[out] val_residual - Pointer to the total residual.
 	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
@@ -1090,6 +528,15 @@ public:
  */
 class CUpwHLLC_Flow : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double Area;				/*!< \brief Area of the face i-j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *UnitNormal;		/*!< \brief Unitary normal vector. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
 	bool implicit;
 	double *Diff_U;
 	double *Velocity_i, *Velocity_j, *RoeVelocity;
@@ -1120,6 +567,57 @@ public:
 	~CUpwHLLC_Flow(void);
   
 	/*!
+	 * \brief Computation of the matrix P, this matrix diagonalize the conservative Jacobians in
+	 *        the form $P^{-1}(A.Normal)P=Lambda$.
+	 * \param[in] val_density - Value of the density.
+	 * \param[in] val_velocity - Value of the velocity.
+	 * \param[in] val_soundspeed - Value of the sound speed.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[out] val_p_tensor - Pointer to the P matrix.
+	 */
+	void GetPMatrix(double *val_density, double *val_velocity,
+                  double *val_soundspeed, double *val_normal,
+                  double **val_p_tensor);
+  
+	/*!
+	 * \brief Computation of the matrix P^{-1}, this matrix diagonalize the conservative Jacobians
+	 *        in the form $P^{-1}(A.Normal)P=Lambda$.
+	 * \param[in] val_density - Value of the density.
+	 * \param[in] val_velocity - Value of the velocity.
+	 * \param[in] val_soundspeed - Value of the sound speed.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[out] val_invp_tensor - Pointer to inverse of the P matrix.
+	 */
+	void GetPMatrix_inv(double *val_density, double *val_velocity,
+                      double *val_soundspeed, double *val_normal,
+                      double **val_invp_tensor);
+  
+  /*!
+	 * \brief Compute the projection of the inviscid Jacobian matrices.
+	 * \param[in] val_velocity Pointer to the velocity.
+	 * \param[in] val_energy Value of the energy.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[in] val_scale - Scale of the projection.
+	 * \param[out] val_Proj_Jac_tensor - Pointer to the projected inviscid Jacobian.
+	 */
+	void GetInviscidProjJac(double *val_velocity, double *val_energy,
+                          double *val_normal, double val_scale,
+                          double **val_Proj_Jac_tensor);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+	/*!
 	 * \brief Compute the Roe's flux between two nodes i and j.
 	 * \param[out] val_residual - Pointer to the total residual.
 	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
@@ -1133,11 +631,20 @@ public:
  * \class CUpwSca_TurbSA
  * \brief Class for doing a scalar upwind solver for the Spalar-Allmaral turbulence model equations.
  * \ingroup ConvDiscr
- * \author A. Bueno.
+ * \author F. Palacios.
  * \version 1.1.0
  */
 class CUpwSca_TurbSA : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double *TurbVar_i,	/*!< \brief Vector of turbulent variables at point i. */
+	*TurbVar_j;	/*!< \brief Vector of derivative of turbulent variables at point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
 	double *Velocity_i, *Velocity_j;
 	bool implicit, grid_movement;
 	double Density_i, Density_j, q_ij, a0, a1;
@@ -1158,6 +665,26 @@ public:
 	 */
 	~CUpwSca_TurbSA(void);
   
+  /*!
+	 * \brief Set the value of the turbulent variable.
+	 * \param[in] val_turbvar_i - Value of the turbulent variable at point i.
+	 * \param[in] val_turbvar_j - Value of the turbulent variable at point j.
+	 */
+	void SetTurbVar(double *val_turbvar_i, double *val_turbvar_j);
+  
+	/*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
 	/*!
 	 * \brief Compute the scalar upwind flux between two nodes i and j.
 	 * \param[out] val_residual - Pointer to the total residual.
@@ -1177,6 +704,15 @@ public:
  */
 class CUpwSca_TurbSST : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double *TurbVar_i,	/*!< \brief Vector of turbulent variables at point i. */
+	*TurbVar_j;	/*!< \brief Vector of derivative of turbulent variables at point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
 	double *Velocity_i, *Velocity_j;
 	bool implicit, grid_movement;
 	double Density_i, Density_j,
@@ -1199,6 +735,26 @@ public:
 	 */
 	~CUpwSca_TurbSST(void);
   
+  /*!
+	 * \brief Set the value of the turbulent variable.
+	 * \param[in] val_turbvar_i - Value of the turbulent variable at point i.
+	 * \param[in] val_turbvar_j - Value of the turbulent variable at point j.
+	 */
+	void SetTurbVar(double *val_turbvar_i, double *val_turbvar_j);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
 	/*!
 	 * \brief Compute the scalar upwind flux between two nodes i and j.
 	 * \param[out] val_residual - Pointer to the total residual.
@@ -1219,6 +775,22 @@ public:
 class CCentJST_Flow : public CNumerics {
   
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double Area;				/*!< \brief Area of the face i-j. */
+  unsigned short Neighbor_i,	/*!< \brief Number of neighbors of the point i. */
+	Neighbor_j;					/*!< \brief Number of neighbors of the point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+  double Sensor_i,	/*!< \brief Pressure sensor at point i. */
+	Sensor_j;			/*!< \brief Pressure sensor at point j. */
+  double *Und_Lapl_i, /*!< \brief Undivided laplacians at point i. */
+	*Und_Lapl_j;		/*!< \brief Undivided laplacians at point j. */
+  double Lambda_i,	/*!< \brief Spectral radius at point i. */
+	Lambda_j;			/*!< \brief Spectral radius at point j. */
   double Pressure_i,	/*!< \brief Pressure at point i. */
 	Pressure_j;			/*!< \brief Pressure at point j. */
 	unsigned short iDim, iVar, jVar; /*!< \brief Iteration on dimension and variables. */
@@ -1237,7 +809,10 @@ private:
 	bool implicit, /*!< \brief Implicit calculation. */
 	grid_movement, /*!< \brief Modification for grid movement. */
 	stretching; /*!< \brief Stretching factor. */
-  
+  double SoundSpeed_i,	/*!< \brief Sound speed at point i. */
+	SoundSpeed_j;			/*!< \brief Sound speed at point j. */
+	double Enthalpy_i,	/*!< \brief Enthalpy at point i. */
+	Enthalpy_j;			/*!< \brief Enthalpy at point j. */
   
 public:
   
@@ -1253,6 +828,59 @@ public:
 	 * \brief Destructor of the class.
 	 */
 	~CCentJST_Flow(void);
+  
+  /*!
+	 * \brief Compute the projection of the inviscid Jacobian matrices.
+	 * \param[in] val_velocity Pointer to the velocity.
+	 * \param[in] val_energy Value of the energy.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[in] val_scale - Scale of the projection.
+	 * \param[out] val_Proj_Jac_tensor - Pointer to the projected inviscid Jacobian.
+	 */
+	void GetInviscidProjJac(double *val_velocity, double *val_energy,
+                          double *val_normal, double val_scale,
+                          double **val_Proj_Jac_tensor);
+  
+  /*!
+	 * \brief Set the number of neighbor to a point.
+	 * \param[in] val_neighbor_i - Number of neighbor to point i.
+	 * \param[in] val_neighbor_j - Number of neighbor to point j.
+	 */
+	void SetNeighbor(unsigned short val_neighbor_i, unsigned short val_neighbor_j);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+	/*!
+	 * \brief Set the value of the spectral radius.
+	 * \param[in] val_lambda_i - Value of the spectral radius at point i.
+	 * \param[in] val_lambda_j - Value of the spectral radius at point j.
+	 */
+	void SetLambda(double val_lambda_i, double val_lambda_j);
+  
+  /*!
+	 * \brief Set the value of the pressure sensor.
+	 * \param[in] val_sensor_i Pressure sensor at point i.
+	 * \param[in] val_sensor_j Pressure sensor at point j.
+	 */
+	void SetSensor(double val_sensor_i, double val_sensor_j);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+  /*!
+	 * \brief Set the value of undivided laplacian.
+	 * \param[in] val_und_lapl_i Undivided laplacian at point i.
+	 * \param[in] val_und_lapl_j Undivided laplacian at point j.
+	 */
+	void SetUndivided_Laplacian(double *val_und_lapl_i, double *val_und_lapl_j);
   
   /*!
 	 * \brief Compute the projected inviscid flux vector.
@@ -1288,6 +916,18 @@ public:
  */
 class CCentLax_Flow : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double Area;				/*!< \brief Area of the face i-j. */
+  unsigned short Neighbor_i,	/*!< \brief Number of neighbors of the point i. */
+	Neighbor_j;					/*!< \brief Number of neighbors of the point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+  double Lambda_i,	/*!< \brief Spectral radius at point i. */
+	Lambda_j;			/*!< \brief Spectral radius at point j. */
   double Pressure_i,	/*!< \brief Pressure at point i. */
 	Pressure_j;			/*!< \brief Pressure at point j. */
 	unsigned short iDim, iVar, jVar; /*!< \brief Iteration on dimension and variables. */
@@ -1305,6 +945,10 @@ private:
 	bool implicit, /*!< \brief Implicit calculation. */
 	grid_movement, /*!< \brief Modification for grid movement. */
 	stretching, ProjGridVel;
+  double SoundSpeed_i,	/*!< \brief Sound speed at point i. */
+	SoundSpeed_j;			/*!< \brief Sound speed at point j. */
+	double Enthalpy_i,	/*!< \brief Enthalpy at point i. */
+	Enthalpy_j;			/*!< \brief Enthalpy at point j. */
   
 public:
   
@@ -1322,6 +966,38 @@ public:
 	~CCentLax_Flow(void);
   
   /*!
+	 * \brief Compute the projection of the inviscid Jacobian matrices.
+	 * \param[in] val_velocity Pointer to the velocity.
+	 * \param[in] val_energy Value of the energy.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[in] val_scale - Scale of the projection.
+	 * \param[out] val_Proj_Jac_tensor - Pointer to the projected inviscid Jacobian.
+	 */
+	void GetInviscidProjJac(double *val_velocity, double *val_energy,
+                          double *val_normal, double val_scale,
+                          double **val_Proj_Jac_tensor);
+  
+  /*!
+	 * \brief Set the number of neighbor to a point.
+	 * \param[in] val_neighbor_i - Number of neighbor to point i.
+	 * \param[in] val_neighbor_j - Number of neighbor to point j.
+	 */
+	void SetNeighbor(unsigned short val_neighbor_i, unsigned short val_neighbor_j);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+	/*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+  /*!
 	 * \brief Compute the projected inviscid flux vector.
 	 * \param[in] val_density - Pointer to the density.
 	 * \param[in] val_velocity - Pointer to the velocity.
@@ -1333,6 +1009,13 @@ public:
 	void GetInviscidProjFlux(double *val_density, double *val_velocity,
                            double *val_pressure, double *val_enthalpy,
                            double *val_normal, double *val_Proj_Flux);
+  
+	/*!
+	 * \brief Set the value of the spectral radius.
+	 * \param[in] val_lambda_i - Value of the spectral radius at point i.
+	 * \param[in] val_lambda_j - Value of the spectral radius at point j.
+	 */
+	void SetLambda(double val_lambda_i, double val_lambda_j);
   
 	/*!
 	 * \brief Compute the flow residual using a Lax method.
@@ -1350,11 +1033,28 @@ public:
  * \class CAvgGrad_Flow
  * \brief Class for computing viscous term using the average of gradients.
  * \ingroup ViscDiscr
- * \author A. Bueno, and F. Palacios.
+ * \author F. Palacios.
  * \version 1.1.0
  */
 class CAvgGrad_Flow : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double Area;				/*!< \brief Area of the face i-j. */
+  double **PrimVar_Grad_i,	/*!< \brief Gradient of primitive variables at point i. */
+	**PrimVar_Grad_j;			/*!< \brief Gradient of primitive variables at point j. */
+  double *Coord_i,	/*!< \brief Cartesians coordinates of point i. */
+	*Coord_j;			/*!< \brief Cartesians coordinates of point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *UnitNormal;		/*!< \brief Unitary normal vector. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+  double turb_ke_i,	/*!< \brief Turbulent kinetic energy at point i. */
+	turb_ke_j;			/*!< \brief Turbulent kinetic energy at point j. */
+  double Eddy_Viscosity_i,	/*!< \brief Eddy viscosity at point i. */
+	Eddy_Viscosity_j;			/*!< \brief Eddy viscosity at point j. */
   double Laminar_Viscosity_i,	/*!< \brief Laminar viscosity at point i. */
 	Laminar_Viscosity_j;		/*!< \brief Variation of laminar viscosity at point j. */
   double
@@ -1388,6 +1088,69 @@ public:
 	 */
 	~CAvgGrad_Flow(void);
   
+  /*!
+	 * \brief TSL-Approximation of Viscous NS Jacobians.
+	 * \param[in] val_Mean_PrimVar - Mean value of the primitive variables.
+	 * \param[in] val_laminar_viscosity - Value of the laminar viscosity.
+	 * \param[in] val_eddy_viscosity - Value of the eddy viscosity.
+	 * \param[in] val_dist_ij - Distance between the points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[in] val_dS - Area of the face between two nodes.
+	 * \param[in] val_Proj_Visc_Flux - Pointer to the projected viscous flux.
+	 * \param[out] val_Proj_Jac_Tensor_i - Pointer to the projected viscous Jacobian at point i.
+	 * \param[out] val_Proj_Jac_Tensor_j - Pointer to the projected viscous Jacobian at point j.
+	 */
+	void GetViscousProjJac(double *val_Mean_PrimVar,
+                         double val_laminar_viscosity,
+                         double val_eddy_viscosity,
+                         double val_dist_ij,
+                         double *val_normal, double val_dS,
+                         double *val_Proj_Visc_Flux,
+                         double **val_Proj_Jac_Tensor_i,
+                         double **val_Proj_Jac_Tensor_j);
+  
+  /*!
+	 * \brief Set the gradient of the primitive variables.
+	 * \param[in] val_primvar_grad_i - Gradient of the primitive variable at point i.
+	 * \param[in] val_primvar_grad_j - Gradient of the primitive variable at point j.
+	 */
+	void SetPrimVarGradient(double **val_primvar_grad_i,
+                          double **val_primvar_grad_j);
+  
+  /*!
+	 * \brief Set coordinates of the points.
+	 * \param[in] val_coord_i - Coordinates of the point i.
+	 * \param[in] val_coord_j - Coordinates of the point j.
+	 */
+	void SetCoord(double *val_coord_i, double *val_coord_j);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the eddy viscosity.
+	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
+	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
+	 */
+	void SetEddyViscosity(double val_eddy_viscosity_i,
+                        double val_eddy_viscosity_j);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+  /*!
+	 * \brief Set the turbulent kinetic energy.
+	 * \param[in] val_turb_ke_i - Value of the turbulent kinetic energy at point i.
+	 * \param[in] val_turb_ke_j - Value of the turbulent kinetic energy at point j.
+	 */
+	void SetTurbKineticEnergy(double val_turb_ke_i, double val_turb_ke_j);
   
 	/*!
 	 * \brief Get the viscous fluxes.
@@ -1438,11 +1201,28 @@ public:
  * \class CAvgGrad_TurbSA
  * \brief Class for computing viscous term using average of gradients (Spalart-Allmaras Turbulence model).
  * \ingroup ViscDiscr
- * \author A. Bueno.
+ * \author F. Palacios.
  * \version 1.1.0
  */
 class CAvgGrad_TurbSA : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double **TurbVar_Grad_i,	/*!< \brief Gradient of turbulent variables at point i. */
+	**TurbVar_Grad_j;			/*!< \brief Gradient of turbulent variables at point j. */
+  double *Coord_i,	/*!< \brief Cartesians coordinates of point i. */
+	*Coord_j;			/*!< \brief Cartesians coordinates of point j. */
+  double *TurbVar_i,	/*!< \brief Vector of turbulent variables at point i. */
+	*TurbVar_j;	/*!< \brief Vector of derivative of turbulent variables at point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+  double Density_i,	/*!< \brief Density at point i. */
+	Density_j;			/*!< \brief Density at point j. */
+  double Eddy_Viscosity_i,	/*!< \brief Eddy viscosity at point i. */
+	Eddy_Viscosity_j;			/*!< \brief Eddy viscosity at point j. */
   double Laminar_Viscosity_i,	/*!< \brief Laminar viscosity at point i. */
 	Laminar_Viscosity_j;		/*!< \brief Variation of laminar viscosity at point j. */
 	double **Mean_GradTurbVar;
@@ -1472,6 +1252,40 @@ public:
 	 */
 	~CAvgGrad_TurbSA(void);
   
+  /*!
+	 * \brief Set the gradient of the turbulent variables.
+	 * \param[in] val_turbvar_grad_i - Gradient of the turbulent variable at point i.
+	 * \param[in] val_turbvar_grad_j - Gradient of the turbulent variable at point j.
+	 */
+	void SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j);
+  
+  /*!
+	 * \brief Set coordinates of the points.
+	 * \param[in] val_coord_i - Coordinates of the point i.
+	 * \param[in] val_coord_j - Coordinates of the point j.
+	 */
+	void SetCoord(double *val_coord_i, double *val_coord_j);
+  
+  /*!
+	 * \brief Set the value of the turbulent variable.
+	 * \param[in] val_turbvar_i - Value of the turbulent variable at point i.
+	 * \param[in] val_turbvar_j - Value of the turbulent variable at point j.
+	 */
+	void SetTurbVar(double *val_turbvar_i, double *val_turbvar_j);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
 	/*!
 	 * \brief Set the laminar viscosity.
 	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
@@ -1479,6 +1293,14 @@ public:
 	 */
 	void SetLaminarViscosity(double val_laminar_viscosity_i,
                            double val_laminar_viscosity_j);
+  
+  /*!
+	 * \brief Set the eddy viscosity.
+	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
+	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
+	 */
+	void SetEddyViscosity(double val_eddy_viscosity_i,
+                        double val_eddy_viscosity_j);
   
 	/*!
 	 * \brief Compute the viscous turbulence terms residual using an average of gradients.
@@ -1494,11 +1316,28 @@ public:
  * \class CAvgGradCorrected_Flow
  * \brief Class for computing viscous term using the average of gradients with a correction.
  * \ingroup ViscDiscr
- * \author A. Bueno, and F. Palacios.
+ * \author F. Palacios.
  * \version 1.1.0
  */
 class CAvgGradCorrected_Flow : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double Area;				/*!< \brief Area of the face i-j. */
+  double **PrimVar_Grad_i,	/*!< \brief Gradient of primitive variables at point i. */
+	**PrimVar_Grad_j;			/*!< \brief Gradient of primitive variables at point j. */
+  double *Coord_i,	/*!< \brief Cartesians coordinates of point i. */
+	*Coord_j;			/*!< \brief Cartesians coordinates of point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *UnitNormal;		/*!< \brief Unitary normal vector. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+  double turb_ke_i,	/*!< \brief Turbulent kinetic energy at point i. */
+	turb_ke_j;			/*!< \brief Turbulent kinetic energy at point j. */
+  double Eddy_Viscosity_i,	/*!< \brief Eddy viscosity at point i. */
+	Eddy_Viscosity_j;			/*!< \brief Eddy viscosity at point j. */
   double Laminar_Viscosity_i,	/*!< \brief Laminar viscosity at point i. */
 	Laminar_Viscosity_j;		/*!< \brief Variation of laminar viscosity at point j. */
   double
@@ -1533,6 +1372,78 @@ public:
 	 */
 	~CAvgGradCorrected_Flow(void);
   
+  /*!
+	 * \brief TSL-Approximation of Viscous NS Jacobians.
+	 * \param[in] val_Mean_PrimVar - Mean value of the primitive variables.
+	 * \param[in] val_laminar_viscosity - Value of the laminar viscosity.
+	 * \param[in] val_eddy_viscosity - Value of the eddy viscosity.
+	 * \param[in] val_dist_ij - Distance between the points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 * \param[in] val_dS - Area of the face between two nodes.
+	 * \param[in] val_Proj_Visc_Flux - Pointer to the projected viscous flux.
+	 * \param[out] val_Proj_Jac_Tensor_i - Pointer to the projected viscous Jacobian at point i.
+	 * \param[out] val_Proj_Jac_Tensor_j - Pointer to the projected viscous Jacobian at point j.
+	 */
+	void GetViscousProjJac(double *val_Mean_PrimVar,
+                         double val_laminar_viscosity,
+                         double val_eddy_viscosity,
+                         double val_dist_ij,
+                         double *val_normal, double val_dS,
+                         double *val_Proj_Visc_Flux,
+                         double **val_Proj_Jac_Tensor_i,
+                         double **val_Proj_Jac_Tensor_j);
+  
+  /*!
+	 * \brief Set the gradient of the primitive variables.
+	 * \param[in] val_primvar_grad_i - Gradient of the primitive variable at point i.
+	 * \param[in] val_primvar_grad_j - Gradient of the primitive variable at point j.
+	 */
+	void SetPrimVarGradient(double **val_primvar_grad_i,
+                          double **val_primvar_grad_j);
+  
+  /*!
+	 * \brief Set coordinates of the points.
+	 * \param[in] val_coord_i - Coordinates of the point i.
+	 * \param[in] val_coord_j - Coordinates of the point j.
+	 */
+	void SetCoord(double *val_coord_i, double *val_coord_j);
+
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+  /*!
+	 * \brief Set the eddy viscosity.
+	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
+	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
+	 */
+	void SetEddyViscosity(double val_eddy_viscosity_i,
+                        double val_eddy_viscosity_j);
+  
+  /*!
+	 * \brief Set the turbulent kinetic energy.
+	 * \param[in] val_turb_ke_i - Value of the turbulent kinetic energy at point i.
+	 * \param[in] val_turb_ke_j - Value of the turbulent kinetic energy at point j.
+	 */
+	void SetTurbKineticEnergy(double val_turb_ke_i, double val_turb_ke_j);
+  
+	/*!
+	 * \brief Set the laminar viscosity.
+	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
+	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
+	 */
+	void SetLaminarViscosity(double val_laminar_viscosity_i,
+                           double val_laminar_viscosity_j);
+  
 	/*!
 	 * \brief Get the viscous fluxes.
 	 * \param[in] val_primvar - Value of the primitive variables.
@@ -1561,14 +1472,6 @@ public:
                           double val_eddy_viscosity);
   
 	/*!
-	 * \brief Set the laminar viscosity.
-	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
-	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
-	 */
-	void SetLaminarViscosity(double val_laminar_viscosity_i,
-                           double val_laminar_viscosity_j);
-  
-	/*!
 	 * \brief Compute the viscous flow residual using an average of gradients with correction.
 	 * \param[out] val_residual - Pointer to the total residual.
 	 * \param[out] val_Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
@@ -1582,20 +1485,36 @@ public:
  * \class CAvgGradCorrected_TurbSA
  * \brief Class for computing viscous term using average of gradients with correction (Spalart-Allmaras turbulence model).
  * \ingroup ViscDiscr
- * \author A. Bueno.
+ * \author F. Palacios.
  * \version 1.1.0
  */
 class CAvgGradCorrected_TurbSA : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double **TurbVar_Grad_i,	/*!< \brief Gradient of turbulent variables at point i. */
+	**TurbVar_Grad_j;			/*!< \brief Gradient of turbulent variables at point j. */
+  double *Coord_i,	/*!< \brief Cartesians coordinates of point i. */
+	*Coord_j;			/*!< \brief Cartesians coordinates of point j. */
+  double *TurbVar_i,	/*!< \brief Vector of turbulent variables at point i. */
+	*TurbVar_j;	/*!< \brief Vector of derivative of turbulent variables at point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
   double Laminar_Viscosity_i,	/*!< \brief Laminar viscosity at point i. */
 	Laminar_Viscosity_j;		/*!< \brief Variation of laminar viscosity at point j. */
-
+	double Eddy_Viscosity_i,	/*!< \brief Eddy viscosity at point i. */
+	Eddy_Viscosity_j;			/*!< \brief Eddy viscosity at point j. */
 	double **Mean_GradTurbVar;
 	double *Proj_Mean_GradTurbVar_Kappa, *Proj_Mean_GradTurbVar_Edge, *Proj_Mean_GradTurbVar_Corrected;
 	double *Edge_Vector;
 	bool implicit;
 	double sigma, nu_i, nu_j, nu_e, dist_ij_2, proj_vector_ij, nu_hat_i, nu_hat_j;
 	unsigned short iVar, iDim;
+  double Density_i,	/*!< \brief Density at point i. */
+	Density_j;			/*!< \brief Density at point j. */
   
 public:
   
@@ -1611,6 +1530,48 @@ public:
 	 * \brief Destructor of the class.
 	 */
 	~CAvgGradCorrected_TurbSA(void);
+  
+  /*!
+	 * \brief Set the gradient of the turbulent variables.
+	 * \param[in] val_turbvar_grad_i - Gradient of the turbulent variable at point i.
+	 * \param[in] val_turbvar_grad_j - Gradient of the turbulent variable at point j.
+	 */
+	void SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j);
+  
+  /*!
+	 * \brief Set the value of the turbulent variable.
+	 * \param[in] val_turbvar_i - Value of the turbulent variable at point i.
+	 * \param[in] val_turbvar_j - Value of the turbulent variable at point j.
+	 */
+	void SetTurbVar(double *val_turbvar_i, double *val_turbvar_j);
+  
+  /*!
+	 * \brief Set coordinates of the points.
+	 * \param[in] val_coord_i - Coordinates of the point i.
+	 * \param[in] val_coord_j - Coordinates of the point j.
+	 */
+	void SetCoord(double *val_coord_i, double *val_coord_j);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+  /*!
+	 * \brief Set the eddy viscosity.
+	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
+	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
+	 */
+	void SetEddyViscosity(double val_eddy_viscosity_i,
+                        double val_eddy_viscosity_j);
   
 	/*!
 	 * \brief Set the laminar viscosity.
@@ -1634,14 +1595,26 @@ public:
  * \class CAvgGrad_TurbSST
  * \brief Class for computing viscous term using average of gradient with correction (Menter SST turbulence model).
  * \ingroup ViscDiscr
- * \author A. Bueno.
+ * \author F. Palacios.
  * \version 1.1.0
  */
 class CAvgGrad_TurbSST : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double **TurbVar_Grad_i,	/*!< \brief Gradient of turbulent variables at point i. */
+	**TurbVar_Grad_j;			/*!< \brief Gradient of turbulent variables at point j. */
+  double *Coord_i,	/*!< \brief Cartesians coordinates of point i. */
+	*Coord_j;			/*!< \brief Cartesians coordinates of point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
   double Laminar_Viscosity_i,	/*!< \brief Laminar viscosity at point i. */
 	Laminar_Viscosity_j;		/*!< \brief Variation of laminar viscosity at point j. */
-
+	double Eddy_Viscosity_i,	/*!< \brief Eddy viscosity at point i. */
+	Eddy_Viscosity_j;			/*!< \brief Eddy viscosity at point j. */
 	double sigma_k1,                     /*!< \brief Constants for the viscous terms, k-w (1), k-eps (2)*/
 	sigma_k2,
 	sigma_om1,
@@ -1663,6 +1636,8 @@ private:
   
 	bool implicit;
 	unsigned short iVar, iDim;
+  double Density_i,	/*!< \brief Density at point i. */
+	Density_j;			/*!< \brief Density at point j. */
   
 public:
   
@@ -1679,10 +1654,37 @@ public:
 	 */
 	~CAvgGrad_TurbSST(void);
   
+  /*!
+	 * \brief Set the gradient of the turbulent variables.
+	 * \param[in] val_turbvar_grad_i - Gradient of the turbulent variable at point i.
+	 * \param[in] val_turbvar_grad_j - Gradient of the turbulent variable at point j.
+	 */
+	void SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j);
+  
+  /*!
+	 * \brief Set coordinates of the points.
+	 * \param[in] val_coord_i - Coordinates of the point i.
+	 * \param[in] val_coord_j - Coordinates of the point j.
+	 */
+	void SetCoord(double *val_coord_i, double *val_coord_j);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
 	/*!
 	 * \brief Sets value of first blending function.
 	 */
 	void SetF1blending(double val_F1_i, double val_F1_j) { F1_i = val_F1_i; F1_j = val_F1_j;}
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
   
 	/*!
 	 * \brief Set the laminar viscosity.
@@ -1691,6 +1693,14 @@ public:
 	 */
 	void SetLaminarViscosity(double val_laminar_viscosity_i,
                            double val_laminar_viscosity_j);
+  
+  /*!
+	 * \brief Set the eddy viscosity.
+	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
+	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
+	 */
+	void SetEddyViscosity(double val_eddy_viscosity_i,
+                        double val_eddy_viscosity_j);
   
 	/*!
 	 * \brief Compute the viscous turbulent residual using an average of gradients wtih correction.
@@ -1707,14 +1717,36 @@ public:
  * \class CAvgGradCorrected_TurbSST
  * \brief Class for computing viscous term using average of gradient with correction (Menter SST turbulence model).
  * \ingroup ViscDiscr
- * \author A. Bueno.
+ * \author F. Palacios.
  * \version 1.1.0
  */
 class CAvgGradCorrected_TurbSST : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double **TurbVar_Grad_i,	/*!< \brief Gradient of turbulent variables at point i. */
+	**TurbVar_Grad_j;			/*!< \brief Gradient of turbulent variables at point j. */
+
+  double *TurbVar_i,	/*!< \brief Vector of turbulent variables at point i. */
+	*TurbVar_j;	/*!< \brief Vector of derivative of turbulent variables at point j. */
+
+  double *Coord_i,	/*!< \brief Cartesians coordinates of point i. */
+	*Coord_j;			/*!< \brief Cartesians coordinates of point j. */
+  double *Normal;	/*!< \brief Normal vector, it norm is the area of the face. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+
   double Laminar_Viscosity_i,	/*!< \brief Laminar viscosity at point i. */
 	Laminar_Viscosity_j;		/*!< \brief Variation of laminar viscosity at point j. */
-
+  
+	double Eddy_Viscosity_i,	/*!< \brief Eddy viscosity at point i. */
+	Eddy_Viscosity_j;			/*!< \brief Eddy viscosity at point j. */
+  
+  double Density_i,	/*!< \brief Density at point i. */
+	Density_j;			/*!< \brief Density at point j. */
+  
 	double sigma_k1,                     /*!< \brief Constants for the viscous terms, k-w (1), k-eps (2)*/
 	sigma_k2,
 	sigma_om1,
@@ -1752,6 +1784,40 @@ public:
 	 */
 	~CAvgGradCorrected_TurbSST(void);
   
+  /*!
+	 * \brief Set the gradient of the turbulent variables.
+	 * \param[in] val_turbvar_grad_i - Gradient of the turbulent variable at point i.
+	 * \param[in] val_turbvar_grad_j - Gradient of the turbulent variable at point j.
+	 */
+	void SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j);
+  
+  /*!
+	 * \brief Set the value of the turbulent variable.
+	 * \param[in] val_turbvar_i - Value of the turbulent variable at point i.
+	 * \param[in] val_turbvar_j - Value of the turbulent variable at point j.
+	 */
+	void SetTurbVar(double *val_turbvar_i, double *val_turbvar_j);
+  
+  /*!
+	 * \brief Set coordinates of the points.
+	 * \param[in] val_coord_i - Coordinates of the point i.
+	 * \param[in] val_coord_j - Coordinates of the point j.
+	 */
+	void SetCoord(double *val_coord_i, double *val_coord_j);
+  
+  /*!
+	 * \brief Set the value of the normal vector to the face between two points.
+	 * \param[in] val_normal - Normal vector, the norm of the vector is the area of the face.
+	 */
+	void SetNormal(double *val_normal);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
 	/*!
 	 * \brief Sets value of first blending function.
 	 */
@@ -1765,6 +1831,14 @@ public:
 	void SetLaminarViscosity(double val_laminar_viscosity_i,
                            double val_laminar_viscosity_j);
   
+  /*!
+	 * \brief Set the eddy viscosity.
+	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
+	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
+	 */
+	void SetEddyViscosity(double val_eddy_viscosity_i,
+                        double val_eddy_viscosity_j);
+  
 	/*!
 	 * \brief Compute the viscous turbulent residual using an average of gradients wtih correction.
 	 * \param[out] val_residual - Pointer to the total residual.
@@ -1777,41 +1851,33 @@ public:
 };
 
 /*!
- * \class CSourceNothing
- * \brief Dummy class.
+ * \class CSourcePieceWise_TurbSA
+ * \brief Class for integrating the source terms of the Spalart-Allmaras turbulence model equation.
  * \ingroup SourceDiscr
  * \author F. Palacios.
  * \version 1.1.0
  */
-class CSourceNothing : public CNumerics {
-public:
-  
-	/*!
-	 * \brief Constructor of the class.
-	 * \param[in] val_nDim - Number of dimensions of the problem.
-	 * \param[in] val_nVar - Number of variables of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	CSourceNothing(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	~CSourceNothing(void);
-};
-
-/*!
- * \class CSourcePieceWise_TurbSA
- * \brief Class for integrating the source terms of the Spalart-Allmaras turbulence model equation.
- * \ingroup SourceDiscr
- * \author A. Bueno.
- * \version 1.1.0
- */
 class CSourcePieceWise_TurbSA : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+	double Volume;				/*!< \brief Volume of the control volume around point i. */
+  double **PrimVar_Grad_i,	/*!< \brief Gradient of primitive variables at point i. */
+	**PrimVar_Grad_j;			/*!< \brief Gradient of primitive variables at point j. */
+  double **TurbVar_Grad_i,	/*!< \brief Gradient of turbulent variables at point i. */
+	**TurbVar_Grad_j;			/*!< \brief Gradient of turbulent variables at point j. */
+  double *TurbVar_i,	/*!< \brief Vector of turbulent variables at point i. */
+	*TurbVar_j;	/*!< \brief Vector of derivative of turbulent variables at point j. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+  double dist_i,	/*!< \brief Distance of point i to the nearest wall. */
+	dist_j;			/*!< \brief Distance of point j to the nearest wall. */
   double Laminar_Viscosity_i,	/*!< \brief Laminar viscosity at point i. */
 	Laminar_Viscosity_j;		/*!< \brief Variation of laminar viscosity at point j. */
-
+	double Density_i,	/*!< \brief Density at point i. */
+	Density_j;			/*!< \brief Density at point j. */
 	double cv1_3;
 	double k2;
 	double cb1;
@@ -1853,6 +1919,41 @@ public:
 	 */
 	~CSourcePieceWise_TurbSA(void);
   
+  /*!
+	 * \brief Set the value of the volume of the control volume.
+	 * \param[in] val_volume Volume of the control volume.
+	 */
+	void SetVolume(double val_volume);
+  
+  /*!
+	 * \brief Set the gradient of the primitive variables.
+	 * \param[in] val_primvar_grad_i - Gradient of the primitive variable at point i.
+	 * \param[in] val_primvar_grad_j - Gradient of the primitive variable at point j.
+	 */
+	void SetPrimVarGradient(double **val_primvar_grad_i,
+                          double **val_primvar_grad_j);
+  
+  /*!
+	 * \brief Set the gradient of the turbulent variables.
+	 * \param[in] val_turbvar_grad_i - Gradient of the turbulent variable at point i.
+	 * \param[in] val_turbvar_grad_j - Gradient of the turbulent variable at point j.
+	 */
+	void SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j);
+  
+  /*!
+	 * \brief Set the value of the turbulent variable.
+	 * \param[in] val_turbvar_i - Value of the turbulent variable at point i.
+	 * \param[in] val_turbvar_j - Value of the turbulent variable at point j.
+	 */
+	void SetTurbVar(double *val_turbvar_i, double *val_turbvar_j);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
 	/*!
 	 * \brief Residual for source term integration.
 	 * \param[out] val_residual - Pointer to the total residual.
@@ -1870,47 +1971,19 @@ public:
 	void SetLaminarViscosity(double val_laminar_viscosity_i,
                            double val_laminar_viscosity_j);
   
+  /*!
+	 * \brief Set the value of the distance from the nearest wall.
+	 * \param[in] val_dist_i - Value of of the distance from point i to the nearest wall.
+	 * \param[in] val_dist_j - Value of of the distance from point j to the nearest wall.
+	 */
+	void SetDistance(double val_dist_i, double val_dist_j);
+  
 	/*!
 	 * \brief Residual for source term integration.
 	 * \param[in] intermittency_in - Value of the intermittency.
 	 */
   void SetIntermittency(double intermittency_in);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_production - Value of the Production.
-	 */
-  void SetProduction(double val_production);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_destruction - Value of the Destruction.
-	 */
-  void SetDestruction(double val_destruction);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_crossproduction - Value of the CrossProduction.
-	 */
-  void SetCrossProduction(double val_crossproduction);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_production - Value of the Production.
-	 */
-  double GetProduction(void);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_destruction - Value of the Destruction.
-	 */
-  double GetDestruction(void);
-  
-  /*!
-	 * \brief Residual for source term integration.
-	 * \param[in] val_crossproduction - Value of the CrossProduction.
-	 */
-  double GetCrossProduction(void);
+
 };
 
 /*!
@@ -1922,9 +1995,25 @@ public:
  */
 class CSourcePieceWise_TurbSST : public CNumerics {
 private:
+  unsigned short nDim, nVar;	/*!< \brief Number of dimensions and variables. */
+	double Gamma;				/*!< \brief Fluid's Gamma constant (ratio of specific heats). */
+	double Gamma_Minus_One;		/*!< \brief Fluids's Gamma - 1.0  . */
+	double Gas_Constant;		 		/*!< \brief Gas constant. */
+  double Volume;				/*!< \brief Volume of the control volume around point i. */
+  double **PrimVar_Grad_i,	/*!< \brief Gradient of primitive variables at point i. */
+	**PrimVar_Grad_j;			/*!< \brief Gradient of primitive variables at point j. */
+  double *TurbVar_i,	/*!< \brief Vector of turbulent variables at point i. */
+	*TurbVar_j;	/*!< \brief Vector of derivative of turbulent variables at point j. */
+  double *V_i,		/*!< \brief Vector of primitive variables at point i. */
+	*V_j;				/*!< \brief Vector of primitive variables at point j. */
+  double dist_i,	/*!< \brief Distance of point i to the nearest wall. */
+	dist_j;			/*!< \brief Distance of point j to the nearest wall. */
   double Laminar_Viscosity_i,	/*!< \brief Laminar viscosity at point i. */
 	Laminar_Viscosity_j;		/*!< \brief Variation of laminar viscosity at point j. */
-
+	double Eddy_Viscosity_i,	/*!< \brief Eddy viscosity at point i. */
+	Eddy_Viscosity_j;			/*!< \brief Eddy viscosity at point j. */
+  double Density_i,	/*!< \brief Density at point i. */
+	Density_j;			/*!< \brief Density at point j. */
 	double F1_i,
 	F1_j,
 	F2_i,
@@ -1957,6 +2046,41 @@ public:
 	 * \brief Destructor of the class.
 	 */
 	~CSourcePieceWise_TurbSST(void);
+  
+  /*!
+	 * \brief Set the value of the volume of the control volume.
+	 * \param[in] val_volume Volume of the control volume.
+	 */
+	void SetVolume(double val_volume);
+  
+	/*!
+	 * \brief Set the gradient of the primitive variables.
+	 * \param[in] val_primvar_grad_i - Gradient of the primitive variable at point i.
+	 * \param[in] val_primvar_grad_j - Gradient of the primitive variable at point j.
+	 */
+	void SetPrimVarGradient(double **val_primvar_grad_i,
+                          double **val_primvar_grad_j);
+  
+  /*!
+	 * \brief Set the value of the turbulent variable.
+	 * \param[in] val_turbvar_i - Value of the turbulent variable at point i.
+	 * \param[in] val_turbvar_j - Value of the turbulent variable at point j.
+	 */
+	void SetTurbVar(double *val_turbvar_i, double *val_turbvar_j);
+  
+  /*!
+	 * \brief Set the value of the primitive variables.
+	 * \param[in] val_v_i - Value of the primitive variable at point i.
+	 * \param[in] val_v_j - Value of the primitive variable at point j.
+	 */
+	void SetPrimitive(double *val_v_i, double *val_v_j);
+  
+  /*!
+	 * \brief Set the value of the distance from the nearest wall.
+	 * \param[in] val_dist_i - Value of of the distance from point i to the nearest wall.
+	 * \param[in] val_dist_j - Value of of the distance from point j to the nearest wall.
+	 */
+	void SetDistance(double val_dist_i, double val_dist_j);
   
 	/*!
 	 * \brief Set the value of the first blending function.
@@ -1994,6 +2118,13 @@ public:
 	void SetLaminarViscosity(double val_laminar_viscosity_i,
                            double val_laminar_viscosity_j);
   
+  /*!
+	 * \brief Set the eddy viscosity.
+	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
+	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
+	 */
+	void SetEddyViscosity(double val_eddy_viscosity_i,
+                        double val_eddy_viscosity_j);
 	/*!
 	 * \brief Residual for source term integration.
 	 * \param[out] val_residual - Pointer to the total residual.
@@ -2002,6 +2133,31 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	void ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config);
+};
+
+
+/*!
+ * \class CSourceNothing
+ * \brief Dummy class.
+ * \ingroup SourceDiscr
+ * \author F. Palacios.
+ * \version 1.1.0
+ */
+class CSourceNothing : public CNumerics {
+public:
+  
+	/*!
+	 * \brief Constructor of the class.
+	 * \param[in] val_nDim - Number of dimensions of the problem.
+	 * \param[in] val_nVar - Number of variables of the problem.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	CSourceNothing(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
+  
+	/*!
+	 * \brief Destructor of the class.
+	 */
+	~CSourceNothing(void);
 };
 
 #include "numerics_structure.inl"
