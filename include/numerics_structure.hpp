@@ -1063,7 +1063,7 @@ private:
   double
   **tau,		/*!< \brief Viscous stress tensor. */
 	**delta;			/*!< \brief Identity matrix. */
-	unsigned short iDim, iVar, jVar;		/*!< \brief Iterators in dimension an variable. */
+	unsigned short iDim, jDim, iVar, jVar;		/*!< \brief Iterators in dimension an variable. */
 	double *Mean_PrimVar,					/*!< \brief Mean primitive variables. */
 	*PrimVar_i, *PrimVar_j,				/*!< \brief Primitives variables at point i and 1. */
 	**Mean_GradPrimVar,						/*!< \brief Mean value of the gradient. */
@@ -1131,14 +1131,6 @@ public:
 	void SetNormal(double *val_normal);
   
   /*!
-	 * \brief Set the eddy viscosity.
-	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
-	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
-	 */
-	void SetEddyViscosity(double val_eddy_viscosity_i,
-                        double val_eddy_viscosity_j);
-  
-  /*!
 	 * \brief Set the value of the primitive variables.
 	 * \param[in] val_v_i - Value of the primitive variable at point i.
 	 * \param[in] val_v_j - Value of the primitive variable at point j.
@@ -1178,14 +1170,6 @@ public:
                           double val_turb_ke, double *val_normal,
                           double val_laminar_viscosity,
                           double val_eddy_viscosity);
-  
-  /*!
-	 * \brief Set the laminar viscosity.
-	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
-	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
-	 */
-	void SetLaminarViscosity(double val_laminar_viscosity_i,
-                           double val_laminar_viscosity_j);
   
 	/*!
 	 * \brief Compute the viscous flow residual using an average of gradients.
@@ -1287,22 +1271,6 @@ public:
 	void SetPrimitive(double *val_v_i, double *val_v_j);
   
 	/*!
-	 * \brief Set the laminar viscosity.
-	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
-	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
-	 */
-	void SetLaminarViscosity(double val_laminar_viscosity_i,
-                           double val_laminar_viscosity_j);
-  
-  /*!
-	 * \brief Set the eddy viscosity.
-	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
-	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
-	 */
-	void SetEddyViscosity(double val_eddy_viscosity_i,
-                        double val_eddy_viscosity_j);
-  
-	/*!
 	 * \brief Compute the viscous turbulence terms residual using an average of gradients.
 	 * \param[out] val_residual - Pointer to the total residual.
 	 * \param[out] Jacobian_i - Jacobian of the numerical method at node i (implicit computation).
@@ -1346,7 +1314,7 @@ private:
   double
   **tau,		/*!< \brief Viscous stress tensor. */
 	**delta;			/*!< \brief Identity matrix. */
-	unsigned short iDim, iVar, jVar;		/*!< \brief Iterators in dimension an variable. */
+	unsigned short iDim, jDim, iVar, jVar;		/*!< \brief Iterators in dimension an variable. */
 	double *Mean_PrimVar,					/*!< \brief Mean primitive variables. */
 	*PrimVar_i, *PrimVar_j,				/*!< \brief Primitives variables at point i and 1. */
 	*Edge_Vector,									/*!< \brief Vector form point i to point j. */
@@ -1422,27 +1390,11 @@ public:
 	void SetPrimitive(double *val_v_i, double *val_v_j);
   
   /*!
-	 * \brief Set the eddy viscosity.
-	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
-	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
-	 */
-	void SetEddyViscosity(double val_eddy_viscosity_i,
-                        double val_eddy_viscosity_j);
-  
-  /*!
 	 * \brief Set the turbulent kinetic energy.
 	 * \param[in] val_turb_ke_i - Value of the turbulent kinetic energy at point i.
 	 * \param[in] val_turb_ke_j - Value of the turbulent kinetic energy at point j.
 	 */
 	void SetTurbKineticEnergy(double val_turb_ke_i, double val_turb_ke_j);
-  
-	/*!
-	 * \brief Set the laminar viscosity.
-	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
-	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
-	 */
-	void SetLaminarViscosity(double val_laminar_viscosity_i,
-                           double val_laminar_viscosity_j);
   
 	/*!
 	 * \brief Get the viscous fluxes.
@@ -1565,22 +1517,6 @@ public:
 	 */
 	void SetPrimitive(double *val_v_i, double *val_v_j);
   
-  /*!
-	 * \brief Set the eddy viscosity.
-	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
-	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
-	 */
-	void SetEddyViscosity(double val_eddy_viscosity_i,
-                        double val_eddy_viscosity_j);
-  
-	/*!
-	 * \brief Set the laminar viscosity.
-	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
-	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
-	 */
-	void SetLaminarViscosity(double val_laminar_viscosity_i,
-                           double val_laminar_viscosity_j);
-  
 	/*!
 	 * \brief Compute the viscous turbulent residual using an average of gradients with correction.
 	 * \param[out] val_residual - Pointer to the total residual.
@@ -1685,22 +1621,6 @@ public:
 	 * \param[in] val_v_j - Value of the primitive variable at point j.
 	 */
 	void SetPrimitive(double *val_v_i, double *val_v_j);
-  
-	/*!
-	 * \brief Set the laminar viscosity.
-	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
-	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
-	 */
-	void SetLaminarViscosity(double val_laminar_viscosity_i,
-                           double val_laminar_viscosity_j);
-  
-  /*!
-	 * \brief Set the eddy viscosity.
-	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
-	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
-	 */
-	void SetEddyViscosity(double val_eddy_viscosity_i,
-                        double val_eddy_viscosity_j);
   
 	/*!
 	 * \brief Compute the viscous turbulent residual using an average of gradients wtih correction.
@@ -1822,22 +1742,6 @@ public:
 	 * \brief Sets value of first blending function.
 	 */
 	void SetF1blending(double val_F1_i, double val_F1_j) { F1_i = val_F1_i; F1_j = val_F1_j;}
-  
-	/*!
-	 * \brief Set the laminar viscosity.
-	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
-	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
-	 */
-	void SetLaminarViscosity(double val_laminar_viscosity_i,
-                           double val_laminar_viscosity_j);
-  
-  /*!
-	 * \brief Set the eddy viscosity.
-	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
-	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
-	 */
-	void SetEddyViscosity(double val_eddy_viscosity_i,
-                        double val_eddy_viscosity_j);
   
 	/*!
 	 * \brief Compute the viscous turbulent residual using an average of gradients wtih correction.
@@ -1962,14 +1866,6 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	void ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config);
-  
-	/*!
-	 * \brief Set the laminar viscosity.
-	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
-	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
-	 */
-	void SetLaminarViscosity(double val_laminar_viscosity_i,
-                           double val_laminar_viscosity_j);
   
   /*!
 	 * \brief Set the value of the distance from the nearest wall.
@@ -2109,22 +2005,7 @@ public:
 	 * \param[in] val_CDkw_j - Value of the cross diffusion at point j.
 	 */
 	virtual void SetCrossDiff(double val_CDkw_i, double val_CDkw_j);
-  
-	/*!
-	 * \brief Set the laminar viscosity.
-	 * \param[in] val_laminar_viscosity_i - Value of the laminar viscosity at point i.
-	 * \param[in] val_laminar_viscosity_j - Value of the laminar viscosity at point j.
-	 */
-	void SetLaminarViscosity(double val_laminar_viscosity_i,
-                           double val_laminar_viscosity_j);
-  
-  /*!
-	 * \brief Set the eddy viscosity.
-	 * \param[in] val_eddy_viscosity_i - Value of the eddy viscosity at point i.
-	 * \param[in] val_eddy_viscosity_j - Value of the eddy viscosity at point j.
-	 */
-	void SetEddyViscosity(double val_eddy_viscosity_i,
-                        double val_eddy_viscosity_j);
+
 	/*!
 	 * \brief Residual for source term integration.
 	 * \param[out] val_residual - Pointer to the total residual.

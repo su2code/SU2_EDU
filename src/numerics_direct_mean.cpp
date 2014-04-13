@@ -2190,14 +2190,14 @@ CAvgGrad_Flow::CAvgGrad_Flow(unsigned short val_nDim, unsigned short val_nVar, C
 
   tau = new double* [nDim];
   delta = new double* [nDim];
-  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
+  for (iDim = 0; iDim < nDim; iDim++) {
     tau[iDim] = new double [nDim];
     delta[iDim] = new double [nDim];
   }
   
-  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
-    for (unsigned short jDim = 0; jDim < nDim; jDim++) {
-      if (iDim==jDim) delta[iDim][jDim]=1.0;
+  for (iDim = 0; iDim < nDim; iDim++) {
+    for (jDim = 0; jDim < nDim; jDim++) {
+      if (iDim == jDim) delta[iDim][jDim]=1.0;
       else delta[iDim][jDim]=0.0;
     }
   }
@@ -2571,11 +2571,6 @@ void CAvgGrad_Flow::GetViscousProjFlux(double *val_primvar,
   
 }
 
-void CAvgGrad_Flow::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
-	Laminar_Viscosity_i = val_lam_viscosity_i;
-	Laminar_Viscosity_j = val_lam_viscosity_j;
-}
-
 CAvgGradCorrected_Flow::CAvgGradCorrected_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics() {
   
   implicit = (config->GetKind_TimeIntScheme_Flow() == EULER_IMPLICIT);
@@ -2597,6 +2592,13 @@ CAvgGradCorrected_Flow::CAvgGradCorrected_Flow(unsigned short val_nDim, unsigned
   for (unsigned short iDim = 0; iDim < nDim; iDim++) {
     tau[iDim] = new double [nDim];
     delta[iDim] = new double [nDim];
+  }
+  
+  for (iDim = 0; iDim < nDim; iDim++) {
+    for (jDim = 0; jDim < nDim; jDim++) {
+      if (iDim == jDim) delta[iDim][jDim]=1.0;
+      else delta[iDim][jDim]=0.0;
+    }
   }
   
   /*--- Compressible flow, primitive variables nDim+3, (T,vx,vy,vz,P,rho) ---*/
@@ -2981,11 +2983,6 @@ void CAvgGradCorrected_Flow::GetViscousProjFlux(double *val_primvar,
       Proj_Flux_Tensor[iVar] += Flux_Tensor[iVar][iDim] * val_normal[iDim];
   }
   
-}
-
-void CAvgGradCorrected_Flow::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
-	Laminar_Viscosity_i = val_lam_viscosity_i;
-	Laminar_Viscosity_j = val_lam_viscosity_j;
 }
 
 CSourceNothing::CSourceNothing(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics() { }

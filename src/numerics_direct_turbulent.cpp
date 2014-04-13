@@ -184,16 +184,6 @@ inline void CAvgGrad_TurbSA::SetNormal(double *val_normal) {
   Normal = val_normal;
 }
 
-void CAvgGrad_TurbSA::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
-	Laminar_Viscosity_i = val_lam_viscosity_i;
-	Laminar_Viscosity_j = val_lam_viscosity_j;
-}
-
-void CAvgGrad_TurbSA::SetEddyViscosity(double val_eddy_viscosity_i, double val_eddy_viscosity_j) {
-	Eddy_Viscosity_i=val_eddy_viscosity_i;
-	Eddy_Viscosity_j=val_eddy_viscosity_j;
-}
-
 inline void CAvgGrad_TurbSA::SetPrimitive(double *val_v_i, double *val_v_j) {
 	V_i = val_v_i;
 	V_j = val_v_j;
@@ -305,16 +295,6 @@ inline void CAvgGradCorrected_TurbSA::SetTurbVar(double *val_turbvar_i, double *
 
 inline void CAvgGradCorrected_TurbSA::SetNormal(double *val_normal) {
   Normal = val_normal;
-}
-
-void CAvgGradCorrected_TurbSA::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
-	Laminar_Viscosity_i = val_lam_viscosity_i;
-	Laminar_Viscosity_j = val_lam_viscosity_j;
-}
-
-void CAvgGradCorrected_TurbSA::SetEddyViscosity(double val_eddy_viscosity_i, double val_eddy_viscosity_j) {
-	Eddy_Viscosity_i=val_eddy_viscosity_i;
-	Eddy_Viscosity_j=val_eddy_viscosity_j;
 }
 
 inline void CAvgGradCorrected_TurbSA::SetPrimitive(double *val_v_i, double *val_v_j) {
@@ -637,16 +617,6 @@ inline void CAvgGrad_TurbSST::SetNormal(double *val_normal) {
   Normal = val_normal;
 }
 
-void CAvgGrad_TurbSST::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
-	Laminar_Viscosity_i = val_lam_viscosity_i;
-	Laminar_Viscosity_j = val_lam_viscosity_j;
-}
-
-void CAvgGrad_TurbSST::SetEddyViscosity(double val_eddy_viscosity_i, double val_eddy_viscosity_j) {
-	Eddy_Viscosity_i=val_eddy_viscosity_i;
-	Eddy_Viscosity_j=val_eddy_viscosity_j;
-}
-
 inline void CAvgGrad_TurbSST::SetPrimitive(double *val_v_i, double *val_v_j) {
 	V_i = val_v_i;
 	V_j = val_v_j;
@@ -776,16 +746,6 @@ inline void CAvgGradCorrected_TurbSST::SetNormal(double *val_normal) {
   Normal = val_normal;
 }
 
-void CAvgGradCorrected_TurbSST::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
-	Laminar_Viscosity_i = val_lam_viscosity_i;
-	Laminar_Viscosity_j = val_lam_viscosity_j;
-}
-
-void CAvgGradCorrected_TurbSST::SetEddyViscosity(double val_eddy_viscosity_i, double val_eddy_viscosity_j) {
-	Eddy_Viscosity_i=val_eddy_viscosity_i;
-	Eddy_Viscosity_j=val_eddy_viscosity_j;
-}
-
 inline void CAvgGradCorrected_TurbSST::SetPrimitive(double *val_v_i, double *val_v_j) {
 	V_i = val_v_i;
 	V_j = val_v_j;
@@ -891,11 +851,6 @@ inline void CSourcePieceWise_TurbSST::SetCrossDiff(double val_CDkw_i, double val
 inline void CSourcePieceWise_TurbSST::SetPrimVarGradient(double **val_primvar_grad_i, double **val_primvar_grad_j) {
 	PrimVar_Grad_i = val_primvar_grad_i;
 	PrimVar_Grad_j = val_primvar_grad_j;
-}
-
-void CSourcePieceWise_TurbSST::SetEddyViscosity(double val_eddy_viscosity_i, double val_eddy_viscosity_j) {
-	Eddy_Viscosity_i=val_eddy_viscosity_i;
-	Eddy_Viscosity_j=val_eddy_viscosity_j;
 }
 
 inline void CSourcePieceWise_TurbSST::SetDistance(double val_dist_i, double val_dist_j) {

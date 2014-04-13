@@ -134,11 +134,6 @@ inline void CAvgGrad_Flow::SetTurbKineticEnergy(double val_turb_ke_i, double val
 	turb_ke_j = val_turb_ke_j;
 }
 
-inline void CAvgGrad_Flow::SetEddyViscosity(double val_eddy_viscosity_i, double val_eddy_viscosity_j) {
-	Eddy_Viscosity_i=val_eddy_viscosity_i;
-	Eddy_Viscosity_j=val_eddy_viscosity_j;
-}
-
 inline void CAvgGradCorrected_Flow::SetPrimVarGradient(double **val_primvar_grad_i, double **val_primvar_grad_j) {
 	PrimVar_Grad_i = val_primvar_grad_i;
 	PrimVar_Grad_j = val_primvar_grad_j;
@@ -161,9 +156,4 @@ inline void CAvgGradCorrected_Flow::SetPrimitive(double *val_v_i, double *val_v_
 inline void CAvgGradCorrected_Flow::SetTurbKineticEnergy(double val_turb_ke_i, double val_turb_ke_j) {
 	turb_ke_i = val_turb_ke_i;
 	turb_ke_j = val_turb_ke_j;
-}
-
-inline void CAvgGradCorrected_Flow::SetEddyViscosity(double val_eddy_viscosity_i, double val_eddy_viscosity_j) {
-	Eddy_Viscosity_i=val_eddy_viscosity_i;
-	Eddy_Viscosity_j=val_eddy_viscosity_j;
 }
