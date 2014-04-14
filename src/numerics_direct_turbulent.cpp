@@ -24,20 +24,28 @@
 #include <limits>
 
 CUpwSca_TurbSA::CUpwSca_TurbSA(unsigned short val_nDim, unsigned short val_nVar,
-                               CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
+                               CConfig *config) : CNumerics() {
   
   implicit        = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
   
+  nDim = val_nDim;
+  nVar = val_nVar;
+  Gamma = config->GetGamma();
+  Gamma_Minus_One = Gamma - 1.0;
+  Gas_Constant = config->GetGas_ConstantND();
+  
   Velocity_i = new double [nDim];
   Velocity_j = new double [nDim];
-  
+  Normal = new double [nDim];
+
 }
 
 CUpwSca_TurbSA::~CUpwSca_TurbSA(void) {
   
   delete [] Velocity_i;
   delete [] Velocity_j;
-  
+  delete [] Normal;
+
 }
 
 void CUpwSca_TurbSA::ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config) {
@@ -61,10 +69,30 @@ void CUpwSca_TurbSA::ComputeResidual(double *val_residual, double **val_Jacobian
   
 }
 
-CAvgGrad_TurbSA::CAvgGrad_TurbSA(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
+inline void CUpwSca_TurbSA::SetTurbVar(double *val_turbvar_i, double *val_turbvar_j) {
+	TurbVar_i = val_turbvar_i;
+	TurbVar_j = val_turbvar_j;
+}
+
+inline void CUpwSca_TurbSA::SetNormal(double *val_normal) {
+  Normal = val_normal;
+}
+
+inline void CUpwSca_TurbSA::SetPrimitive(double *val_v_i, double *val_v_j) {
+	V_i = val_v_i;
+	V_j = val_v_j;
+}
+
+CAvgGrad_TurbSA::CAvgGrad_TurbSA(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics() {
   unsigned short iVar;
   
   implicit = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
+  
+  nDim = val_nDim;
+  nVar = val_nVar;
+  Gamma = config->GetGamma();
+  Gamma_Minus_One = Gamma - 1.0;
+  Gas_Constant = config->GetGas_ConstantND();
   
   sigma = 2./3.;
   
@@ -74,7 +102,8 @@ CAvgGrad_TurbSA::CAvgGrad_TurbSA(unsigned short val_nDim, unsigned short val_nVa
   Mean_GradTurbVar = new double* [nVar];
   for (iVar = 0; iVar < nVar; iVar++)
     Mean_GradTurbVar[iVar] = new double [nDim];
-  
+  Normal = new double [nDim];
+
 }
 
 CAvgGrad_TurbSA::~CAvgGrad_TurbSA(void) {
@@ -86,7 +115,8 @@ CAvgGrad_TurbSA::~CAvgGrad_TurbSA(void) {
   for (iVar = 0; iVar < nVar; iVar++)
     delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
-  
+  delete [] Normal;
+
 }
 
 void CAvgGrad_TurbSA::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
@@ -134,11 +164,42 @@ void CAvgGrad_TurbSA::ComputeResidual(double *val_residual, double **Jacobian_i,
   
 }
 
+inline void CAvgGrad_TurbSA::SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j) {
+	TurbVar_Grad_i = val_turbvar_grad_i;
+	TurbVar_Grad_j = val_turbvar_grad_j;
+}
+
+
+inline void CAvgGrad_TurbSA::SetCoord(double *val_coord_i, double *val_coord_j) {
+	Coord_i = val_coord_i;
+	Coord_j = val_coord_j;
+}
+
+inline void CAvgGrad_TurbSA::SetTurbVar(double *val_turbvar_i, double *val_turbvar_j) {
+	TurbVar_i = val_turbvar_i;
+	TurbVar_j = val_turbvar_j;
+}
+
+inline void CAvgGrad_TurbSA::SetNormal(double *val_normal) {
+  Normal = val_normal;
+}
+
+inline void CAvgGrad_TurbSA::SetPrimitive(double *val_v_i, double *val_v_j) {
+	V_i = val_v_i;
+	V_j = val_v_j;
+}
+
 CAvgGradCorrected_TurbSA::CAvgGradCorrected_TurbSA(unsigned short val_nDim, unsigned short val_nVar,
-                                                   CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
+                                                   CConfig *config) : CNumerics() {
   unsigned short iVar;
   
   implicit        = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
+  
+  nDim = val_nDim;
+  nVar = val_nVar;
+  Gamma = config->GetGamma();
+  Gamma_Minus_One = Gamma - 1.0;
+  Gas_Constant = config->GetGas_ConstantND();
   
   sigma = 2./3.;
   
@@ -149,7 +210,8 @@ CAvgGradCorrected_TurbSA::CAvgGradCorrected_TurbSA(unsigned short val_nDim, unsi
   Mean_GradTurbVar = new double* [nVar];
   for (iVar = 0; iVar < nVar; iVar++)
     Mean_GradTurbVar[iVar] = new double [nDim];
-  
+  Normal = new double [nDim];
+
 }
 
 CAvgGradCorrected_TurbSA::~CAvgGradCorrected_TurbSA(void) {
@@ -162,7 +224,8 @@ CAvgGradCorrected_TurbSA::~CAvgGradCorrected_TurbSA(void) {
   for (iVar = 0; iVar < nVar; iVar++)
     delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
-  
+  delete [] Normal;
+
 }
 
 void CAvgGradCorrected_TurbSA::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
@@ -215,10 +278,40 @@ void CAvgGradCorrected_TurbSA::ComputeResidual(double *val_residual, double **Ja
   
 }
 
+inline void CAvgGradCorrected_TurbSA::SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j) {
+	TurbVar_Grad_i = val_turbvar_grad_i;
+	TurbVar_Grad_j = val_turbvar_grad_j;
+}
+
+inline void CAvgGradCorrected_TurbSA::SetCoord(double *val_coord_i, double *val_coord_j) {
+	Coord_i = val_coord_i;
+	Coord_j = val_coord_j;
+}
+
+inline void CAvgGradCorrected_TurbSA::SetTurbVar(double *val_turbvar_i, double *val_turbvar_j) {
+	TurbVar_i = val_turbvar_i;
+	TurbVar_j = val_turbvar_j;
+}
+
+inline void CAvgGradCorrected_TurbSA::SetNormal(double *val_normal) {
+  Normal = val_normal;
+}
+
+inline void CAvgGradCorrected_TurbSA::SetPrimitive(double *val_v_i, double *val_v_j) {
+	V_i = val_v_i;
+	V_j = val_v_j;
+}
+
 CSourcePieceWise_TurbSA::CSourcePieceWise_TurbSA(unsigned short val_nDim, unsigned short val_nVar,
-                                                 CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
+                                                 CConfig *config) : CNumerics() {
   
   transition = false; // Debugging, -AA
+  
+  nDim = val_nDim;
+  nVar = val_nVar;
+  Gamma = config->GetGamma();
+  Gamma_Minus_One = Gamma - 1.0;
+  Gas_Constant = config->GetGas_ConstantND();
   
   /*--- Spalart-Allmaras closure constants ---*/
   cv1_3 = pow(7.1,3.0);
@@ -309,25 +402,61 @@ void CSourcePieceWise_TurbSA::ComputeResidual(double *val_residual, double **val
     dfw = dg*glim*(1.-g_6/(g_6+cw3_6));
     val_Jacobian_i[0][0] -= cw1*(dfw*TurbVar_i[0] +	2.*fw)*TurbVar_i[0]/dist_i_2*Volume;
   }
-  
-  
+
+}
+
+inline void CSourcePieceWise_TurbSA::SetIntermittency(double intermittency_in) { intermittency = intermittency_in; }
+
+inline void CSourcePieceWise_TurbSA::SetVolume(double val_volume) { Volume = val_volume; }
+
+inline void CSourcePieceWise_TurbSA::SetPrimVarGradient(double **val_primvar_grad_i, double **val_primvar_grad_j) {
+	PrimVar_Grad_i = val_primvar_grad_i;
+	PrimVar_Grad_j = val_primvar_grad_j;
+}
+
+inline void CSourcePieceWise_TurbSA::SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j) {
+	TurbVar_Grad_i = val_turbvar_grad_i;
+	TurbVar_Grad_j = val_turbvar_grad_j;
+}
+
+inline void CSourcePieceWise_TurbSA::SetTurbVar(double *val_turbvar_i, double *val_turbvar_j) {
+	TurbVar_i = val_turbvar_i;
+	TurbVar_j = val_turbvar_j;
+}
+
+inline void CSourcePieceWise_TurbSA::SetPrimitive(double *val_v_i, double *val_v_j) {
+	V_i = val_v_i;
+	V_j = val_v_j;
+}
+
+inline void CSourcePieceWise_TurbSA::SetDistance(double val_dist_i, double val_dist_j) {
+	dist_i = val_dist_i;
+	dist_j = val_dist_j;
 }
 
 CUpwSca_TurbSST::CUpwSca_TurbSST(unsigned short val_nDim, unsigned short val_nVar,
-                                 CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
+                                 CConfig *config) : CNumerics() {
   
   implicit        = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
   
+  nDim = val_nDim;
+  nVar = val_nVar;
+  Gamma = config->GetGamma();
+  Gamma_Minus_One = Gamma - 1.0;
+  Gas_Constant = config->GetGas_ConstantND();
+  
   Velocity_i = new double [nDim];
   Velocity_j = new double [nDim];
-  
+  Normal = new double [nDim];
+
 }
 
 CUpwSca_TurbSST::~CUpwSca_TurbSST(void) {
   
   delete [] Velocity_i;
   delete [] Velocity_j;
-  
+  delete [] Normal;
+
 }
 
 void CUpwSca_TurbSST::ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config) {
@@ -358,11 +487,31 @@ void CUpwSca_TurbSST::ComputeResidual(double *val_residual, double **val_Jacobia
   
 }
 
-CAvgGrad_TurbSST::CAvgGrad_TurbSST(unsigned short val_nDim, unsigned short val_nVar, double *constants, CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
+inline void CUpwSca_TurbSST::SetTurbVar(double *val_turbvar_i, double *val_turbvar_j) {
+	TurbVar_i = val_turbvar_i;
+	TurbVar_j = val_turbvar_j;
+}
+
+inline void CUpwSca_TurbSST::SetNormal(double *val_normal) {
+  Normal = val_normal;
+}
+
+inline void CUpwSca_TurbSST::SetPrimitive(double *val_v_i, double *val_v_j) {
+	V_i = val_v_i;
+	V_j = val_v_j;
+}
+
+CAvgGrad_TurbSST::CAvgGrad_TurbSST(unsigned short val_nDim, unsigned short val_nVar, double *constants, CConfig *config) : CNumerics() {
   
   unsigned short iVar;
   
   implicit = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
+  
+  nDim = val_nDim;
+  nVar = val_nVar;
+  Gamma = config->GetGamma();
+  Gamma_Minus_One = Gamma - 1.0;
+  Gas_Constant = config->GetGas_ConstantND();
   
   sigma_k1  = constants[0];
   sigma_om1 = constants[2];
@@ -376,7 +525,8 @@ CAvgGrad_TurbSST::CAvgGrad_TurbSST(unsigned short val_nDim, unsigned short val_n
   Mean_GradTurbVar = new double* [nVar];
   for (iVar = 0; iVar < nVar; iVar++)
     Mean_GradTurbVar[iVar] = new double [nDim];
-  
+  Normal = new double [nDim];
+
 }
 
 CAvgGrad_TurbSST::~CAvgGrad_TurbSST(void) {
@@ -390,7 +540,8 @@ CAvgGrad_TurbSST::~CAvgGrad_TurbSST(void) {
   for (iVar = 0; iVar < nVar; iVar++)
     delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
-  
+  delete [] Normal;
+
 }
 
 void CAvgGrad_TurbSST::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
@@ -452,12 +603,36 @@ void CAvgGrad_TurbSST::ComputeResidual(double *val_residual, double **Jacobian_i
   
 }
 
+inline void CAvgGrad_TurbSST::SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j) {
+	TurbVar_Grad_i = val_turbvar_grad_i;
+	TurbVar_Grad_j = val_turbvar_grad_j;
+}
 
-CAvgGradCorrected_TurbSST::CAvgGradCorrected_TurbSST(unsigned short val_nDim, unsigned short val_nVar, double *constants, CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
+inline void CAvgGrad_TurbSST::SetCoord(double *val_coord_i, double *val_coord_j) {
+	Coord_i = val_coord_i;
+	Coord_j = val_coord_j;
+}
+
+inline void CAvgGrad_TurbSST::SetNormal(double *val_normal) {
+  Normal = val_normal;
+}
+
+inline void CAvgGrad_TurbSST::SetPrimitive(double *val_v_i, double *val_v_j) {
+	V_i = val_v_i;
+	V_j = val_v_j;
+}
+
+CAvgGradCorrected_TurbSST::CAvgGradCorrected_TurbSST(unsigned short val_nDim, unsigned short val_nVar, double *constants, CConfig *config) : CNumerics() {
   
   unsigned short iVar;
   
   implicit = (config->GetKind_TimeIntScheme_Turb() == EULER_IMPLICIT);
+  
+  nDim = val_nDim;
+  nVar = val_nVar;
+  Gamma = config->GetGamma();
+  Gamma_Minus_One = Gamma - 1.0;
+  Gas_Constant = config->GetGas_ConstantND();
   
   sigma_k1  = constants[0];
   sigma_om1 = constants[2];
@@ -471,7 +646,8 @@ CAvgGradCorrected_TurbSST::CAvgGradCorrected_TurbSST(unsigned short val_nDim, un
   Mean_GradTurbVar = new double* [nVar];
   for (iVar = 0; iVar < nVar; iVar++)
     Mean_GradTurbVar[iVar] = new double [nDim];
-  
+  Normal = new double [nDim];
+
 }
 
 CAvgGradCorrected_TurbSST::~CAvgGradCorrected_TurbSST(void) {
@@ -485,7 +661,8 @@ CAvgGradCorrected_TurbSST::~CAvgGradCorrected_TurbSST(void) {
   for (iVar = 0; iVar < nVar; iVar++)
     delete [] Mean_GradTurbVar[iVar];
   delete [] Mean_GradTurbVar;
-  
+  delete [] Normal;
+
 }
 
 void CAvgGradCorrected_TurbSST::ComputeResidual(double *val_residual, double **Jacobian_i, double **Jacobian_j, CConfig *config) {
@@ -550,8 +727,38 @@ void CAvgGradCorrected_TurbSST::ComputeResidual(double *val_residual, double **J
   
 }
 
+inline void CAvgGradCorrected_TurbSST::SetTurbVarGradient(double **val_turbvar_grad_i, double **val_turbvar_grad_j) {
+	TurbVar_Grad_i = val_turbvar_grad_i;
+	TurbVar_Grad_j = val_turbvar_grad_j;
+}
+
+inline void CAvgGradCorrected_TurbSST::SetTurbVar(double *val_turbvar_i, double *val_turbvar_j) {
+	TurbVar_i = val_turbvar_i;
+	TurbVar_j = val_turbvar_j;
+}
+
+inline void CAvgGradCorrected_TurbSST::SetCoord(double *val_coord_i, double *val_coord_j) {
+	Coord_i = val_coord_i;
+	Coord_j = val_coord_j;
+}
+
+inline void CAvgGradCorrected_TurbSST::SetNormal(double *val_normal) {
+  Normal = val_normal;
+}
+
+inline void CAvgGradCorrected_TurbSST::SetPrimitive(double *val_v_i, double *val_v_j) {
+	V_i = val_v_i;
+	V_j = val_v_j;
+}
+
 CSourcePieceWise_TurbSST::CSourcePieceWise_TurbSST(unsigned short val_nDim, unsigned short val_nVar, double *constants,
-                                                   CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
+                                                   CConfig *config) : CNumerics() {
+  
+  nDim = val_nDim;
+  nVar = val_nVar;
+  Gamma = config->GetGamma();
+  Gamma_Minus_One = Gamma - 1.0;
+  Gas_Constant = config->GetGas_ConstantND();
   
   /*--- Closure constants ---*/
   beta_star     = constants[6];
@@ -619,4 +826,44 @@ void CSourcePieceWise_TurbSST::ComputeResidual(double *val_residual, double **va
     val_Jacobian_i[1][0] = 0.0;                               val_Jacobian_i[1][1] = -2.0*beta_blended*TurbVar_i[1]*Volume;
   }
   
+}
+
+inline void CSourcePieceWise_TurbSST::SetVolume(double val_volume) { Volume = val_volume; }
+
+inline void CSourcePieceWise_TurbSST::SetF1blending(double val_F1_i, double val_F1_j){
+	F1_i = val_F1_i;
+	F1_j = val_F1_j;
+}
+
+inline void CSourcePieceWise_TurbSST::SetF2blending(double val_F2_i, double val_F2_j){
+	F2_i = val_F2_i;
+	F2_j = val_F2_j;
+}
+
+inline void CSourcePieceWise_TurbSST::SetStrainMag(double val_StrainMag_i, double val_StrainMag_j){
+	StrainMag = val_StrainMag_i;
+}
+
+inline void CSourcePieceWise_TurbSST::SetCrossDiff(double val_CDkw_i, double val_CDkw_j){
+	CDkw = val_CDkw_i;
+}
+
+inline void CSourcePieceWise_TurbSST::SetPrimVarGradient(double **val_primvar_grad_i, double **val_primvar_grad_j) {
+	PrimVar_Grad_i = val_primvar_grad_i;
+	PrimVar_Grad_j = val_primvar_grad_j;
+}
+
+inline void CSourcePieceWise_TurbSST::SetDistance(double val_dist_i, double val_dist_j) {
+	dist_i = val_dist_i;
+	dist_j = val_dist_j;
+}
+
+inline void CSourcePieceWise_TurbSST::SetTurbVar(double *val_turbvar_i, double *val_turbvar_j) {
+	TurbVar_i = val_turbvar_i;
+	TurbVar_j = val_turbvar_j;
+}
+
+inline void CSourcePieceWise_TurbSST::SetPrimitive(double *val_v_i, double *val_v_j) {
+	V_i = val_v_i;
+	V_j = val_v_j;
 }

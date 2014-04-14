@@ -925,6 +925,11 @@ void CSolver::SetSolution_Limiter(CGeometry *geometry, CConfig *config) {
       /*--- Venkatakrishnan (Venkatakrishnan 1994) limiter ---*/
     case VENKATAKRISHNAN:
       
+      /*-- Get limiter parameters from the configuration file ---*/
+      dave = config->GetRefElemLength();
+      LimK = config->GetLimiterCoeff();
+      eps2 = pow((LimK*dave), 3.0);
+      
       for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
         
         iPoint     = geometry->edge[iEdge]->GetNode(0);
@@ -937,11 +942,6 @@ void CSolver::SetSolution_Limiter(CGeometry *geometry, CConfig *config) {
         Coord_j    = geometry->node[jPoint]->GetCoord();
         
         for (iVar = 0; iVar < nVar; iVar++) {
-          
-          /*-- Get limiter parameters from the configuration file ---*/
-          dave = config->GetRefElemLength();
-          LimK = config->GetLimiterCoeff();
-          eps2 = pow((LimK*dave), 3.0);
           
           /*--- Calculate the interface left gradient, delta- (dm) ---*/
           dm = 0.0;
@@ -958,9 +958,6 @@ void CSolver::SetSolution_Limiter(CGeometry *geometry, CConfig *config) {
             if (geometry->node[iPoint]->GetDomain()) node[iPoint]->SetLimiter(iVar, limiter);
           
           /*-- Repeat for point j on the edge ---*/
-          dave = config->GetRefElemLength();
-          LimK = config->GetLimiterCoeff();
-          eps2 = pow((LimK*dave), 3.0);
           
           dm = 0.0;
           for (iDim = 0; iDim < nDim; iDim++)
