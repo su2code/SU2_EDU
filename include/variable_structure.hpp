@@ -909,6 +909,48 @@ public:
 	 */
 	virtual void SetmuT(double val_muT);
   
+  /*!
+	 * \overload
+	 * \param[in] val_density - Value of the flow density (initialization value).
+	 * \param[in] val_velocity - Value of the flow velocity (initialization value).
+	 * \param[in] val_energy - Value of the flow energy (initialization value).
+	 * \param[in] val_ndim - Number of dimensions of the problem.
+	 * \param[in] val_nvar - Number of variables of the problem.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void Set_CEulerVariable(double val_density, double *val_velocity, double val_energy, unsigned short val_ndim,
+                                  unsigned short val_nvar, CConfig *config) { };
+  
+	/*!
+	 * \overload
+	 * \param[in] val_solution - Pointer to the flow value (initialization value).
+	 * \param[in] val_ndim - Number of dimensions of the problem.
+	 * \param[in] val_nvar - Number of variables of the problem.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void Set_CEulerVariable(double *val_solution, unsigned short val_ndim, unsigned short val_nvar, CConfig *config) { };
+  
+  /*!
+	 * \overload
+	 * \param[in] val_density - Value of the flow density (initialization value).
+	 * \param[in] val_velocity - Value of the flow velocity (initialization value).
+	 * \param[in] val_energy - Value of the flow energy (initialization value).
+	 * \param[in] val_ndim - Number of dimensions of the problem.
+	 * \param[in] val_nvar - Number of variables of the problem.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void Set_CNSVariable(double val_density, double *val_velocity,
+                       double val_energy, unsigned short val_ndim, unsigned short val_nvar, CConfig *config) { };
+  
+	/*!
+	 * \overload
+	 * \param[in] val_solution - Pointer to the flow value (initialization value).
+	 * \param[in] val_ndim - Number of dimensions of the problem.
+	 * \param[in] val_nvar - Number of variables of the problem.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void Set_CNSVariable(double *val_solution, unsigned short val_ndim, unsigned short val_nvar, CConfig *config) { };
+  
 };
 
 /*!
@@ -936,6 +978,11 @@ public:
 	CEulerVariable(void);
   
 	/*!
+	 * \brief Destructor of the class.
+	 */
+	virtual ~CEulerVariable(void);
+  
+  /*!
 	 * \overload
 	 * \param[in] val_density - Value of the flow density (initialization value).
 	 * \param[in] val_velocity - Value of the flow velocity (initialization value).
@@ -944,7 +991,7 @@ public:
 	 * \param[in] val_nvar - Number of variables of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-	CEulerVariable(double val_density, double *val_velocity, double val_energy, unsigned short val_ndim,
+	void Set_CEulerVariable(double val_density, double *val_velocity, double val_energy, unsigned short val_ndim,
                  unsigned short val_nvar, CConfig *config);
   
 	/*!
@@ -954,12 +1001,8 @@ public:
 	 * \param[in] val_nvar - Number of variables of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-	CEulerVariable(double *val_solution, unsigned short val_ndim, unsigned short val_nvar, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	virtual ~CEulerVariable(void);
+	void Set_CEulerVariable(double *val_solution, unsigned short val_ndim, unsigned short val_nvar, CConfig *config);
+
   
 	/*!
 	 * \brief Set to zero the gradient of the primitive variables.
@@ -1191,6 +1234,11 @@ public:
 	CNSVariable(void);
   
 	/*!
+	 * \brief Destructor of the class.
+	 */
+	~CNSVariable(void);
+  
+  /*!
 	 * \overload
 	 * \param[in] val_density - Value of the flow density (initialization value).
 	 * \param[in] val_velocity - Value of the flow velocity (initialization value).
@@ -1199,7 +1247,7 @@ public:
 	 * \param[in] val_nvar - Number of variables of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-	CNSVariable(double val_density, double *val_velocity,
+	void Set_CNSVariable(double val_density, double *val_velocity,
               double val_energy, unsigned short val_ndim, unsigned short val_nvar, CConfig *config);
   
 	/*!
@@ -1209,12 +1257,7 @@ public:
 	 * \param[in] val_nvar - Number of variables of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-	CNSVariable(double *val_solution, unsigned short val_ndim, unsigned short val_nvar, CConfig *config);
-  
-	/*!
-	 * \brief Destructor of the class.
-	 */
-	~CNSVariable(void);
+	void Set_CNSVariable(double *val_solution, unsigned short val_ndim, unsigned short val_nvar, CConfig *config);
   
 	/*!
 	 * \brief Set the laminar viscosity.
