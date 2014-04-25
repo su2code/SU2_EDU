@@ -651,7 +651,19 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
   bool high_order_diss = ((config->GetKind_Centered_Flow() == JST) && (iMesh == MESH_0));
   double *local_Residual;
   
-  for (iColor = 0; iColor < geometry->GetnColor(); iColor++)
+  double *Res_Conv_private;
+  int nVar_Flow = solver_container[FLOW_SOL]->GetnVar();
+  CNumerics *numerics_local;
+  
+#pragma omp parallel for private(iColor, iEdge_Local, iEdge, iPoint, jPoint, iPoint_Local, jPoint_Local, numerics_local, Res_Conv_private)
+  for (iColor = 0; iColor < geometry->GetnColor(); iColor++) {
+    
+    /*--- Allocate private pointers ---*/
+    
+    numerics_local =  new CCentJST_Flow(nDim,nVar_Flow, config);
+    Res_Conv_private =  new double[nVar];
+    for (int iVar = 0; iVar < nVar; iVar++) Res_Conv_private[iVar] = 0.0;
+    
     for (iEdge_Local = 0; iEdge_Local < geometry->GetnEdge(iColor); iEdge_Local++) {
       
       //  for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
@@ -664,29 +676,31 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
       
       iPoint = geometry->edge[iEdge]->GetNode(0);
       jPoint = geometry->edge[iEdge]->GetNode(1);
-      numerics->SetNormal(geometry->edge[iEdge]->GetNormal());
-      numerics->SetNeighbor(geometry->node[iPoint]->GetnNeighbor(),
+      numerics_local->SetNormal(geometry->edge[iEdge]->GetNormal());
+      numerics_local->SetNeighbor(geometry->node[iPoint]->GetnNeighbor(),
                             geometry->node[jPoint]->GetnNeighbor());
       
       /*--- Set primitive variables w/o reconstruction ---*/
       
-      numerics->SetPrimitive(node[iPoint]->GetPrimVar(), node[jPoint]->GetPrimVar());
+      numerics_local->SetPrimitive(node[iPoint]->GetPrimVar(),
+                                   node[jPoint]->GetPrimVar());
       
       /*--- Set the largest convective eigenvalue ---*/
       
-      numerics->SetLambda(node[iPoint]->GetLambda(), node[jPoint]->GetLambda());
+      numerics_local->SetLambda(node[iPoint]->GetLambda(),
+                                node[jPoint]->GetLambda());
       
       /*--- Set undivided laplacian an pressure based sensor ---*/
       
       if (high_order_diss) {
-        numerics->SetUndivided_Laplacian(node[iPoint]->GetUndivided_Laplacian(),
+        numerics_local->SetUndivided_Laplacian(node[iPoint]->GetUndivided_Laplacian(),
                                          node[jPoint]->GetUndivided_Laplacian());
-        numerics->SetSensor(node[iPoint]->GetSensor(), node[jPoint]->GetSensor());
+        numerics_local->SetSensor(node[iPoint]->GetSensor(), node[jPoint]->GetSensor());
       }
       
       /*--- Compute residuals, and jacobians ---*/
       
-      numerics->ComputeResidual(Res_Conv, Jacobian_i, Jacobian_j, config);
+      numerics_local->ComputeResidual(Res_Conv_private, Jacobian_i, Jacobian_j, config);
       
       /*--- Locate the block positions in the residual vector ---*/
       
@@ -695,8 +709,8 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
       
       /*--- Update convective and artificial dissipation residuals ---*/
       
-      LinSysRes.AddBlock(iPoint_Local, Res_Conv);
-      LinSysRes.SubtractBlock(jPoint_Local, Res_Conv);
+      LinSysRes.AddBlock(iPoint_Local, Res_Conv_private);
+      LinSysRes.SubtractBlock(jPoint_Local, Res_Conv_private);
       
       //      LinSysRes.AddBlock(iPoint, Res_Conv);
       //      LinSysRes.SubtractBlock(jPoint, Res_Conv);
@@ -709,6 +723,7 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
         Jacobian.SubtractBlock(jPoint,jPoint,Jacobian_j);
       }
     }
+  } // end omp parallel
   
   /*--- Add a communication loop over the repeated points ---*/
   

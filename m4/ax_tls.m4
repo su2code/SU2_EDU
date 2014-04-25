@@ -67,8 +67,8 @@ AC_DEFUN([AX_TLS], [
 ])
 
   if test "$ac_cv_tls" != "none"; then
-    dnl AC_DEFINE([TLS], [], [If the compiler supports a TLS storage class define it to that here])
-    AC_DEFINE_UNQUOTED([TLS], $ac_cv_tls, [If the compiler supports a TLS storage class define it to that here])
+    AC_DEFINE([TLS], [], [If the compiler supports a TLS storage class define it to that here])
+    dnl AC_DEFINE_UNQUOTED([TLS], $ac_cv_tls, [If the compiler supports a TLS storage class define it to that here])
   fi
   AC_MSG_RESULT($ac_cv_tls)
 ])

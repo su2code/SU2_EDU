@@ -32,6 +32,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef OPENMP
+#include <omp.h>
+#endif
+
 #ifdef METIS
 extern "C" {
 #include "metis.h"

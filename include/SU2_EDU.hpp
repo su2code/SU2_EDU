@@ -23,8 +23,11 @@
 
 #pragma once
 
-#include <ctime>
+#ifdef OPENMP
+#include <omp.h>
+#endif
 
+#include <ctime>
 #include<string>
 
 #include "solver_structure.hpp"

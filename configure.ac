@@ -56,10 +56,15 @@ AC_SUBST([su2_externals_INCLUDES])
 AC_SUBST([su2_externals_LIBS])
 
 
-###########################
-# Force the NO_MPI directive and -O3 optimization
+# Check for OpenMP
+AC_C_OPENMP
+if (test $ac_cv_prog_cc_openmp != no); then
+  CXXFLAGS=""$CXXFLAGS" -DOPENMP $OPENMP_CFLAGS"
+  enableomp="yes"
+else
+  enableomp="no"
+fi
 
-CXXFLAGS=""$CXXFLAGS" -DNO_MPI -O3"
 
 ###########################
 
@@ -103,6 +108,7 @@ Build Configuration Summary:
     Compiler:             ${CXX}
     Compiler flags:       ${CXXFLAGS}
     Metis support:        $enablemetis
+    OpenMP support:       $enableomp
 
     External includes:    $su2_externals_INCLUDES
     External libs:        $su2_externals_LIBS

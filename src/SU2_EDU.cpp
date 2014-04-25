@@ -69,6 +69,15 @@ int main(int argc, char *argv[]) {
   cout << "| For detailed use instructions, see the SU2_EDU/README file.           |" << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
   
+  /*--- Check for OpenMP and print some information to the console ---*/
+#ifdef OPENMP
+  unsigned long nThreads = omp_get_max_threads();
+  cout << endl;
+  cout <<"-------------------------------------------------------------------------" << endl;
+  cout << " Running the OpenMP version of SU2_EDU with " << nThreads << " threads. " << endl;
+  cout <<"-------------------------------------------------------------------------" << endl;
+#endif
+  
   /*--- Retrieve the config file name from the command line ---*/
   
   char config_file_name[200];

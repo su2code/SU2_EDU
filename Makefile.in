@@ -98,7 +98,8 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	compile config.guess config.sub install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_tls.m4 \
-	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/openmp.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -308,6 +309,7 @@ METIS_INCLUDE = @METIS_INCLUDE@
 METIS_LIB = @METIS_LIB@
 MKDIR_P = @MKDIR_P@
 OBJEXT = @OBJEXT@
+OPENMP_CFLAGS = @OPENMP_CFLAGS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@

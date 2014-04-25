@@ -625,6 +625,7 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+OPENMP_CFLAGS
 su2_externals_LIBS
 su2_externals_INCLUDES
 BUILD_METIS_FALSE
@@ -743,6 +744,7 @@ enable_silent_rules
 enable_dependency_tracking
 enable_metis
 with_metis_cppflags
+enable_openmp
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1382,6 +1384,7 @@ Optional Features:
   --disable-dependency-tracking
                           speeds up one-time build
   --enable-metis          build with Metis graph partitioning suppport
+  --disable-openmp        do not use OpenMP
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -5202,11 +5205,9 @@ fi
 
   if test "$ac_cv_tls" != "none"; then
 
-cat >>confdefs.h <<_ACEOF
-#define TLS $ac_cv_tls
-_ACEOF
+$as_echo "#define TLS /**/" >>confdefs.h
 
-  fi
+      fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_tls" >&5
 $as_echo "$ac_cv_tls" >&6; }
 
@@ -5242,10 +5243,259 @@ ac_config_files="$ac_config_files externals/metis/Makefile"
 
 
 
-###########################
-# Force the NO_MPI directive and -O3 optimization
+# Check for OpenMP
 
-CXXFLAGS=""$CXXFLAGS" -DNO_MPI -O3"
+   # Check whether --enable-openmp was given.
+if test "${enable_openmp+set}" = set; then :
+  enableval=$enable_openmp; enableopenmp="$enableval"
+else
+  enableopenmp=yes
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring for OpenMP Support >>>" >&5
+$as_echo "<<< Configuring for OpenMP Support >>>" >&6; }
+   OPENMP_CFLAGS=
+   if test "$enableopenmp" = yes; then
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CC option to support OpenMP" >&5
+$as_echo_n "checking for $CC option to support OpenMP... " >&6; }
+     if ${ac_cv_prog_cc_openmp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+       ac_cv_prog_cc_openmp=no
+       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #ifndef _OPENMP
+  Unlucky
+ #endif
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_openmp=none
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+       if test "$ac_cv_prog_cc_openmp" = no; then
+                                                                        if test "$GCC" = yes; then
+                      gt_save_CFLAGS="$CFLAGS"
+           CFLAGS="$CFLAGS -fopenmp"
+           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #ifndef _OPENMP
+  Unlucky
+ #endif
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_openmp="-fopenmp"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+           CFLAGS="$gt_save_CFLAGS"
+         else
+                      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #if defined __SUNPRO_C || defined __SUNPRO_CC
+  Brand
+ #endif
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "Brand" >/dev/null 2>&1; then :
+  ac_openmp_result=yes
+else
+  ac_openmp_result=no
+fi
+rm -f conftest*
+
+           if test $ac_openmp_result = yes; then
+             gt_save_CFLAGS="$CFLAGS"
+             CFLAGS="$CFLAGS -xopenmp"
+             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #ifndef _OPENMP
+  Unlucky
+ #endif
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_openmp="-xopenmp"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+             CFLAGS="$gt_save_CFLAGS"
+           else
+                          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #if defined __INTEL_COMPILER
+  Brand
+ #endif
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "Brand" >/dev/null 2>&1; then :
+  ac_openmp_result=yes
+else
+  ac_openmp_result=no
+fi
+rm -f conftest*
+
+             if test $ac_openmp_result = yes; then
+               gt_save_CFLAGS="$CFLAGS"
+               CFLAGS="$CFLAGS -openmp"
+               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #ifndef _OPENMP
+  Unlucky
+ #endif
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_openmp="-openmp"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+               CFLAGS="$gt_save_CFLAGS"
+             else
+                              cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #if defined __sgi || defined __PGI || defined __PGIC__
+  Brand
+ #endif
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "Brand" >/dev/null 2>&1; then :
+  ac_openmp_result=yes
+else
+  ac_openmp_result=no
+fi
+rm -f conftest*
+
+               if test $ac_openmp_result = yes; then
+                 gt_save_CFLAGS="$CFLAGS"
+                 CFLAGS="$CFLAGS -mp"
+                 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #ifndef _OPENMP
+  Unlucky
+ #endif
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_openmp="-mp"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+                 CFLAGS="$gt_save_CFLAGS"
+               else
+                                  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #if defined __DECC || defined __DECCXX
+  Brand
+ #endif
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "Brand" >/dev/null 2>&1; then :
+  ac_openmp_result=yes
+else
+  ac_openmp_result=no
+fi
+rm -f conftest*
+
+                 if test $ac_openmp_result = yes; then
+                   gt_save_CFLAGS="$CFLAGS"
+                   CFLAGS="$CFLAGS -omp"
+                   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #ifndef _OPENMP
+  Unlucky
+ #endif
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_openmp="-omp"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+                   CFLAGS="$gt_save_CFLAGS"
+                 else
+                                      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #if defined _AIX
+  Brand
+ #endif
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "Brand" >/dev/null 2>&1; then :
+  ac_openmp_result=yes
+else
+  ac_openmp_result=no
+fi
+rm -f conftest*
+
+                   if test $ac_openmp_result = yes; then
+                     gt_save_CFLAGS="$CFLAGS"
+                     CFLAGS="$CFLAGS -qsmp=omp"
+                     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+ #ifndef _OPENMP
+  Unlucky
+ #endif
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_openmp="-qsmp=omp"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+                     CFLAGS="$gt_save_CFLAGS"
+                   else
+                     :
+                   fi
+                 fi
+               fi
+             fi
+           fi
+         fi
+       fi
+
+fi
+
+     case $ac_cv_prog_cc_openmp in
+       none)
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+$as_echo "none needed" >&6; } ;;
+       no)
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+$as_echo "unsupported" >&6; } ;;
+       *)
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_openmp" >&5
+$as_echo "$ac_cv_prog_cc_openmp" >&6; } ;;
+     esac
+     case $ac_cv_prog_cc_openmp in
+       none | no)
+         OPENMP_CFLAGS= ;;
+       *)
+         OPENMP_CFLAGS=$ac_cv_prog_cc_openmp ;;
+     esac
+   fi
+
+
+if (test $ac_cv_prog_cc_openmp != no); then
+  CXXFLAGS=""$CXXFLAGS" -DOPENMP $OPENMP_CFLAGS"
+  enableomp="yes"
+else
+  enableomp="no"
+fi
+
 
 ###########################
 
@@ -7082,6 +7332,7 @@ Build Configuration Summary:
     Compiler:             ${CXX}
     Compiler flags:       ${CXXFLAGS}
     Metis support:        $enablemetis
+    OpenMP support:       $enableomp
 
     External includes:    $su2_externals_INCLUDES
     External libs:        $su2_externals_LIBS
@@ -7120,6 +7371,7 @@ Build Configuration Summary:
     Compiler:             ${CXX}
     Compiler flags:       ${CXXFLAGS}
     Metis support:        $enablemetis
+    OpenMP support:       $enableomp
 
     External includes:    $su2_externals_INCLUDES
     External libs:        $su2_externals_LIBS

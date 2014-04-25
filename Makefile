@@ -98,7 +98,8 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	compile config.guess config.sub install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_tls.m4 \
-	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/openmp.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -284,9 +285,9 @@ CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3 -fPIC -DTIME -DNO_MPI -O3
+CXXFLAGS = -O3 -fPIC -DTIME -DOPENMP -fopenmp
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"SU2_EDU\" -DPACKAGE_TARNAME=\"SU2_EDU\" -DPACKAGE_VERSION=\"1.1.0\" -DPACKAGE_STRING=\"SU2_EDU\ 1.1.0\" -DPACKAGE_BUGREPORT=\"susquared-dev@lists.stanford.edu\" -DPACKAGE_URL=\"http://su2.stanford.edu\" -DPACKAGE=\"SU2_EDU\" -DVERSION=\"1.1.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_SHORT_INT=2 -DSIZEOF_INT=4 -DSIZEOF_UNSIGNED_INT=4 -DSIZEOF_LONG_INT=8 -DSIZEOF_FLOAT=4 -DSIZEOF_DOUBLE=8 -DSIZEOF_VOID_P=8 -DHAVE_METIS=1 -DTLS=__thread
+DEFS = -DPACKAGE_NAME=\"SU2_EDU\" -DPACKAGE_TARNAME=\"SU2_EDU\" -DPACKAGE_VERSION=\"1.1.0\" -DPACKAGE_STRING=\"SU2_EDU\ 1.1.0\" -DPACKAGE_BUGREPORT=\"susquared-dev@lists.stanford.edu\" -DPACKAGE_URL=\"http://su2.stanford.edu\" -DPACKAGE=\"SU2_EDU\" -DVERSION=\"1.1.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_SHORT_INT=2 -DSIZEOF_INT=4 -DSIZEOF_UNSIGNED_INT=4 -DSIZEOF_LONG_INT=8 -DSIZEOF_FLOAT=4 -DSIZEOF_DOUBLE=8 -DSIZEOF_VOID_P=8 -DHAVE_METIS=1 -DTLS=/\*\*/
 DEPDIR = .deps
 ECHO_C = \c
 ECHO_N = 
@@ -308,6 +309,7 @@ METIS_INCLUDE = -DMETIS -I$(top_srcdir)/externals/metis/include
 METIS_LIB = $(top_builddir)/externals/metis/libmetis.a
 MKDIR_P = ./install-sh -c -d
 OBJEXT = o
+OPENMP_CFLAGS = -fopenmp
 PACKAGE = SU2_EDU
 PACKAGE_BUGREPORT = susquared-dev@lists.stanford.edu
 PACKAGE_NAME = SU2_EDU

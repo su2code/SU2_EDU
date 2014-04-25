@@ -25,8 +25,8 @@
 CGeometry::CGeometry(void) {
   
   nEdge = 0;
-  nColor = 24;
-  nEdge_Color = new unsigned long[nColor];
+  nColor = 1;
+  nEdge_Color = NULL;
   Global_Edge = NULL;
   nPointRepeated = 0;
   Repeated_Parent = NULL;
@@ -1812,287 +1812,350 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
 #ifdef METIS
   
-  cout << "Coloring the mesh edges using METIS." << endl;
+  /*--- Initialize the number of colors to 1 and check for the number
+   of OpenMP threads (partitions). If OpenMP is not available
+   we will maintain a single color and avoid calling METIS. ---*/
   
-  /*--- Set up some structures for building the edge graph ---*/
+  nColor = 1;
+#ifdef OPENMP
+  nColor = omp_get_max_threads();
+#endif
   
-  unsigned long iPoint, jPoint, adjPoint, maxNeighbors;
-  unsigned long iEdge, iEdge_Local, adjEdge, iColor, jColor;
-  unsigned short iNode, jNode;
-  idx_t nvtxs, *part = NULL, *xadj = NULL, *adjncy= NULL;
-  idx_t ncon, nparts, status, objval;
-  int *EdgesPerColor, Edge_Counter;
-  int rank = MASTER_NODE;
-  int size = SINGLE_NODE;
-  vector<unsigned long> Node_Colors_Vec;
-  vector<unsigned long>::iterator it;
-  
-  /*--- Number of OpenMP threads (partitions) ---*/
-  
-  //!!! Threads are currently hard-coded to 24 on line 28 of this file !!!
-  
-  nparts = nColor;
-  EdgesPerColor = new int[nparts];
-  
-  /*--- Total number of edges in the graph and memory for the coloring ---*/
-  
-  nvtxs = (idx_t) nEdge;
-  part = new idx_t[nEdge];
-  
-  /*--- Number of weights per edge. We'll set it to 1, as we are dealing
-   with unweighted graphs, and also set vwgt to null (each edge carries
-   the same weight). ---*/
-  
-  ncon = 1;
-  
-  /*--- Build the adjacency arrays for the edge graph. Allocate memory. ---*/
-  
-  xadj = new idx_t[nEdge+1];
-  
-  /*--- Get a measure of max neighbors for any one node in order to get a
-   reasonable amount of memory for the adjacency array ---*/
-  
-  maxNeighbors = 0;
-  for (iPoint = 0; iPoint < nPoint; iPoint++)
-    if (node[iPoint]->GetnNeighbor() > maxNeighbors)
-      maxNeighbors = node[iPoint]->GetnNeighbor();
-  
-  /*--- Allocate memory as if all edges have 2 end points with the maximum
-   number of neighbors for simplicity. However, you could compute the true
-   number of edges in the line graph as well. ---*/
-  
-  adjncy = new idx_t[nEdge*maxNeighbors*2];
-  
-  /*--- Loop over all edges and build the edge graph ---*/
-  
-  Edge_Counter = 0; xadj[0] = 0;
-  for (iEdge = 0; iEdge < nEdge; iEdge++) {
+  if (nColor > 1) {
     
-    /*--- Each edge has two nodes that will connect with other edges ---*/
+    cout << "Coloring the mesh edges using METIS." << endl;
     
-    iPoint = edge[iEdge]->GetNode(0);
-    jPoint = edge[iEdge]->GetNode(1);
+    /*--- Set up some structures for building the edge graph ---*/
     
-    /*--- Loop over all neighbors for iPoint and add adjacent edges ---*/
+    unsigned long iPoint, jPoint, adjPoint, maxNeighbors;
+    unsigned long iEdge, iEdge_Local, adjEdge, iColor, jColor;
+    unsigned short iNode, jNode;
+    idx_t nvtxs, *part = NULL, *xadj = NULL, *adjncy= NULL;
+    idx_t ncon, nparts, status, objval;
+    int *EdgesPerColor, Edge_Counter;
+    int rank = MASTER_NODE;
+    int size = SINGLE_NODE;
+    vector<unsigned long> Node_Colors_Vec;
+    vector<unsigned long>::iterator it;
     
-    for (iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
-      adjPoint = node[iPoint]->GetPoint(iNode);
+    /*--- Set the number of colors to the number of OpenMP threads ---*/
+    
+    nparts = nColor;
+    nEdge_Color   = new unsigned long[nColor];
+    EdgesPerColor = new int[nparts];
+    
+    /*--- Total number of edges in the graph and memory for the coloring ---*/
+    
+    nvtxs = (idx_t) nEdge;
+    part = new idx_t[nEdge];
+    
+    /*--- Number of weights per edge. We'll set it to 1, as we are dealing
+     with unweighted graphs, and also set vwgt to null (each edge carries
+     the same weight). ---*/
+    
+    ncon = 1;
+    
+    /*--- Build the adjacency arrays for the edge graph. Allocate memory. ---*/
+    
+    xadj = new idx_t[nEdge+1];
+    
+    /*--- Get a measure of max neighbors for any one node in order to get a
+     reasonable amount of memory for the adjacency array ---*/
+    
+    maxNeighbors = 0;
+    for (iPoint = 0; iPoint < nPoint; iPoint++)
+      if (node[iPoint]->GetnNeighbor() > maxNeighbors)
+        maxNeighbors = node[iPoint]->GetnNeighbor();
+    
+    /*--- Allocate memory as if all edges have 2 end points with the maximum
+     number of neighbors for simplicity. However, you could compute the true
+     number of edges in the line graph as well. ---*/
+    
+    adjncy = new idx_t[nEdge*maxNeighbors*2];
+    
+    /*--- Loop over all edges and build the edge graph ---*/
+    
+    Edge_Counter = 0; xadj[0] = 0;
+    for (iEdge = 0; iEdge < nEdge; iEdge++) {
       
-      /*--- Avoid jPoint during the search (we'll do jPoint next) ---*/
+      /*--- Each edge has two nodes that will connect with other edges ---*/
       
-      if (adjPoint != jPoint) {
+      iPoint = edge[iEdge]->GetNode(0);
+      jPoint = edge[iEdge]->GetNode(1);
+      
+      /*--- Loop over all neighbors for iPoint and add adjacent edges ---*/
+      
+      for (iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
+        adjPoint = node[iPoint]->GetPoint(iNode);
+        
+        /*--- Avoid jPoint during the search (we'll do jPoint next) ---*/
+        
+        if (adjPoint != jPoint) {
+          
+          /*--- Find the edge connecting these two nodes ---*/
+          
+          adjEdge = FindEdge(iPoint, adjPoint);
+          
+          /*--- Add the edge if different than iEdge (should already be
+           the case since we are avoiding jPoint) ---*/
+          
+          if (adjEdge != iEdge) {
+            adjncy[Edge_Counter] = (idx_t) adjEdge;
+            Edge_Counter++;
+          }
+        }
+      }
+      
+      /*--- Loop over all neighbors for jPoint and add adjacent edges ---*/
+      
+      for (jNode = 0; jNode < node[jPoint]->GetnPoint(); jNode++) {
+        adjPoint = node[jPoint]->GetPoint(jNode);
+        
+        /*--- Avoid iPoint during the search ---*/
+        
+        if (adjPoint != iPoint) {
+          
+          /*--- Find the edge connecting these two nodes ---*/
+          
+          adjEdge = FindEdge(jPoint, adjPoint);
+          
+          /*--- Add the edge if different than iEdge (should already be
+           the case since we are avoiding jPoint) ---*/
+          
+          if (adjEdge != iEdge) {
+            adjncy[Edge_Counter] = (idx_t) adjEdge;
+            Edge_Counter++;
+            
+          }
+        }
+      }
+      
+      /*--- Set xadj for the starting location in adjncy for the next edge. ---*/
+      
+      xadj[iEdge+1] = Edge_Counter;
+      
+    }
+    
+    /*--- Set some METIS options ---*/
+    
+    idx_t options[METIS_NOPTIONS];
+    METIS_SetDefaultOptions(options);
+    options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;
+    options[METIS_OPTION_NUMBERING] = 0;
+    
+    /*--- Call METIS to partition the edge graph ---*/
+    
+    status = METIS_PartGraphKway(&nvtxs, &ncon, xadj, adjncy, NULL, NULL, NULL,
+                                 &nparts, NULL, NULL, options, &objval, part);
+    
+    /*--- Store the new edge coloring into the edge data structure ---*/
+    
+    for (iEdge = 0; iEdge < nEdge; iEdge++) {
+      edge[iEdge]->SetColor(part[iEdge]);
+      EdgesPerColor[part[iEdge]]++;
+    }
+    
+    /*--- Some post-processing for number of edges by color ---*/
+    
+    for (iColor = 0; iColor < nColor; iColor++) {
+      nEdge_Color[iColor] = EdgesPerColor[iColor];
+      cout << "Edge color group "<< iColor << " contains ";
+      cout << EdgesPerColor[iColor] << " edges. "<< endl;
+    }
+    
+    /*--- Allocate memory and create local<->global edge mapping ---*/
+    
+    Global_Edge = new unsigned long*[nColor];
+    for (iColor = 0; iColor < nColor; iColor++) {
+      Global_Edge[iColor] = new unsigned long[GetnEdge(iColor)];
+      Edge_Counter = 0;
+      for (iEdge = 0; iEdge < nEdge; iEdge++) {
+        if (part[iEdge] == iColor) {
+          Global_Edge[iColor][Edge_Counter] = iEdge;
+          Edge_Counter++;
+        }
+      }
+    }
+    
+    /*--- Set up some structures for repeated points ---*/
+    
+    unsigned long **Node_Colors = new unsigned long*[nColor];
+    for (iColor = 0; iColor < nColor; iColor++) {
+      Node_Colors[iColor] = new unsigned long[nPointDomain];
+    }
+    unsigned long *ColorsPerNode = new unsigned long[nPointDomain];
+    bool *FoundNode = new bool[nPointDomain];
+    for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+      ColorsPerNode[iPoint] = 0;
+    }
+    
+    for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+      
+      /*--- Loop over all neighbor points ---*/
+      
+      Node_Colors_Vec.clear();
+      for (iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
+        adjPoint = node[iPoint]->GetPoint(iNode);
         
         /*--- Find the edge connecting these two nodes ---*/
         
         adjEdge = FindEdge(iPoint, adjPoint);
         
-        /*--- Add the edge if different than iEdge (should already be
-         the case since we are avoiding jPoint) ---*/
+        /*--- Add the color of this edge to the vector ---*/
         
-        if (adjEdge != iEdge) {
-          adjncy[Edge_Counter] = (idx_t) adjEdge;
-          Edge_Counter++;
+        iColor = edge[adjEdge]->GetColor();
+        Node_Colors_Vec.push_back(iColor);
+        
+      }
+      
+      /*--- Sort the colors and remove duplicates ---*/
+      
+      sort(Node_Colors_Vec.begin(), Node_Colors_Vec.end());
+      it = unique(Node_Colors_Vec.begin(), Node_Colors_Vec.end());
+      Node_Colors_Vec.resize(it - Node_Colors_Vec.begin());
+      
+      /*--- Store the unique colors for this node. ---*/
+      
+      ColorsPerNode[iPoint] = Node_Colors_Vec.size();
+      for (iColor = 0; iColor <	Node_Colors_Vec.size(); iColor++) {
+        Node_Colors[iColor][iPoint] = Node_Colors_Vec[iColor];
+      }
+      
+    }
+    
+    /*--- Compute total number of repeated points due to edge coloring ---*/
+    
+    nPointRepeated = 0;
+    for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+      nPointRepeated += ColorsPerNode[iPoint] - 1;
+    }
+    
+    /*--- Allocate memory to store the mapping between parent<->repeated nodes ---*/
+    
+    Repeated_Points = new unsigned long*[nColor];
+    for (iColor = 0; iColor < nColor; iColor++) {
+      Repeated_Points[iColor] = new unsigned long[nPointDomain];
+    }
+    Repeated_Parent = new unsigned long[nPointRepeated];
+    
+    /*--- Create the mapping between parent<->repeated nodes ---*/
+    
+    unsigned long nRepeats, iPoint_Repeated = 0;
+    for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+      
+      /*--- The first color becomes the parent of the node, any additional
+       colors will be associated with a repeated node. ---*/
+      
+      nRepeats = ColorsPerNode[iPoint] - 1;
+      
+      if (nRepeats > 0) {
+        
+        /*--- This point is repeated, so set the flag to true, store the
+         mappings, and increment our repeated node counters. ---*/
+        
+        node[iPoint]->SetRepeatedPoint(true);
+        
+        /*--- Store the point to its own index for all colors by default ---*/
+        
+        for (iColor = 0; iColor < nColor; iColor++) {
+          Repeated_Points[iColor][iPoint] = iPoint;
         }
-      }
-    }
-    
-    /*--- Loop over all neighbors for jPoint and add adjacent edges ---*/
-    
-    for (jNode = 0; jNode < node[jPoint]->GetnPoint(); jNode++) {
-      adjPoint = node[jPoint]->GetPoint(jNode);
-      
-      /*--- Avoid iPoint during the search ---*/
-      
-      if (adjPoint != iPoint) {
         
-        /*--- Find the edge connecting these two nodes ---*/
+        /*--- For any additional colors (repeats) overwrite with a new index ---*/
         
-        adjEdge = FindEdge(jPoint, adjPoint);
-        
-        /*--- Add the edge if different than iEdge (should already be
-         the case since we are avoiding jPoint) ---*/
-        
-        if (adjEdge != iEdge) {
-          adjncy[Edge_Counter] = (idx_t) adjEdge;
-          Edge_Counter++;
-          
+        for (jColor = 1; jColor < ColorsPerNode[iPoint]; jColor++) {
+          Repeated_Parent[iPoint_Repeated] = iPoint;
+          iColor = Node_Colors[jColor][iPoint];
+          Repeated_Points[iColor][iPoint] = nPointDomain+iPoint_Repeated;
+          iPoint_Repeated++;
         }
+        
+      } else {
+        
+        /*--- This point is not repeated, so set the flag to false. ---*/
+        
+        node[iPoint]->SetRepeatedPoint(false);
+        for (iColor = 0; iColor < nColor; iColor++) {
+          Repeated_Points[iColor][iPoint] = iPoint;
+        }
+        
       }
-    }
-    
-    /*--- Set xadj for the starting location in adjncy for the next edge. ---*/
-    
-    xadj[iEdge+1] = Edge_Counter;
-    
-  }
-  
-  /*--- Set some METIS options ---*/
-  
-  idx_t options[METIS_NOPTIONS];
-  METIS_SetDefaultOptions(options);
-  options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;
-  options[METIS_OPTION_NUMBERING] = 0;
-  
-  /*--- Call METIS to partition the edge graph ---*/
-  
-  status = METIS_PartGraphKway(&nvtxs, &ncon, xadj, adjncy, NULL, NULL, NULL,
-                               &nparts, NULL, NULL, options, &objval, part);
-  
-  /*--- Store the new edge coloring into the edge data structure ---*/
-  
-  for (iEdge = 0; iEdge < nEdge; iEdge++) {
-    edge[iEdge]->SetColor(part[iEdge]);
-    EdgesPerColor[part[iEdge]]++;
-  }
-  
-  /*--- Some post-processing for number of edges by color ---*/
-  
-  for (iColor = 0; iColor < nColor; iColor++) {
-    SetnEdge_Color(iColor, EdgesPerColor[iColor]);
-    cout << "Edge color group "<< iColor << " contains ";
-    cout << EdgesPerColor[iColor] << " edges. "<< endl;
-  }
-  
-  /*--- Allocate memory and create local<->global edge mapping ---*/
-  
-  Global_Edge = new unsigned long*[nColor];
-  for (iColor = 0; iColor < nColor; iColor++) {
-    Global_Edge[iColor] = new unsigned long[GetnEdge(iColor)];
-    Edge_Counter = 0;
-    for (iEdge = 0; iEdge < nEdge; iEdge++) {
-      if (part[iEdge] == iColor) {
-        Global_Edge[iColor][Edge_Counter] = iEdge;
-        Edge_Counter++;
-      }
-    }
-  }
-  
-  /*--- Set up some structure for repeated points ---*/
-  
-  unsigned long **Node_Colors = new unsigned long*[nColor];
-  for (iColor = 0; iColor < nColor; iColor++) {
-    Node_Colors[iColor] = new unsigned long[nPointDomain];
-  }
-  unsigned long *ColorsPerNode = new unsigned long[nPointDomain];
-  bool *FoundNode = new bool[nPointDomain];
-  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
-    ColorsPerNode[iPoint] = 0;
-  }
-  
-  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
-    
-    /*--- Loop over all neighbor points ---*/
-    
-    Node_Colors_Vec.clear();
-    for (iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
-      adjPoint = node[iPoint]->GetPoint(iNode);
-      
-      /*--- Find the edge connecting these two nodes ---*/
-      
-      adjEdge = FindEdge(iPoint, adjPoint);
-      
-      /*--- Add the color of this edge to the vector ---*/
-      
-      iColor = edge[adjEdge]->GetColor();
-      Node_Colors_Vec.push_back(iColor);
       
     }
     
-    /*--- Sort the colors and remove duplicates ---*/
+    /*--- Write a Tecplot file for visualizing the edge coloring. We will
+     store the color at the nodes, so it will only be approximate. ---*/
     
-    sort(Node_Colors_Vec.begin(), Node_Colors_Vec.end());
-    it = unique(Node_Colors_Vec.begin(), Node_Colors_Vec.end());
-    Node_Colors_Vec.resize(it - Node_Colors_Vec.begin());
+    Write_EdgeColors();
     
-    /*--- Store the unique colors for this node. ---*/
+    /*--- Print some information, delete memory, and exit ---*/
     
-    ColorsPerNode[iPoint] = Node_Colors_Vec.size();
-    for (iColor = 0; iColor <	Node_Colors_Vec.size(); iColor++) {
-      Node_Colors[iColor][iPoint] = Node_Colors_Vec[iColor];
+    cout << "Colored "<< nEdge << " edges into "<< nparts << " groups with ";
+    cout << nPointRepeated << " repeated points." << endl;
+    
+    delete [] part;
+    delete [] xadj;
+    delete [] adjncy;
+    delete [] EdgesPerColor;
+    delete [] ColorsPerNode;
+    delete [] FoundNode;
+    for (iColor = 0; iColor < nColor; iColor++) {
+      delete [] Node_Colors[iColor];
+    }
+    delete [] Node_Colors;
+    
+  } else {
+    
+    /*--- OpenMP is not available or called with one thread. Set all edges to
+     a single color so that the various loops operate as normal. ---*/
+    
+    cout << "No edge coloring strategy employed." << endl;
+    
+    nColor = 1;
+    nEdge_Color = new unsigned long[nColor];
+    
+    unsigned long iColor = 0, iEdge, iPoint;
+    
+    /*--- Set all edges to the same color ---*/
+    
+    for (iEdge = 0; iEdge < nEdge; iEdge++) edge[iEdge]->SetColor(iColor);
+    
+    /*--- Some post-processing for number of edges by color ---*/
+    
+    nEdge_Color[0] = nEdge;
+    
+    /*--- Allocate memory and create local<->global edge mapping ---*/
+    
+    Global_Edge = new unsigned long*[nColor];
+    for (iColor = 0; iColor < nColor; iColor++) {
+      Global_Edge[iColor] = new unsigned long[GetnEdge(iColor)];
+      for (iEdge = 0; iEdge < nEdge; iEdge++) {
+        Global_Edge[iColor][iEdge] = iEdge;
+      }
     }
     
-  }
-  
-  /*--- Compute total number of repeated points due to edge coloring ---*/
-  
-  nPointRepeated = 0;
-  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
-    nPointRepeated += ColorsPerNode[iPoint] - 1;
-  }
-  
-  /*--- Allocate memory to store the mapping between parent<->repeated nodes ---*/
-  
-  Repeated_Points = new unsigned long*[nColor];
-  for (iColor = 0; iColor < nColor; iColor++) {
-    Repeated_Points[iColor] = new unsigned long[nPointDomain];
-  }
-  Repeated_Parent = new unsigned long[nPointRepeated];
-  
-  /*--- Create the mapping between parent<->repeated nodes ---*/
-  
-  unsigned long nRepeats, iPoint_Repeated = 0;
-  for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    /*--- Set total number of repeated points to zero. ---*/
     
-    /*--- The first color becomes the parent of the node, any additional
-     colors will be associated with a repeated node. ---*/
+    nPointRepeated = 0;
     
-    nRepeats = ColorsPerNode[iPoint] - 1;
+    /*--- Allocate memory for mapping between parent<->repeated nodes ---*/
     
-    if (nRepeats > 0) {
-      
-      /*--- This point is repeated, so set the flag to true, store the
-       mappings, and increment our repeated node counters. ---*/
-      
-      node[iPoint]->SetRepeatedPoint(true);
-      
-      /*--- Store the point to its own index for all colors by default ---*/
-      
-      for (iColor = 0; iColor < nColor; iColor++) {
-        Repeated_Points[iColor][iPoint] = iPoint;
-      }
-      
-      /*--- For any additional colors (repeats) overwrite with a new index ---*/
-      
-      for (jColor = 1; jColor < ColorsPerNode[iPoint]; jColor++) {
-        Repeated_Parent[iPoint_Repeated] = iPoint;
-        iColor = Node_Colors[jColor][iPoint];
-        Repeated_Points[iColor][iPoint] = nPointDomain+iPoint_Repeated;
-        iPoint_Repeated++;
-      }
-      
-    } else {
+    Repeated_Points = new unsigned long*[nColor];
+    for (iColor = 0; iColor < nColor; iColor++) {
+      Repeated_Points[iColor] = new unsigned long[nPointDomain];
+    }
+    
+    /*--- Create the mapping between parent<->repeated nodes ---*/
+    
+    for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
       
       /*--- This point is not repeated, so set the flag to false. ---*/
       
       node[iPoint]->SetRepeatedPoint(false);
-      for (iColor = 0; iColor < nColor; iColor++) {
-        Repeated_Points[iColor][iPoint] = iPoint;
-      }
+      Repeated_Points[0][iPoint] = iPoint;
       
     }
-    
   }
-  
-  /*--- Write a Tecplot file for visualizing the edge coloring. We will
-   store the color at the nodes, so it will only be approximate. ---*/
-  
-  Write_EdgeColors();
-  
-  /*--- Print some information, delete memory, and exit ---*/
-  
-  cout << "Colored "<< nEdge << " edges into "<< nparts << " groups with ";
-  cout << nPointRepeated << " repeated points." << endl;
-  
-  delete [] part;
-  delete [] xadj;
-  delete [] adjncy;
-  delete [] EdgesPerColor;
-  delete [] ColorsPerNode;
-  delete [] FoundNode;
-  for (iColor = 0; iColor < nColor; iColor++) {
-    delete [] Node_Colors[iColor];
-  }
-  delete [] Node_Colors;
   
 #else
   
@@ -2102,6 +2165,8 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   cout << "No edge coloring strategy employed." << endl;
   
   nColor = 1;
+  nEdge_Color = new unsigned long[nColor];
+  
   unsigned long iColor = 0, iEdge, iPoint;
   
   /*--- Set all edges to the same color ---*/
@@ -2110,7 +2175,7 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
   
   /*--- Some post-processing for number of edges by color ---*/
   
-  SetnEdge_Color(iColor, nEdge);
+  nEdge_Color[0] = nEdge;
   
   /*--- Allocate memory and create local<->global edge mapping ---*/
   
