@@ -27,7 +27,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
   
   bool StopCalc = false;
-  unsigned long ExtIter = 0;
+  unsigned long ExtIter = 0, threads = 1;
   double StartTime = 0.0, StopTime = 0.0, UsedTime = 0.0;
   unsigned short iMesh, iSol, nDim;
   ofstream ConvHist_file;
@@ -71,10 +71,10 @@ int main(int argc, char *argv[]) {
   
   /*--- Check for OpenMP and print some information to the console ---*/
 #ifdef OPENMP
-  unsigned long nThreads = omp_get_max_threads();
+  threads = omp_get_max_threads();
   cout << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
-  cout << " Running the OpenMP version of SU2_EDU with " << nThreads << " threads. " << endl;
+  cout << " Running the OpenMP version of SU2_EDU with " << threads << " threads. " << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
 #endif
   
@@ -168,6 +168,9 @@ int main(int argc, char *argv[]) {
   cout << endl <<"------------------------------ Begin Solver -----------------------------" << endl;
   
   StartTime = double(clock())/double(CLOCKS_PER_SEC);
+#ifdef OPENMP
+  StartTime = omp_get_wtime();
+#endif
   
   while (ExtIter < config_container->GetnExtIter()) {
     
@@ -187,7 +190,9 @@ int main(int argc, char *argv[]) {
      wall clock time required. ---*/
     
     StopTime = double(clock())/double(CLOCKS_PER_SEC);
-    
+#ifdef OPENMP
+    StopTime = omp_get_wtime();
+#endif
     UsedTime = (StopTime - StartTime);
     
     /*--- Update the convergence history file (serial and parallel computations). ---*/
@@ -227,12 +232,17 @@ int main(int argc, char *argv[]) {
   ConvHist_file.close();
   cout << endl <<"History file, closed." << endl;
   
-  StopTime = double(clock())/double(CLOCKS_PER_SEC);
-  
+#ifdef OPENMP
+  StopTime = omp_get_wtime();
+  UsedTime = StopTime-StartTime;
+  cout << "\nCompleted in " << fixed << UsedTime << " seconds on ";
+  cout << threads << " threads (max)." << endl;
+#else
   /*--- Compute/print the total time for performance benchmarking. ---*/
-  
+  StopTime = double(clock())/double(CLOCKS_PER_SEC);
   UsedTime = StopTime-StartTime;
   cout << "\nCompleted in " << fixed << UsedTime << " seconds on 1 core." << endl;
+#endif
   
   /*--- Exit the solver cleanly ---*/
   
