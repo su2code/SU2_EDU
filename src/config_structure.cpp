@@ -749,6 +749,16 @@ void CConfig::SetParsing(char case_filename[200]) {
 
 void CConfig::SetPostprocessing(unsigned short val_software) {
   
+  //!
+  //!
+  //! HARD-CODE THE MG TO BE OFF & TO USE EXPLICIT INTEGRATION!!
+  //! THIS IS WHILE WE TEST THE OPENMP IMPLEMENTATION.
+  nMultiLevel = 0;
+  Kind_TimeIntScheme_Flow = RUNGE_KUTTA_EXPLICIT;
+  //!
+  //!
+  //!
+  
   unsigned short iZone;
   
   /*--- Store the SU2 module that we are executing. ---*/
