@@ -1783,6 +1783,50 @@ void CPhysicalGeometry::SetRCM(CConfig *config) {
   
 }
 
+
+void CPhysicalGeometry::SetEdgeRenumbering(CConfig *config) {
+  
+  unsigned long iEdge, iPoint, jPoint, iEdgeNew = 0;
+  unsigned short iNode;
+  vector<unsigned long> EdgeQueue;
+
+  unsigned long *NewEdge = new unsigned long[nEdge];
+
+  /*--- Initialize the vector to store the Edges ---*/
+  
+  for(iEdge = 0; iEdge < nEdge; iEdge++) NewEdge[iEdge] = nEdge;
+
+  for(iPoint = 0; iPoint < nPoint; iPoint++) {
+    
+    for(iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
+      
+      jPoint = node[iPoint]->GetPoint(iNode);
+      iEdge = FindEdge(iPoint, jPoint);
+      
+      /*--- Store the edges at a particular point ---*/
+      
+      if (NewEdge[iEdge] == nEdge) EdgeQueue.push_back(iEdge);
+      
+    }
+    
+//    /*--- Sort the edges in such a way that it minimizes the jump in the second point ---*/
+//    for(iEdge = 0; iEdge < EdgeQueue.size(); iEdge++) {
+//      
+//    }
+    
+    /*--- Store the new edges ---*/
+    
+    for(iEdge = 0; iEdge < EdgeQueue.size(); iEdge++) {
+      NewEdge[EdgeQueue[iEdge]] = iEdgeNew;
+      iEdgeNew++;
+    }
+    
+    EdgeQueue.clear();
+    
+  }
+  
+}
+
 void CPhysicalGeometry::SetEsuE(void) {
   unsigned short first_elem_face, second_elem_face, iFace, iNode, jElem;
   unsigned long face_point, Test_Elem, iElem;
