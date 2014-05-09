@@ -672,8 +672,6 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
     
     for (iEdge_Local = 0; iEdge_Local < geometry->GetnEdge(iColor); iEdge_Local++) {
       
-      //  for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
-      
       /*--- Get the global edge number ---*/
       
       iEdge = geometry->GetGlobal_Edge(iEdge_Local, iColor);
@@ -682,6 +680,7 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
       
       iPoint = geometry->edge[iEdge]->GetNode(0);
       jPoint = geometry->edge[iEdge]->GetNode(1);
+      
       numerics_local->SetNormal(geometry->edge[iEdge]->GetNormal());
       numerics_local->SetNeighbor(geometry->node[iPoint]->GetnNeighbor(),
                             geometry->node[jPoint]->GetnNeighbor());

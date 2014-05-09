@@ -70,7 +70,7 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   geometry[MESH_0]->SetEsuP();
   geometry[MESH_0]->SetPsuP();
   
-  cout << "Renumbering points." << endl;
+  cout << "Renumbering points (Reverse Cuthill McKee Ordering)." << endl;
   geometry[MESH_0]->SetRCM(config);
   
   cout << "Recomputing point connectivity." << endl;
@@ -94,6 +94,7 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
 
   /*--- Color the edges for shared memory parallelism ---*/
   
+  cout << "Color the edges for shared memory parallelism." << endl;
   geometry[MESH_0]->Color_Edges(config);
   
   /*--- Compute cell center of gravity ---*/
