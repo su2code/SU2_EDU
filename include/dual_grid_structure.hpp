@@ -310,6 +310,13 @@ public:
 	void SetPoint(unsigned long val_point);
 	
   /*!
+	 * \brief Set the points that compose the control volume.
+   * \param[in] iNode - index of the point.
+	 * \param[in] val_point - Point to be added.
+	 */
+  void SetNeighbors(unsigned short iNode, unsigned long val_point);
+
+  /*!
 	 * \brief Reset the points that compose the control volume.
 	 */
 	void ResetPoint(void);

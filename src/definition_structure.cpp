@@ -70,6 +70,9 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   geometry[MESH_0]->SetEsuP();
   geometry[MESH_0]->SetPsuP();
   
+  cout << "Renumbering points." << endl;
+  geometry[MESH_0]->SetRCM(config);
+  
   cout << "Recomputing point connectivity." << endl;
   geometry[MESH_0]->SetEsuP();
   geometry[MESH_0]->SetPsuP();
@@ -88,7 +91,7 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   cout << "Identifying edges and vertices." << endl;
   geometry[MESH_0]->SetEdges();
   geometry[MESH_0]->SetVertex(config);
-  
+
   /*--- Color the edges for shared memory parallelism ---*/
   
   geometry[MESH_0]->Color_Edges(config);

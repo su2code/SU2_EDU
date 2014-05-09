@@ -219,29 +219,37 @@ void CGeometry::SetEdges(void) {
   long TestEdge = 0;
   
   nEdge = 0;
-  for(iPoint = 0; iPoint < nPoint; iPoint++)
+  for(iPoint = 0; iPoint < nPoint; iPoint++) {
+    
     for(iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
       jPoint = node[iPoint]->GetPoint(iNode);
-      for(jNode = 0; jNode < node[jPoint]->GetnPoint(); jNode++)
+      
+      for(jNode = 0; jNode < node[jPoint]->GetnPoint(); jNode++) {
         if (node[jPoint]->GetPoint(jNode) == iPoint) {
           TestEdge = node[jPoint]->GetEdge(jNode);
           break;
         }
+      }
+      
       if (TestEdge == -1) {
         node[iPoint]->SetEdge(nEdge, iNode);
         node[jPoint]->SetEdge(nEdge, jNode);
         nEdge++;
       }
+      
     }
+  }
   
   edge = new CEdge*[nEdge];
   
-  for(iPoint = 0; iPoint < nPoint; iPoint++)
+  for(iPoint = 0; iPoint < nPoint; iPoint++) {
     for(iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
       jPoint = node[iPoint]->GetPoint(iNode);
       iEdge = FindEdge(iPoint, jPoint);
       if (iPoint < jPoint) edge[iEdge] = new CEdge(iPoint, jPoint, nDim);
     }
+  }
+  
 }
 
 void CGeometry::SetFaces(void) {
@@ -1626,6 +1634,29 @@ void CPhysicalGeometry::SetPsuP(void) {
             node[iPoint]->SetPoint(Point_Neighbor);
           }
     }
+  
+  /*--- Reorder Point Surrounding Points ---*/
+  
+  for(iPoint = 0; iPoint < nPoint; iPoint++) {
+  
+    vector<unsigned long> Queue;
+    unsigned long jPoint;
+    
+    for(iNode = 0; iNode < node[iPoint]->GetnPoint(); iNode++) {
+      jPoint = node[iPoint]->GetPoint(iNode);
+      Queue.push_back(jPoint);
+    }
+    
+    sort(Queue.begin(), Queue.end());
+    
+    for(iNode = 0; iNode < Queue.size(); iNode++) {
+      jPoint = Queue[iNode];
+      node[iPoint]->SetNeighbors(iNode, jPoint);
+    }
+
+    Queue.clear();
+  
+  }
   
   /*--- Set the number of neighbors variable, this is
    important for JST and multigrid in parallel ---*/
