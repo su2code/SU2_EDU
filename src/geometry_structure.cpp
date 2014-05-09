@@ -2114,6 +2114,68 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
       
     }
     
+    /*--- Rebuild the node structure in the geometry to include the repeats ---*/
+    
+    // copy old nodes then remove
+    CPoint** temp_node = new CPoint*[nPoint+nPointRepeated];
+    
+    //node = new CPoint*[nPoint];
+    iPoint = 0;
+    
+    /*--- Copy in original points ---*/
+    
+    double *Coords; unsigned long GlobalIndex;
+    for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+      Coords = node[iPoint]->GetCoord();
+      switch(nDim) {
+        case 2:
+          GlobalIndex = iPoint;
+          temp_node[iPoint] = new CPoint(Coords[0], Coords[1], GlobalIndex, config);
+          break;
+        case 3:
+          GlobalIndex = iPoint;
+          temp_node[iPoint] = new CPoint(Coords[0], Coords[1], Coords[2], GlobalIndex, config);
+          break;
+      }
+    }
+    
+    iPoint_Repeated = 0;
+    for (iPoint = nPoint; iPoint < nPoint + nPointRepeated; iPoint++) {
+      /*--- Repeated parent ---*/
+      jPoint = Repeated_Parent[iPoint_Repeated];
+      Coords = node[jPoint]->GetCoord();
+      iPoint_Repeated++;
+
+      switch(nDim) {
+        case 2:
+          GlobalIndex = iPoint;
+          temp_node[iPoint] = new CPoint(Coords[0], Coords[1], GlobalIndex, config);
+          break;
+        case 3:
+          GlobalIndex = iPoint;
+          temp_node[iPoint] = new CPoint(Coords[0], Coords[1], Coords[2], GlobalIndex, config);
+          break;
+      }
+
+      /*--- Set these nodes as repeated using the "domain" flag ---*/
+      
+      temp_node[iPoint]->SetDomain(false);
+
+    }
+    
+    /*--- Delete the old array of points and make temp array permanent ---*/
+//
+//    for (iPoint = 0; iPoint < nPoint; iPoint ++)
+//        if (node[iPoint] != NULL) delete node[iPoint];
+//      delete[] node;
+//    
+//    
+    node = temp_node;
+    
+    /*--- Add the repeated points to the list of nPoint ---*/
+    
+    nPoint = nPointDomain + nPointRepeated;
+    
     /*--- Write a Tecplot file for visualizing the edge coloring. We will
      store the color at the nodes, so it will only be approximate. ---*/
     
@@ -2291,7 +2353,7 @@ void CPhysicalGeometry::Write_EdgeColors(void) {
     
   }
   
-  for(iPoint = 0; iPoint < nPoint; iPoint++) {
+  for(iPoint = 0; iPoint < nPointDomain; iPoint++) {
     for(iDim = 0; iDim < nDim; iDim++)
       Tecplot_File << scientific << node[iPoint]->GetCoord(iDim) << "\t";
     Tecplot_File << Node_Colors[iPoint] << "\n";
@@ -2518,15 +2580,19 @@ void CPhysicalGeometry::SetBoundControlVolume(CConfig *config, unsigned short ac
   double *Coord_Edge_CG = new double [nDim];
   double *Coord_Elem_CG = new double [nDim];
   double *Coord_Vertex = new double [nDim];
-  
+  cout << "beg" << endl;
   /*--- Loop over all the markers ---*/
   for (iMarker = 0; iMarker < nMarker; iMarker++)
   /*--- Loop over all the boundary elements ---*/
     for (iElem = 0; iElem < nElem_Bound[iMarker]; iElem++)
     /*--- Loop over all the nodes of the boundary ---*/
       for(iNode = 0; iNode < bound[iMarker][iElem]->GetnNodes(); iNode++) {
+        cout << "ipoin" << endl;
+
         iPoint = bound[iMarker][iElem]->GetNode(iNode);
         iVertex = node[iPoint]->GetVertex(iMarker);
+        cout << iPoint <<    "   "<< iVertex << endl;
+
         /*--- Loop over the neighbor nodes, there is a face for each one ---*/
         for(iNeighbor_Nodes = 0; iNeighbor_Nodes < bound[iMarker][iElem]->GetnNeighbor_Nodes(iNode); iNeighbor_Nodes++) {
           Neighbor_Node = bound[iMarker][iElem]->GetNeighbor_Nodes(iNode,iNeighbor_Nodes);
@@ -2552,7 +2618,8 @@ void CPhysicalGeometry::SetBoundControlVolume(CConfig *config, unsigned short ac
           }
         }
       }
-  
+  cout << "after" << endl;
+
   delete[] Coord_Edge_CG;
   delete[] Coord_Elem_CG;
   delete[] Coord_Vertex;
@@ -2565,7 +2632,8 @@ void CPhysicalGeometry::SetBoundControlVolume(CConfig *config, unsigned short ac
       Area = sqrt(Area);
       if (Area == 0.0) for (iDim = 0; iDim < nDim; iDim++) NormalFace[iDim] = EPS*EPS;
     }
-  
+  cout << "end" << endl;
+
 }
 
 void CPhysicalGeometry::MatchNearField(CConfig *config) {

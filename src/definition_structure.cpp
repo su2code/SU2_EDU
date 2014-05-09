@@ -71,7 +71,7 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   geometry[MESH_0]->SetPsuP();
   
   cout << "Renumbering points." << endl;
-  geometry[MESH_0]->SetRCM(config);
+  //geometry[MESH_0]->SetRCM(config);
   
   cout << "Recomputing point connectivity." << endl;
   geometry[MESH_0]->SetEsuP();
@@ -95,6 +95,25 @@ void Geometrical_Preprocessing(CGeometry **geometry, CConfig *config) {
   /*--- Color the edges for shared memory parallelism ---*/
   
   geometry[MESH_0]->Color_Edges(config);
+  
+  cout << "Recomputing point connectivity." << endl;
+  geometry[MESH_0]->SetEsuP();
+  geometry[MESH_0]->SetPsuP();
+  
+  cout << "Setting element connectivity." << endl;
+  geometry[MESH_0]->SetEsuE();
+  
+  /*--- Check the orientation before computing geometrical quantities ---*/
+  
+  cout << "Checking the numerical grid orientation." << endl;
+  geometry[MESH_0]->SetBoundVolume();
+  geometry[MESH_0]->Check_Orientation(config);
+  
+  /*--- Create the edge structure ---*/
+  
+  cout << "Identifying edges and vertices." << endl;
+  geometry[MESH_0]->SetEdges();
+  geometry[MESH_0]->SetVertex(config);
   
   /*--- Compute cell center of gravity ---*/
   

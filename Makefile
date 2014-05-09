@@ -280,12 +280,12 @@ AUTOMAKE = ${SHELL} /Users/economon/SU2_EDU/missing automake-1.14
 AWK = awk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -O3 -fPIC
+CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3 -fPIC -DTIME -DOPENMP -fopenmp
+CXXFLAGS = -g -O2 -DOPENMP -fopenmp
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"SU2_EDU\" -DPACKAGE_TARNAME=\"SU2_EDU\" -DPACKAGE_VERSION=\"1.1.0\" -DPACKAGE_STRING=\"SU2_EDU\ 1.1.0\" -DPACKAGE_BUGREPORT=\"susquared-dev@lists.stanford.edu\" -DPACKAGE_URL=\"http://su2.stanford.edu\" -DPACKAGE=\"SU2_EDU\" -DVERSION=\"1.1.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_SHORT_INT=2 -DSIZEOF_INT=4 -DSIZEOF_UNSIGNED_INT=4 -DSIZEOF_LONG_INT=8 -DSIZEOF_FLOAT=4 -DSIZEOF_DOUBLE=8 -DSIZEOF_VOID_P=8 -DHAVE_METIS=1 -DTLS=/\*\*/
 DEPDIR = .deps
@@ -329,7 +329,7 @@ abs_srcdir = /Users/economon/SU2_EDU
 abs_top_builddir = /Users/economon/SU2_EDU
 abs_top_srcdir = /Users/economon/SU2_EDU
 ac_ct_CC = gcc
-ac_ct_CXX = 
+ac_ct_CXX = g++
 am__include = include
 am__leading_dot = .
 am__quote = 
@@ -364,7 +364,7 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /Users/economon/SU2_EDU
+prefix = /usr/local
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin
