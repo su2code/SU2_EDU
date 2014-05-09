@@ -26,6 +26,8 @@ inline void CDualGrid::SetColor(unsigned long val_Color) { Color = val_Color; }
 
 inline unsigned long CDualGrid::GetColor(void) { return Color; }
 
+inline void CPoint::SetNeighbors(unsigned short iNode, unsigned long val_point) { Point[iNode] = val_point; }
+
 inline void CPoint::SetElem(unsigned long val_elem) { Elem.push_back(val_elem); nElem = Elem.size(); }
 
 inline void CPoint::ResetBoundary(void) { if (vertex != NULL) delete [] vertex; Boundary = false; }

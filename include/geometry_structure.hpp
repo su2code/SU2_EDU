@@ -391,12 +391,6 @@ public:
 	 */
 	virtual void SetRCM(CConfig *config);
   
-  /*!
-	 * \brief A virtual member.
-   * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void SetEdgeRenumbering(CConfig *config);
-  
 	/*!
 	 * \brief A virtual member.
 	 */
@@ -874,12 +868,6 @@ public:
    * \param[in] config - Definition of the particular problem.
 	 */
 	void SetRCM(CConfig *config);
-  
-  /*!
-	 * \brief Set an edge renumbering
-   * \param[in] config - Definition of the particular problem.
-	 */
-	void SetEdgeRenumbering(CConfig *config);
   
   /*!
 	 * \brief Color the edges using METIS for shared memory parallelization with OpenMP.

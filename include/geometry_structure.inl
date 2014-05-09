@@ -76,8 +76,6 @@ inline void CGeometry::SetPsuP(void) { }
 
 inline void CGeometry::SetRCM(CConfig *config) { }
 
-inline void CGeometry::SetEdgeRenumbering(CConfig *config) { }
-
 inline void CGeometry::Color_Edges(CConfig *config) { }
 
 inline void CGeometry::Write_EdgeColors(void) { }
