@@ -32,12 +32,58 @@ CEulerVariable::CEulerVariable(void) : CVariable() {
   
 }
 
-CEulerVariable::CEulerVariable(double val_density, double *val_velocity,
+CEulerVariable::~CEulerVariable(void) {
+  
+  if (Primitive         != NULL) delete [] Primitive;
+  if (Limiter_Primitive != NULL) delete [] Limiter_Primitive;
+  
+  if (Gradient_Primitive != NULL) {
+    for (unsigned short iVar = 0; iVar < nPrimVarGrad; iVar++)
+      delete Gradient_Primitive[iVar];
+    delete [] Gradient_Primitive;
+  }
+  
+}
+
+void CEulerVariable::Set_CEulerVariable(double val_density, double *val_velocity,
                                double val_energy, unsigned short val_ndim,
-                               unsigned short val_nvar, CConfig *config)
-: CVariable(val_ndim, val_nvar, config) {
+                               unsigned short val_nvar, CConfig *config) {
   
   unsigned short iVar, iDim, iMesh, nMGSmooth = 0;
+  
+  /*--- Array initialization ---*/
+  
+  Solution            = NULL;
+  Solution_Old        = NULL;
+  Gradient            = NULL;
+  Limiter             = NULL;
+  Solution_Max        = NULL;
+  Solution_Min        = NULL;
+  Grad_AuxVar         = NULL;
+  Undivided_Laplacian = NULL;
+  Res_TruncError      = NULL;
+  Residual_Old        = NULL;
+  Residual_Sum        = NULL;
+  
+  /*--- Initializate the number of dimensions and number of variables ---*/
+  
+  nDim = val_ndim;
+  nVar = val_nvar;
+  
+  /*--- Allocate solution, solution old, and gradient arrays ---*/
+  
+  Solution = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Solution[iVar] = 0.0;
+  
+  Solution_Old = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Solution_Old[iVar] = 0.0;
+  
+  Gradient = new double* [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) {
+    Gradient[iVar] = new double [nDim];
+    for (iDim = 0; iDim < nDim; iDim ++)
+      Gradient[iVar][iDim] = 0.0;
+  }
   
   /*--- Array initialization ---*/
   
@@ -119,11 +165,44 @@ CEulerVariable::CEulerVariable(double val_density, double *val_velocity,
   
 }
 
-CEulerVariable::CEulerVariable(double *val_solution, unsigned short val_ndim,
-                               unsigned short val_nvar, CConfig *config)
-: CVariable(val_ndim, val_nvar, config) {
+void CEulerVariable::Set_CEulerVariable(double *val_solution, unsigned short val_ndim,
+                               unsigned short val_nvar, CConfig *config) {
   
   unsigned short iVar, iDim, iMesh, nMGSmooth = 0;
+  
+  /*--- Array initialization ---*/
+  
+  Solution            = NULL;
+  Solution_Old        = NULL;
+  Gradient            = NULL;
+  Limiter             = NULL;
+  Solution_Max        = NULL;
+  Solution_Min        = NULL;
+  Grad_AuxVar         = NULL;
+  Undivided_Laplacian = NULL;
+  Res_TruncError      = NULL;
+  Residual_Old        = NULL;
+  Residual_Sum        = NULL;
+  
+  /*--- Initializate the number of dimensions and number of variables ---*/
+  
+  nDim = val_ndim;
+  nVar = val_nvar;
+  
+  /*--- Allocate solution, solution old, and gradient arrays ---*/
+  
+  Solution = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Solution[iVar] = 0.0;
+  
+  Solution_Old = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Solution_Old[iVar] = 0.0;
+  
+  Gradient = new double* [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) {
+    Gradient[iVar] = new double [nDim];
+    for (iDim = 0; iDim < nDim; iDim ++)
+      Gradient[iVar][iDim] = 0.0;
+  }
   
   /*--- Array initialization ---*/
   
@@ -195,19 +274,6 @@ CEulerVariable::CEulerVariable(double *val_solution, unsigned short val_ndim,
     Gradient_Primitive[iVar] = new double [nDim];
     for (iDim = 0; iDim < nDim; iDim++)
       Gradient_Primitive[iVar][iDim] = 0.0;
-  }
-  
-}
-
-CEulerVariable::~CEulerVariable(void) {
-  
-  if (Primitive         != NULL) delete [] Primitive;
-  if (Limiter_Primitive != NULL) delete [] Limiter_Primitive;
-  
-  if (Gradient_Primitive != NULL) {
-    for (unsigned short iVar = 0; iVar < nPrimVarGrad; iVar++)
-      delete Gradient_Primitive[iVar];
-    delete [] Gradient_Primitive;
   }
   
 }
@@ -293,32 +359,253 @@ bool CEulerVariable::SetPrimVar_Compressible(CConfig *config) {
 
 CNSVariable::CNSVariable(void) : CEulerVariable() { }
 
-CNSVariable::CNSVariable(double val_density, double *val_velocity,
-                         double val_energy, unsigned short val_ndim,
-                         unsigned short val_nvar, CConfig *config)
-: CEulerVariable(val_density, val_velocity, val_energy, val_ndim, val_nvar, config) {
-  
-  Temperature_Ref = config->GetTemperature_Ref();
-  Viscosity_Ref   = config->GetViscosity_Ref();
-  Viscosity_Inf   = config->GetViscosity_FreeStreamND();
-  Prandtl_Lam     = config->GetPrandtl_Lam();
-  Prandtl_Turb    = config->GetPrandtl_Turb();
-  
-}
-
-CNSVariable::CNSVariable(double *val_solution, unsigned short val_ndim,
-                         unsigned short val_nvar, CConfig *config)
-: CEulerVariable(val_solution, val_ndim, val_nvar, config) {
-  
-  Temperature_Ref = config->GetTemperature_Ref();
-  Viscosity_Ref   = config->GetViscosity_Ref();
-  Viscosity_Inf   = config->GetViscosity_FreeStreamND();
-  Prandtl_Lam     = config->GetPrandtl_Lam();
-  Prandtl_Turb    = config->GetPrandtl_Turb();
-  
-}
-
 CNSVariable::~CNSVariable(void) { }
+
+void CNSVariable::Set_CNSVariable(double val_density, double *val_velocity,
+                         double val_energy, unsigned short val_ndim,
+                         unsigned short val_nvar, CConfig *config) {
+  
+  unsigned short iVar, iDim, iMesh, nMGSmooth = 0;
+  
+  /*--- Array initialization ---*/
+  
+  Solution            = NULL;
+  Solution_Old        = NULL;
+  Gradient            = NULL;
+  Limiter             = NULL;
+  Solution_Max        = NULL;
+  Solution_Min        = NULL;
+  Grad_AuxVar         = NULL;
+  Undivided_Laplacian = NULL;
+  Res_TruncError      = NULL;
+  Residual_Old        = NULL;
+  Residual_Sum        = NULL;
+  
+  /*--- Initializate the number of dimensions and number of variables ---*/
+  
+  nDim = val_ndim;
+  nVar = val_nvar;
+  
+  /*--- Allocate solution, solution old, and gradient arrays ---*/
+  
+  Solution = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Solution[iVar] = 0.0;
+  
+  Solution_Old = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Solution_Old[iVar] = 0.0;
+  
+  Gradient = new double* [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) {
+    Gradient[iVar] = new double [nDim];
+    for (iDim = 0; iDim < nDim; iDim ++)
+      Gradient[iVar][iDim] = 0.0;
+  }
+  
+  /*--- Array initialization ---*/
+  
+  Primitive          = NULL;
+  Gradient_Primitive = NULL;
+  Limiter_Primitive  = NULL;
+  
+  /*--- Allocate and initialize the primitive variables and gradients ---*/
+  
+  nPrimVar = nDim+7; nPrimVarGrad = nDim+4;
+  
+  /*--- Allocate residual structures ---*/
+  
+  Res_TruncError = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) {
+    Res_TruncError[iVar] = 0.0;
+  }
+  
+  /*--- Residual smoothing (multigrid) ---*/
+  
+  for (iMesh = 0; iMesh <= config->GetMGLevels(); iMesh++)
+    nMGSmooth += config->GetMG_CorrecSmooth(iMesh);
+  
+  if (nMGSmooth > 0) {
+    Residual_Sum = new double [nVar];
+    Residual_Old = new double [nVar];
+  }
+  
+  /*--- Allocate undivided laplacian array (centered) ---*/
+  
+  if (config->GetKind_ConvNumScheme_Flow() == SPACE_CENTERED) {
+    Undivided_Laplacian = new double [nVar];
+  }
+  
+  /*--- Allocate arrays for the slope limiter (upwind) ---*/
+  
+  Limiter_Primitive = new double [nPrimVarGrad];
+  for (iVar = 0; iVar < nPrimVarGrad; iVar++) Limiter_Primitive[iVar] = 0.0;
+  
+  Limiter = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Limiter[iVar] = 0.0;
+  
+  Solution_Max = new double [nPrimVarGrad];
+  Solution_Min = new double [nPrimVarGrad];
+  for (iVar = 0; iVar < nPrimVarGrad; iVar++) {
+    Solution_Max[iVar] = 0.0;
+    Solution_Min[iVar] = 0.0;
+  }
+  
+  /*--- Solution and old solution initialization from input ---*/
+  
+  Solution[0]     = val_density;
+  Solution_Old[0] = val_density;
+  for (iDim = 0; iDim < nDim; iDim++) {
+    Solution[iDim+1]     = val_density*val_velocity[iDim];
+    Solution_Old[iDim+1] = val_density*val_velocity[iDim];
+  }
+  Solution[nVar-1]     = val_density*val_energy;
+  Solution_Old[nVar-1] = val_density*val_energy;
+  
+  /*--- Incompressible flow, primitive variables nDim+3, (P,vx,vy,vz,rho,beta),
+   FreeSurface Incompressible flow, primitive variables nDim+4, (P,vx,vy,vz,rho,beta,dist),
+   Compressible flow, primitive variables nDim+5, (T,vx,vy,vz,P,rho,h,c) ---*/
+  
+  Primitive = new double [nPrimVar];
+  for (iVar = 0; iVar < nPrimVar; iVar++) Primitive[iVar] = 0.0;
+  
+  /*--- Incompressible flow, gradients primitive variables nDim+2, (P,vx,vy,vz,rho),
+   FreeSurface Incompressible flow, primitive variables nDim+3, (P,vx,vy,vz,rho,beta,dist),
+   Compressible flow, gradients primitive variables nDim+4, (T,vx,vy,vz,P,rho,h)
+   We need P, and rho for running the adjoint problem ---*/
+  
+  Gradient_Primitive = new double* [nPrimVarGrad];
+  for (iVar = 0; iVar < nPrimVarGrad; iVar++) {
+    Gradient_Primitive[iVar] = new double [nDim];
+    for (iDim = 0; iDim < nDim; iDim++)
+      Gradient_Primitive[iVar][iDim] = 0.0;
+  }
+  
+  Temperature_Ref = config->GetTemperature_Ref();
+  Viscosity_Ref   = config->GetViscosity_Ref();
+  Viscosity_Inf   = config->GetViscosity_FreeStreamND();
+  Prandtl_Lam     = config->GetPrandtl_Lam();
+  Prandtl_Turb    = config->GetPrandtl_Turb();
+  
+}
+
+void CNSVariable::Set_CNSVariable(double *val_solution, unsigned short val_ndim,
+                         unsigned short val_nvar, CConfig *config) {
+  
+  unsigned short iVar, iDim, iMesh, nMGSmooth = 0;
+  
+  /*--- Array initialization ---*/
+  
+  Solution            = NULL;
+  Solution_Old        = NULL;
+  Gradient            = NULL;
+  Limiter             = NULL;
+  Solution_Max        = NULL;
+  Solution_Min        = NULL;
+  Grad_AuxVar         = NULL;
+  Undivided_Laplacian = NULL;
+  Res_TruncError      = NULL;
+  Residual_Old        = NULL;
+  Residual_Sum        = NULL;
+  
+  /*--- Initializate the number of dimensions and number of variables ---*/
+  
+  nDim = val_ndim;
+  nVar = val_nvar;
+  
+  /*--- Allocate solution, solution old, and gradient arrays ---*/
+  
+  Solution = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Solution[iVar] = 0.0;
+  
+  Solution_Old = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Solution_Old[iVar] = 0.0;
+  
+  Gradient = new double* [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) {
+    Gradient[iVar] = new double [nDim];
+    for (iDim = 0; iDim < nDim; iDim ++)
+      Gradient[iVar][iDim] = 0.0;
+  }
+  
+  /*--- Array initialization ---*/
+  
+  Primitive          = NULL;
+  Gradient_Primitive = NULL;
+  Limiter_Primitive  = NULL;
+  
+  /*--- Allocate and initialize the primitive variables and gradients ---*/
+  nPrimVar = nDim+7; nPrimVarGrad = nDim+4;
+  
+  /*--- Allocate residual structures ---*/
+  
+  Res_TruncError = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) {
+    Res_TruncError[iVar] = 0.0;
+  }
+  
+  /*--- Residual smoothing (multigrid) ---*/
+  
+  for (iMesh = 0; iMesh <= config->GetMGLevels(); iMesh++)
+    nMGSmooth += config->GetMG_CorrecSmooth(iMesh);
+  
+  if (nMGSmooth > 0) {
+    Residual_Sum = new double [nVar];
+    Residual_Old = new double [nVar];
+  }
+  
+  /*--- Allocate undivided laplacian array (centered)---*/
+  
+  if (config->GetKind_ConvNumScheme_Flow() == SPACE_CENTERED)
+    Undivided_Laplacian = new double [nVar];
+  
+  /*--- Allocate slope limiter arrays (upwind)---*/
+  
+  Limiter_Primitive = new double [nPrimVarGrad];
+  for (iVar = 0; iVar < nPrimVarGrad; iVar++) Limiter_Primitive[iVar] = 0.0;
+  
+  Limiter = new double [nVar];
+  for (iVar = 0; iVar < nVar; iVar++) Limiter[iVar] = 0.0;
+  
+  Solution_Max = new double [nPrimVarGrad];
+  Solution_Min = new double [nPrimVarGrad];
+  for (iVar = 0; iVar < nPrimVarGrad; iVar++) {
+    Solution_Max[iVar] = 0.0;
+    Solution_Min[iVar] = 0.0;
+  }
+  
+  /*--- Solution initialization from input---*/
+  
+  for (iVar = 0; iVar < nVar; iVar++) {
+    Solution[iVar]     = val_solution[iVar];
+    Solution_Old[iVar] = val_solution[iVar];
+  }
+  
+  /*--- Incompressible flow, primitive variables nDim+3, (P,vx,vy,vz,rho,beta),
+   FreeSurface Incompressible flow, primitive variables nDim+4, (P,vx,vy,vz,rho,beta,dist),
+   Compressible flow, primitive variables nDim+5, (T,vx,vy,vz,P,rho,h,c) ---*/
+  
+  Primitive = new double [nPrimVar];
+  for (iVar = 0; iVar < nPrimVar; iVar++) Primitive[iVar] = 0.0;
+  
+  /*--- Incompressible flow, gradients primitive variables nDim+2, (P,vx,vy,vz,rho),
+   FreeSurface Incompressible flow, primitive variables nDim+4, (P,vx,vy,vz,rho,beta,dist),
+   Compressible flow, gradients primitive variables nDim+4, (T,vx,vy,vz,P,rho,h)
+   We need P, and rho for running the adjoint problem ---*/
+  
+  Gradient_Primitive = new double* [nPrimVarGrad];
+  for (iVar = 0; iVar < nPrimVarGrad; iVar++) {
+    Gradient_Primitive[iVar] = new double [nDim];
+    for (iDim = 0; iDim < nDim; iDim++)
+      Gradient_Primitive[iVar][iDim] = 0.0;
+  }
+
+  
+  Temperature_Ref = config->GetTemperature_Ref();
+  Viscosity_Ref   = config->GetViscosity_Ref();
+  Viscosity_Inf   = config->GetViscosity_FreeStreamND();
+  Prandtl_Lam     = config->GetPrandtl_Lam();
+  Prandtl_Turb    = config->GetPrandtl_Turb();
+  
+}
 
 void CNSVariable::SetVorticity(void) {
   double u_y = Gradient_Primitive[1][1];

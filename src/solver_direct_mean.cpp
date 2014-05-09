@@ -112,15 +112,21 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
    Incompressible flow, primitive variables nDim+5, (P,vx,vy,vz,rho,beta,lamMu,EddyMu),
    FreeSurface Incompressible flow, primitive variables nDim+7, (P,vx,vy,vz,rho,beta,lamMu,EddyMu,LevelSet,Dist),
    Compressible flow, primitive variables nDim+7, (T,vx,vy,vz,P,rho,h,c,lamMu,EddyMu). ---*/
-  
   nDim = geometry->GetnDim();
   nVar = nDim+2; nPrimVar = nDim+7; nPrimVarGrad = nDim+4;
   nMarker      = config->GetnMarker_All();
   nPoint       = geometry->GetnPoint();
   nPointDomain = geometry->GetnPointDomain();
   
-  /*--- Allocate the node variables ---*/
+  /*--- Allocate the node variables (contiguous in memory) ---*/
   node = new CVariable*[nPoint];
+  
+  /*--- Allocate a contiguous chunk of memory for CEulerVariable ---*/
+  CEulerVariable* node_dummy = new CEulerVariable[nPoint];
+
+  /*--- This makes node contiguous in memory ---*/
+  for (iPoint = 0; iPoint < nPoint; iPoint++)
+    node[iPoint] = &node_dummy[iPoint];
   
   /*--- Define some auxiliary vectors related to the residual ---*/
   Residual      = new double[nVar];         for (iVar = 0; iVar < nVar; iVar++) Residual[iVar]      = 0.0;
@@ -276,7 +282,7 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
     
     /*--- Restart the solution from the free-stream state ---*/
     for (iPoint = 0; iPoint < nPoint; iPoint++)
-      node[iPoint] = new CEulerVariable(Density_Inf, Velocity_Inf, Energy_Inf, nDim, nVar, config);
+      node[iPoint]->Set_CEulerVariable(Density_Inf, Velocity_Inf, Energy_Inf, nDim, nVar, config);
   }
   
   else {
@@ -325,7 +331,7 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
       if (iPoint_Local >= 0) {
         if (nDim == 2) point_line >> index >> dull_val >> dull_val >> Solution[0] >> Solution[1] >> Solution[2] >> Solution[3];
         if (nDim == 3) point_line >> index >> dull_val >> dull_val >> dull_val >> Solution[0] >> Solution[1] >> Solution[2] >> Solution[3] >> Solution[4];
-        node[iPoint_Local] = new CEulerVariable(Solution, nDim, nVar, config);
+        node[iPoint_Local]->Set_CEulerVariable(Solution, nDim, nVar, config);
       }
       iPoint_Global++;
     }
@@ -334,7 +340,7 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
      at any halo/periodic nodes. The initial solution can be arbitrary,
      because a send/recv is performed immediately in the solver. ---*/
     for(iPoint = nPointDomain; iPoint < nPoint; iPoint++)
-      node[iPoint] = new CEulerVariable(Solution, nDim, nVar, config);
+      node[iPoint]->Set_CEulerVariable(Solution, nDim, nVar, config);
     
     /*--- Close the restart file ---*/
     restart_file.close();
@@ -2515,8 +2521,15 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
   nPoint       = geometry->GetnPoint();
   nPointDomain = geometry->GetnPointDomain();
   
-  /*--- Allocate the node variables ---*/
+  /*--- Allocate the node variables (contiguous in memory) ---*/
   node = new CVariable*[nPoint];
+  
+  /*--- Allocate a contiguous chunk of memory for CEulerVariable ---*/
+  CNSVariable* node_dummy = new CNSVariable[nPoint];
+  
+  /*--- This makes node contiguous in memory ---*/
+  for (iPoint = 0; iPoint < nPoint; iPoint++)
+    node[iPoint] = &node_dummy[iPoint];
   
   /*--- Define some auxiliar vector related with the residual ---*/
   Residual      = new double[nVar]; for (iVar = 0; iVar < nVar; iVar++) Residual[iVar]      = 0.0;
@@ -2716,7 +2729,7 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
     
     /*--- Restart the solution from the free-stream state ---*/
     for (iPoint = 0; iPoint < nPoint; iPoint++)
-      node[iPoint] = new CNSVariable(Density_Inf, Velocity_Inf, Energy_Inf, nDim, nVar, config);
+      node[iPoint]->Set_CNSVariable(Density_Inf, Velocity_Inf, Energy_Inf, nDim, nVar, config);
   }
   
   else {
@@ -2765,7 +2778,7 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
       if (iPoint_Local >= 0) {
         if (nDim == 2) point_line >> index >> dull_val >> dull_val >> Solution[0] >> Solution[1] >> Solution[2] >> Solution[3];
         if (nDim == 3) point_line >> index >> dull_val >> dull_val >> dull_val >> Solution[0] >> Solution[1] >> Solution[2] >> Solution[3] >> Solution[4];
-        node[iPoint_Local] = new CNSVariable(Solution, nDim, nVar, config);
+        node[iPoint_Local]->Set_CNSVariable(Solution, nDim, nVar, config);
       }
       iPoint_Global++;
     }
@@ -2774,7 +2787,7 @@ CNSSolver::CNSSolver(CGeometry *geometry, CConfig *config, unsigned short iMesh)
      at any halo/periodic nodes. The initial solution can be arbitrary,
      because a send/recv is performed immediately in the solver. ---*/
     for(iPoint = nPointDomain; iPoint < nPoint; iPoint++)
-      node[iPoint] = new CNSVariable(Solution, nDim, nVar, config);
+      node[iPoint]->Set_CNSVariable(Solution, nDim, nVar, config);
     
     /*--- Close the restart file ---*/
     restart_file.close();
