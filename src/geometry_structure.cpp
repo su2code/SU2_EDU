@@ -1793,6 +1793,7 @@ void CPhysicalGeometry::SetRCM(CConfig *config) {
       iPoint = elem[iElem]->GetNode(iNode);
       elem[iElem]->SetNode(iNode, InvResult[iPoint]);
     }
+    
   }
   
   for (iMarker = 0; iMarker < nMarker; iMarker++) {
@@ -2139,9 +2140,27 @@ void CPhysicalGeometry::Color_Edges(CConfig *config) {
       }
     }
     
+    /*--- Set the boundary information ---*/
+    
+    for (unsigned short iMarker = 0; iMarker < nMarker; iMarker++) {
+      for (unsigned short iElem_Surface = 0; iElem_Surface < nElem_Bound[iMarker]; iElem_Surface++) {
+        for (unsigned short iNode_Surface = 0; iNode_Surface < bound[iMarker][iElem_Surface]->GetnNodes(); iNode_Surface++) {
+          unsigned long Point_Surface = bound[iMarker][iElem_Surface]->GetNode(iNode_Surface);
+          temp_node[Point_Surface]->SetBoundary(nMarker);
+          if (config->GetMarker_All_Boundary(iMarker) != SEND_RECEIVE &&
+              config->GetMarker_All_Boundary(iMarker) != INTERFACE_BOUNDARY &&
+              config->GetMarker_All_Boundary(iMarker) != NEARFIELD_BOUNDARY &&
+              config->GetMarker_All_Boundary(iMarker) != PERIODIC_BOUNDARY)
+          temp_node[Point_Surface]->SetPhysicalBoundary(true);
+        }
+      }
+    }
+    
+    /*--- Set repeated parent ---*/
+    
     iPoint_Repeated = 0;
     for (iPoint = nPoint; iPoint < nPoint + nPointRepeated; iPoint++) {
-      /*--- Repeated parent ---*/
+      
       jPoint = Repeated_Parent[iPoint_Repeated];
       Coords = node[jPoint]->GetCoord();
       iPoint_Repeated++;
@@ -2450,56 +2469,76 @@ void CPhysicalGeometry::SetVertex(CConfig *config) {
   unsigned short iMarker, iNode;
   
   /*--- Initialize the Vertex vector for each node of the grid ---*/
+  
   for (iPoint = 0; iPoint < nPoint; iPoint++)
     for (iMarker = 0; iMarker < nMarker; iMarker++)
       node[iPoint]->SetVertex(-1,iMarker);
   
   /*--- Create and compute the vector with the number of vertex per marker ---*/
+  
   nVertex = new unsigned long [nMarker];
   for (iMarker = 0; iMarker < nMarker; iMarker++) {
+    
     /*--- Initialize the number of Bound Vertex for each Marker ---*/
+    
     nVertex[iMarker] = 0;
     for (iElem = 0; iElem < nElem_Bound[iMarker]; iElem++)
       for(iNode = 0; iNode < bound[iMarker][iElem]->GetnNodes(); iNode++) {
         iPoint = bound[iMarker][iElem]->GetNode(iNode);
+        
         /*--- Set the vertex in the node information ---*/
         if ((node[iPoint]->GetVertex(iMarker) == -1) || (config->GetMarker_All_Boundary(iMarker) == SEND_RECEIVE)) {
           iVertex = nVertex[iMarker];
-          node[iPoint]->SetVertex(nVertex[iMarker],iMarker);
+          
+          node[iPoint]->SetVertex(iVertex,iMarker);
+
           nVertex[iMarker]++;
+          
         }
       }
   }
   
   /*--- Initialize the Vertex vector for each node, the previous result is deleted ---*/
+  
   for (iPoint = 0; iPoint < nPoint; iPoint++)
     for (iMarker = 0; iMarker < nMarker; iMarker++)
       node[iPoint]->SetVertex(-1,iMarker);
   
   /*--- Create the bound vertex structure, note that the order
    is the same as in the input file, this is important for Send/Receive part ---*/
+  
   vertex = new CVertex**[nMarker];
   for (iMarker = 0; iMarker < nMarker; iMarker++) {
     vertex[iMarker] = new CVertex* [nVertex[iMarker]];
     nVertex[iMarker] = 0;
     
     /*--- Initialize the number of Bound Vertex for each Marker ---*/
+    
     for (iElem = 0; iElem < nElem_Bound[iMarker]; iElem++)
       for(iNode = 0; iNode < bound[iMarker][iElem]->GetnNodes(); iNode++) {
         iPoint = bound[iMarker][iElem]->GetNode(iNode);
+        
         /*--- Set the vertex in the node information ---*/
+        
         if ((node[iPoint]->GetVertex(iMarker) == -1) || (config->GetMarker_All_Boundary(iMarker) == SEND_RECEIVE)){
+        
           iVertex = nVertex[iMarker];
+          
           vertex[iMarker][iVertex] = new CVertex(iPoint, nDim);
           
           if (config->GetMarker_All_Boundary(iMarker) == SEND_RECEIVE) {
             vertex[iMarker][iVertex]->SetRotation_Type(bound[iMarker][iElem]->GetRotation_Type());
           }
-          node[iPoint]->SetVertex(nVertex[iMarker],iMarker);
+          
+          node[iPoint]->SetVertex(iVertex, iMarker);
           nVertex[iMarker]++;
+          
         }
+        
       }
+    
   }
+  
 }
 
 void CPhysicalGeometry::SetCG(void) {
@@ -2580,19 +2619,17 @@ void CPhysicalGeometry::SetBoundControlVolume(CConfig *config, unsigned short ac
   double *Coord_Edge_CG = new double [nDim];
   double *Coord_Elem_CG = new double [nDim];
   double *Coord_Vertex = new double [nDim];
-  cout << "beg" << endl;
+
   /*--- Loop over all the markers ---*/
   for (iMarker = 0; iMarker < nMarker; iMarker++)
   /*--- Loop over all the boundary elements ---*/
     for (iElem = 0; iElem < nElem_Bound[iMarker]; iElem++)
     /*--- Loop over all the nodes of the boundary ---*/
       for(iNode = 0; iNode < bound[iMarker][iElem]->GetnNodes(); iNode++) {
-        cout << "ipoin" << endl;
 
         iPoint = bound[iMarker][iElem]->GetNode(iNode);
         iVertex = node[iPoint]->GetVertex(iMarker);
-        cout << iPoint <<    "   "<< iVertex << endl;
-
+        
         /*--- Loop over the neighbor nodes, there is a face for each one ---*/
         for(iNeighbor_Nodes = 0; iNeighbor_Nodes < bound[iMarker][iElem]->GetnNeighbor_Nodes(iNode); iNeighbor_Nodes++) {
           Neighbor_Node = bound[iMarker][iElem]->GetNeighbor_Nodes(iNode,iNeighbor_Nodes);
@@ -2618,7 +2655,6 @@ void CPhysicalGeometry::SetBoundControlVolume(CConfig *config, unsigned short ac
           }
         }
       }
-  cout << "after" << endl;
 
   delete[] Coord_Edge_CG;
   delete[] Coord_Elem_CG;
@@ -2632,7 +2668,6 @@ void CPhysicalGeometry::SetBoundControlVolume(CConfig *config, unsigned short ac
       Area = sqrt(Area);
       if (Area == 0.0) for (iDim = 0; iDim < nDim; iDim++) NormalFace[iDim] = EPS*EPS;
     }
-  cout << "end" << endl;
 
 }
 

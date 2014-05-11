@@ -117,12 +117,13 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
   nMarker      = config->GetnMarker_All();
   nPoint       = geometry->GetnPoint();
   nPointDomain = geometry->GetnPointDomain();
-  
+  nPointRepeated = geometry->GetnPointRepeated();
+
   /*--- Allocate the node variables (contiguous in memory) ---*/
-  node = new CVariable*[nPoint];
+  node = new CVariable*[nPoint+nPointRepeated];
   
   /*--- Allocate a contiguous chunk of memory for CEulerVariable ---*/
-  CEulerVariable* node_dummy = new CEulerVariable[nPoint];
+  CEulerVariable* node_dummy = new CEulerVariable[nPoint+nPointRepeated];
 
   /*--- This makes node contiguous in memory ---*/
   for (iPoint = 0; iPoint < nPoint; iPoint++)
@@ -174,7 +175,6 @@ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config, unsigned short 
   LinSysSol.Initialize(nPoint, nPointDomain, nVar, 0.0);
   
   /*--- Add some extra space for repeated points due to OpenMP edge loops ---*/
-  unsigned long nPointRepeated = geometry->GetnPointRepeated();
   LinSysRes.Initialize(nPoint+nPointRepeated, nPointDomain, nVar, 0.0);
   
   /*--- Jacobians and vector structures for implicit computations ---*/
@@ -672,8 +672,6 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
     
     for (iEdge_Local = 0; iEdge_Local < geometry->GetnEdge(iColor); iEdge_Local++) {
       
-      //  for (iEdge = 0; iEdge < geometry->GetnEdge(); iEdge++) {
-      
       /*--- Get the global edge number ---*/
       
       iEdge = geometry->GetGlobal_Edge(iEdge_Local, iColor);
@@ -718,9 +716,6 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
       LinSysRes.AddBlock(iPoint_Local, Res_Conv_private);
       LinSysRes.SubtractBlock(jPoint_Local, Res_Conv_private);
       
-      //      LinSysRes.AddBlock(iPoint, Res_Conv);
-      //      LinSysRes.SubtractBlock(jPoint, Res_Conv);
-      
       /*--- Set implicit computation ---*/
       if (implicit) {
         Jacobian.AddBlock(iPoint,iPoint,Jacobian_i);
@@ -728,6 +723,7 @@ void CEulerSolver::Centered_Residual(CGeometry *geometry, CSolver **solver_conta
         Jacobian.SubtractBlock(jPoint,iPoint,Jacobian_i);
         Jacobian.SubtractBlock(jPoint,jPoint,Jacobian_j);
       }
+      
     }
   } // end omp parallel
   
