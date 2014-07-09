@@ -560,8 +560,8 @@ void CConfig::SetConfig_Options() {
   /*--- Options related to freestream specification ---*/
   /* CONFIG_CATEGORY: Freestream Conditions */
   
-  /* DESCRIPTION: Specific gas constant (287.87 J/kg*K (air), only for compressible flows) */
-  AddScalarOption("GAS_CONSTANT", Gas_Constant, 287.87);
+  /* DESCRIPTION: Specific gas constant (287.058 J/kg*K (air), only for compressible flows) */
+  AddScalarOption("GAS_CONSTANT", Gas_Constant, 287.058);
   /* DESCRIPTION: Ratio of specific heats (1.4 (air), only for compressible flows) */
   AddScalarOption("GAMMA_VALUE", Gamma, 1.4);
   /* DESCRIPTION: Reynolds number (non-dimensional, based on the free-stream values) */
@@ -582,10 +582,10 @@ void CConfig::SetConfig_Options() {
   AddScalarOption("FREESTREAM_PRESSURE", Pressure_FreeStream, 101325.0);
   /* DESCRIPTION: Free-stream density (1.2886 Kg/m^3 (air), 998.2 Kg/m^3 (water)) */
   AddScalarOption("FREESTREAM_DENSITY", Density_FreeStream, -1.0);
-  /* DESCRIPTION: Free-stream temperature (273.15 K by default) */
-  AddScalarOption("FREESTREAM_TEMPERATURE", Temperature_FreeStream, 273.15);
-  /* DESCRIPTION: Free-stream vibrational-electronic temperature (273.15 K by default) */
-  AddScalarOption("FREESTREAM_TEMPERATURE_VE", Temperature_ve_FreeStream, 273.15);
+  /* DESCRIPTION: Free-stream temperature (288.15 K by default) */
+  AddScalarOption("FREESTREAM_TEMPERATURE", Temperature_FreeStream, 288.15);
+  /* DESCRIPTION: Free-stream vibrational-electronic temperature (288.15 K by default) */
+  AddScalarOption("FREESTREAM_TEMPERATURE_VE", Temperature_ve_FreeStream, 288.15);
   /* DESCRIPTION: Free-stream velocity (m/s) */
   AddArrayOption("FREESTREAM_VELOCITY", 3, Velocity_FreeStream, default_vec_3d);
   /* DESCRIPTION: Free-stream viscosity (1.853E-5 Ns/m^2 (air), 0.798E-3 Ns/m^2 (water)) */
