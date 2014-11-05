@@ -192,6 +192,9 @@ int main(int argc, char *argv[]) {
   grid_movement->SetVolume_Deformation(geometry_container[MESH_0], config_container, true);
   grid_movement->UpdateMultiGrid(geometry_container, config_container);
   
+  cout << "Writing a .su2 mesh file (mesh_AIRFOIL.su2)." << endl;
+  geometry_container[MESH_0]->SetMeshFile(config_container, "mesh_AIRFOIL.su2");
+
   /*--- Definition of the output class. The output class
    manages the writing of all restart, volume solution, surface solution,
    surface comma-separated value, and convergence history files (both in serial

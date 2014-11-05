@@ -4148,65 +4148,6 @@ void CConfig::SetNondimensionalization(unsigned short val_nDim) {
       cout << "Total time (s): " << Total_UnstTime << ". Time step (s): " << Delta_UnstTime << endl;
     }
     
-    /*--- Print out reference values. ---*/
-    cout <<"--Reference values:"<< endl;
-    cout << "Reference pressure (N/m^2): "      << Pressure_Ref    << endl;
-    
-    cout << "Reference temperature (K): "   << Temperature_Ref << endl;
-    cout << "Reference energy (kg.m/s^2): "       << Energy_FreeStream/Energy_FreeStreamND     << endl;
-    
-    cout << "Reference density (kg/m^3): "       << Density_Ref     << endl;
-    cout << "Reference velocity (m/s): "       << Velocity_Ref     << endl;
-    
-    if (Viscous)
-      cout << "Reference viscosity (N.s/m^2): "       << Viscosity_Ref     << endl;
-    
-    if (Unsteady)
-      cout << "Reference time (s): "        << Time_Ref      << endl;
-    
-    /*--- Print out resulting non-dim values here. ---*/
-    cout << "--Resulting non-dimensional state:" << endl;
-    cout << "Mach number (non-dimensional): " << Mach << endl;
-    if (Viscous) {
-      cout << "Reynolds number (non-dimensional): " << Reynolds << endl;
-      cout << "Reynolds length (m): "       << Length_Reynolds     << endl;
-    }
-    if (GravityForce) {
-      cout << "Froude number (non-dimensional): " << Froude << endl;
-      cout << "Lenght of the baseline wave (non-dimensional): " << 2.0*PI_NUMBER*Froude*Froude << endl;
-    }
-    
-    cout << "Specific gas constant (non-dimensional): "   << Gas_Constant << endl;
-    cout << "Freestream temperature (non-dimensional): "  << Temperature_FreeStreamND << endl;
-    cout << "Freestream pressure (non-dimensional): "     << Pressure_FreeStreamND    << endl;
-    cout << "Freestream density (non-dimensional): "      << Density_FreeStreamND     << endl;
-    if (val_nDim == 2) {
-      cout << "Freestream velocity (non-dimensional): (" << Velocity_FreeStreamND[0] << ",";
-      cout << Velocity_FreeStreamND[1] << ")" << endl;
-    } else if (val_nDim == 3) {
-      cout << "Freestream velocity (non-dimensional): (" << Velocity_FreeStreamND[0] << ",";
-      cout << Velocity_FreeStreamND[1] << "," << Velocity_FreeStreamND[2] << ")" << endl;
-    }
-    cout << "Freestream velocity magnitude (non-dimensional): "	 << ModVel_FreeStreamND << endl;
-    
-    if (turbulent){
-      cout << "Free-stream turb. kinetic energy (non-dimensional): " << Tke_FreeStreamND << endl;
-      cout << "Free-stream specific dissipation (non-dimensional): " << Omega_FreeStreamND << endl;
-    }
-    
-    cout << "Freestream energy (non-dimensional): "					 << Energy_FreeStreamND << endl;
-    
-    if (Viscous)
-      cout << "Freestream viscosity (non-dimensional): " << Viscosity_FreeStreamND << endl;
-    
-    if (Unsteady) {
-      cout << "Total time (non-dimensional): "				 << Total_UnstTimeND << endl;
-      cout << "Time step (non-dimensional): "				 << Delta_UnstTimeND << endl;
-    }
-    if (Grid_Movement) cout << "Force coefficients computed using MACH_MOTION." << endl;
-    else cout << "Force coefficients computed using freestream values." << endl;
-    
-    cout << "Note: Negative pressure, temperature or density is not allowed!" << endl;
   }
   
 }

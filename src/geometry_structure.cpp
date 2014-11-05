@@ -443,28 +443,6 @@ CPhysicalGeometry::CPhysicalGeometry(CConfig *config, unsigned short val_iZone, 
           node[Point_Surface]->SetSolidBoundary(true);
       }
   
-  /*--- Loop over the points element to re-scale the mesh, and plot it ---*/
-  
-  if (config->GetKind_SU2() == SU2_EDU) {
-    
-    Mesh_Scale_Change = config->GetMesh_Scale_Change();
-    
-    for (iPoint = 0; iPoint < nPoint; iPoint++) {
-      for (iDim = 0; iDim < nDim; iDim++) {
-        NewCoord[iDim] = Mesh_Scale_Change*node[iPoint]->GetCoord(iDim);
-      }
-      node[iPoint]->SetCoord(NewCoord);
-    }
-    
-    if (config->GetMesh_Output()) {
-      SetMeshFile(config, config->GetMesh_Out_FileName());
-      cout.precision(4);
-      cout << "Scaled mesh by a factor of " << Mesh_Scale_Change << endl;
-      cout << " and wrote to the output file: " << config->GetMesh_Out_FileName() << endl;
-    }
-    
-  }
-  
 }
 
 CPhysicalGeometry::~CPhysicalGeometry(void) {
