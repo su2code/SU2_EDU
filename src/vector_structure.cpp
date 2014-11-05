@@ -1,23 +1,23 @@
 /*!
  * \file vector_structure.cpp
  * \brief Main classes required for solving linear systems of equations
- * \author Current Development: Stanford University.
- * \version 1.1.0
+ * \author Aerospace Design Laboratory (Stanford University).
+ * \version 1.2.0
  *
- * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
+ * SU2 EDU, Copyright (C) 2014 Aerospace Design Laboratory (Stanford University).
  *
- * SU2 is free software; you can redistribute it and/or
+ * SU2 EDU is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * SU2 is distributed in the hope that it will be useful,
+ * SU2 EDU is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SU2 EDU. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../include/vector_structure.hpp"
@@ -40,7 +40,7 @@ CSysVector::CSysVector(const unsigned long & size, const double & val) {
     << "invalid input: size = " << size << endl;
     throw(-1);
   }
-  
+
   vec_val = new double[nElm];
   for (unsigned int i = 0; i < nElm; i++)
     vec_val[i] = val;
@@ -49,7 +49,7 @@ CSysVector::CSysVector(const unsigned long & size, const double & val) {
 
 CSysVector::CSysVector(const unsigned long & numBlk, const unsigned long & numBlkDomain, const unsigned short & numVar,
                        const double & val) {
-  
+
   nElm = numBlk*numVar; nElmDomain = numBlkDomain*numVar;
   nBlk = numBlk; nBlkDomain = numBlkDomain;
   nVar = numVar;
@@ -60,7 +60,7 @@ CSysVector::CSysVector(const unsigned long & numBlk, const unsigned long & numBl
     << "invalid input: numBlk, numVar = " << numBlk << "," << numVar << endl;
     throw(-1);
   }
-  
+	
   vec_val = new double[nElm];
   for (unsigned int i = 0; i < nElm; i++)
     vec_val[i] = val;
@@ -92,7 +92,7 @@ CSysVector::CSysVector(const unsigned long & size, const double* u_array) {
     << "invalid input: size = " << size << endl;
     throw(-1);
   }
-  
+
   vec_val = new double[nElm];
   for (unsigned long i = 0; i < nElm; i++)
     vec_val[i] = u_array[i];
@@ -101,7 +101,7 @@ CSysVector::CSysVector(const unsigned long & size, const double* u_array) {
 
 CSysVector::CSysVector(const unsigned long & numBlk, const unsigned long & numBlkDomain, const unsigned short & numVar,
                        const double* u_array) {
-  
+
   nElm = numBlk*numVar; nElmDomain = numBlkDomain*numVar;
   nBlk = numBlk; nBlkDomain = numBlkDomain;
   nVar = numVar;
@@ -112,7 +112,7 @@ CSysVector::CSysVector(const unsigned long & numBlk, const unsigned long & numBl
     << "invalid input: numBlk, numVar = " << numBlk << "," << numVar << endl;
     throw(-1);
   }
-  
+
   vec_val = new double[nElm];
   for (unsigned long i = 0; i < nElm; i++)
     vec_val[i] = u_array[i];
@@ -122,7 +122,7 @@ CSysVector::CSysVector(const unsigned long & numBlk, const unsigned long & numBl
 CSysVector::~CSysVector() {
   delete [] vec_val;
   nElm = -1;
-  nElmDomain = -1;
+	nElmDomain = -1;
   nBlk = -1;
   nBlkDomain = -1;
   nVar = -1;
@@ -140,10 +140,17 @@ void CSysVector::Initialize(const unsigned long & numBlk, const unsigned long & 
     << "invalid input: numBlk, numVar = " << numBlk << "," << numVar << endl;
     throw(-1);
   }
-  
+	
   vec_val = new double[nElm];
   for (unsigned long i = 0; i < nElm; i++)
     vec_val[i] = val;
+  
+}
+
+void CSysVector::Write_Vector(char *name) {
+  
+  spVec_utils SPVector;
+  SPVector.bsr_write(nVar, nBlk, vec_val, name);
   
 }
 
@@ -187,7 +194,7 @@ CSysVector & CSysVector::operator=(const CSysVector & u) {
   nElmDomain = u.nElmDomain;
   
   nBlk = u.nBlk;
-  nBlkDomain = u.nBlkDomain;
+	nBlkDomain = u.nBlkDomain;
   
   nVar = u.nVar;
   vec_val = new double[nElm];
@@ -323,19 +330,19 @@ void CSysVector::SetBlock(unsigned long val_ipoint, double *val_residual) {
 }
 
 void CSysVector::SetBlock(unsigned long val_ipoint, unsigned short val_var, double val_residual) {
-  
+
   vec_val[val_ipoint*nVar+val_var] = val_residual;
 }
 
 void CSysVector::SetBlock_Zero(unsigned long val_ipoint) {
   unsigned short iVar;
-  
+
   for (iVar = 0; iVar < nVar; iVar++)
     vec_val[val_ipoint*nVar+iVar] = 0.0;
 }
 
 void CSysVector::SetBlock_Zero(unsigned long val_ipoint, unsigned short val_var) {
-  vec_val[val_ipoint*nVar+val_var] = 0.0;
+    vec_val[val_ipoint*nVar+val_var] = 0.0;
 }
 
 double CSysVector::GetBlock(unsigned long val_ipoint, unsigned short val_var) {
@@ -365,4 +372,21 @@ double dotProd(const CSysVector & u, const CSysVector & v) {
   prod = loc_prod;
   
   return prod;
+}
+
+void spVec_utils::csr_write(unsigned long nrows, double* values,
+                            char* filename)
+{
+  FILE *fp=fopen(filename, "w");
+  fwrite(&(nrows), sizeof(nrows), 1, fp);
+  fwrite(values, sizeof(double), nrows, fp);
+  fclose (fp);
+}
+
+void spVec_utils::bsr_write(unsigned short bdim, unsigned long nbrows, double* bvalues, char* filename)
+{
+  FILE *fp=fopen(filename, "w");
+  fwrite(&(nbrows), sizeof(nbrows), 1, fp);
+  fwrite(bvalues, sizeof(double), nbrows*bdim, fp);
+  fclose (fp);
 }

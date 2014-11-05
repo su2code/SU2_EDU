@@ -2,23 +2,23 @@
  * \file vector_structure.hpp
  * \brief Headers for the classes related to linear solvers (CG, FGMRES, etc)
  *        The subroutines and functions are in the <i>linear_solvers_structure.cpp</i> file.
- * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.1.0
+ * \author Aerospace Design Laboratory (Stanford University).
+ * \version 1.2.0
  *
- * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
+ * SU2 EDU, Copyright (C) 2014 Aerospace Design Laboratory (Stanford University).
  *
- * SU2 is free software; you can redistribute it and/or
+ * SU2 EDU is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * SU2 is distributed in the hope that it will be useful,
+ * SU2 EDU is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SU2 EDU. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -31,6 +31,7 @@
 #include <iomanip>
 #include <string>
 #include <cstdlib>
+#include <stdio.h>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ const double eps = numeric_limits<double>::epsilon(); /*!< \brief machine epsilo
  * \class CSysVector
  * \brief Class for holding and manipulating vectors needed by linear solvers
  * \author J. Hicken.
- * \version 1.1.0
+ * \version 1.2.0
  *
  * We could use the STL vector as a base class here, but this gives us
  * more flexibility with the underlying data (e.g. we may decide to
@@ -87,6 +88,11 @@ public:
    * \param[in] u - CSysVector that is being copied
    */
   CSysVector(const CSysVector & u);
+  
+  /*!
+	 * \brief Sets to zero all the entries of the sparse matrix.
+	 */
+  void Write_Vector(char *name);
   
   /*!
 	 * \brief Sets to zero all the entries of the vector.
@@ -333,7 +339,7 @@ public:
  * \class CMatrixVectorProduct
  * \brief abstract base class for defining matrix-vector products
  * \author J. Hicken.
- * \version 1.1.0
+ * \version 1.2.0
  *
  * The Krylov-subspace solvers require only matrix-vector products and
  * not the actual matrix/Jacobian.  We need some way to indicate which
@@ -358,7 +364,7 @@ inline CMatrixVectorProduct::~CMatrixVectorProduct() {}
  * \class CPreconditioner
  * \brief abstract base class for defining preconditioning operation
  * \author J. Hicken.
- * \version 1.1.0
+ * \version 1.2.0
  *
  * See the remarks regarding the CMatrixVectorProduct class.  The same
  * idea applies here to the preconditioning operation.
@@ -370,5 +376,21 @@ public:
   const = 0; ///< preconditioning operation
 };
 inline CPreconditioner::~CPreconditioner() {}
+
+/*!
+ * \class spVec_utils
+ * \brief Class to output a vector
+ */
+class spVec_utils {
+private:
+  
+public:
+  
+  void csr_write(unsigned long nrows, double* values,
+                 char* filename);
+  
+  void bsr_write(unsigned short bdim, unsigned long nbrows, double* bvalues, char* filename);
+ 
+};
 
 #include "vector_structure.inl"

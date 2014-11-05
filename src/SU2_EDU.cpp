@@ -2,7 +2,7 @@
  * \file SU2_EDU.cpp
  * \brief Main file of Computational Fluid Dynamics Code (SU2_EDU).
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.1.0
+ * \version 1.2.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
   cout <<"|   \\___ \\  | |  | |   / /    Forum: www.cfd-online.com/Forums/su2/     |" << endl;
   cout <<"|   ____) | | |__| |  / /_                                              |" << endl;
   cout <<"|  |_____/   \\____/  |____|   Educational Code                          |" << endl;
-  cout <<"|                             Release 1.1.0                             |" << endl;
+  cout <<"|                             Release 1.2.0                             |" << endl;
   cout <<"-------------------------------------------------------------------------" << endl;
   cout << "| SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).       |" << endl;
   cout << "| SU2 is distributed in the hope that it will be useful,                |" << endl;
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
   /*--- Definition of the configuration option class. In this constructor,
    the input configuration file is parsed and all options are read and stored. ---*/
   
-  config_container = new CConfig(config_file_name, SU2_EDU, VERB_HIGH);
+  config_container = new CConfig(config_file_name, SU2_EDU, ZONE_0, 1, 2, VERB_HIGH);
   
   /*--- Perform the non-dimensionalization for the flow equations using the
    specified reference values. ---*/
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
    the multigrid structure which is stored in the CPhysicalGeometry class. ---*/
   
   geometry_container = new CGeometry*[config_container->GetMGLevels()+1];
-  geometry_container[MESH_0] = new CPhysicalGeometry(config_container);
+  geometry_container[MESH_0] = new CPhysicalGeometry(config_container, ZONE_0, 1);
   
   cout << endl <<"------------------------- Geometry Preprocessing ------------------------" << endl;
   
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
    (piecewise constant reconstruction) evaluated in each dual mesh volume. ---*/
   
   numerics_container = new CNumerics***[config_container->GetMGLevels()+1];
-  Numerics_Preprocessing(numerics_container, solver_container,geometry_container, config_container);
+  Numerics_Preprocessing(numerics_container, solver_container, geometry_container, config_container);
   
   /*--- Surface grid deformation using design variables ---*/
   cout << endl << "------------------------- Surface grid deformation ----------------------" << endl;

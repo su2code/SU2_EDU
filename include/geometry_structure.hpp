@@ -2,27 +2,33 @@
  * \file geometry_structure.hpp
  * \brief Headers of the main subroutines for creating the geometrical structure.
  *        The subroutines and functions are in the <i>geometry_structure.cpp</i> file.
- * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.1.0
+ * \author Aerospace Design Laboratory (Stanford University).
+ * \version 1.2.0
  *
- * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
+ * SU2 EDU, Copyright (C) 2014 Aerospace Design Laboratory (Stanford University).
  *
- * SU2 is free software; you can redistribute it and/or
+ * SU2 EDU is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * SU2 is distributed in the hope that it will be useful,
+ * SU2 EDU is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SU2 EDU. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
 
+#ifdef HAVE_METIS
+  #include "metis.h"
+#endif
+#ifdef HAVE_CGNS
+  #include "cgnslib.h"
+#endif
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -43,7 +49,7 @@ using namespace std;
  * \brief Parent class for defining the geometry of the problem (complete geometry, 
  *        multigrid agglomerated geometry, only boundary geometry, etc..)
  * \author F. Palacios.
- * \version 1.1.0
+ * \version 1.2.0
  */
 class CGeometry {
 protected:
@@ -101,16 +107,6 @@ public:
 																			 must be sent. */
 	vector<unsigned long> OldBoundaryElems[MAX_NUMBER_MARKER];  /*!< \brief Vector of old boundary elements. */
 
-  
-  
-  vector<unsigned long> SendTransfLocal[MAX_NUMBER_DOMAIN];	/*!< \brief Vector to store the type of transformation for this
-                                                             send point. */
-  vector<unsigned long> ReceivedTransfLocal[MAX_NUMBER_DOMAIN];	/*!< \brief Vector to store the type of transformation for this
-                                                                 received point. */
-	vector<unsigned long> SendDomainLocal[MAX_NUMBER_DOMAIN];								/*!< \brief SendDomain[from domain][to domain] and return the
-                                                                           point index of the node that must me sended. */
-	vector<unsigned long> ReceivedDomainLocal[MAX_NUMBER_DOMAIN];								/*!< \brief SendDomain[from domain][to domain] and return the
-                                                                               point index of the node that must me sended. */
   short *Marker_All_SendRecv;
   
 	/*--- Create vectors and distribute the values among the different planes queues ---*/
@@ -228,9 +224,9 @@ public:
 
 	/*! 
 	 * \brief Set the number of dimensions of the problem.
-	 * \param[in] val_ndim - Number of dimensions.
+	 * \param[in] val_nDim - Number of dimensions.
 	 */
-	void SetnDim(unsigned short val_ndim);
+	void SetnDim(unsigned short val_nDim);
 
 	/*! 
 	 * \brief Get the index of a marker.
@@ -308,28 +304,23 @@ public:
 	 * \brief A virtual member.
 	 * \param[in] config - Definition of the particular problem.		 
 	 */
-	virtual void ComputeReference_Area(CConfig *config);
-
-	/*! 
-	 * \brief A virtual member.
-	 */
-	virtual void SetEsuP(void);
+	virtual void SetPositive_ZArea(CConfig *config);
 
 	/*! 
 	 * \brief A virtual member.
 	 */	
-	virtual void SetPsuP(void);
+	virtual void SetPoint_Connectivity(void);
   
   /*!
 	 * \brief A virtual member.
    * \param[in] config - Definition of the particular problem.
 	 */
-	virtual void SetRCM(CConfig *config);
+	virtual void SetRCM_Ordering(CConfig *config);
   
 	/*!
 	 * \brief A virtual member.
 	 */		
-	virtual void SetEsuE(void);
+	virtual void SetElement_Connectivity(void);
 
 	/*! 
 	 * \brief A virtual member.
@@ -372,27 +363,6 @@ public:
 	/*! 
 	 * \brief A virtual member.
 	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void MatchNearField(CConfig *config);
-
-	/*! 
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	virtual void MatchInterface(CConfig *config);
-
-	/*! 
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] geometry_donor - Geometry of the donor zone.
-	 * \param[in] config_donor - Definition of the donor problem.
-	 */
-	virtual void MatchZone(CConfig *config, CGeometry *geometry_donor, CConfig *config_donor, 
-			unsigned short val_iZone, unsigned short val_nZone);
-
-	/*! 
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] action - Allocate or not the new elements.		 
 	 */
 	virtual void SetBoundControlVolume(CConfig *config, unsigned short action);
@@ -402,13 +372,20 @@ public:
 	 * \param[in] config_filename - Name of the file where the tecplot information is going to be stored.
 	 */
 	virtual void SetTecPlot(char config_filename[200]);
+  
+  /*!
+	 * \brief A virtual member.
+	 * \param[in] config_filename - Name of the file where the tecplot information is going to be stored.
+	 */
+	virtual void SetTecPlot(char config_filename[200], bool new_file);
 
 	/*! 
 	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.		 
-	 * \param[in] mesh_filename - Name of the file where the tecplot information is going to be stored.
+   * \param[in] mesh_filename - Name of the file where the tecplot information is going to be stored.
+   * \param[in] new_file - Boolean to decide if aopen a new file or add to a old one
+	 * \param[in] config - Definition of the particular problem.
 	 */
-	virtual void SetBoundTecPlot(CConfig *config, char mesh_filename[200]);
+	virtual void SetBoundTecPlot(char mesh_filename[200], bool new_file, CConfig *config);
 
 	/*! 
 	 * \brief A virtual member.
@@ -424,11 +401,9 @@ public:
 
 	/*! 
 	 * \brief A virtual member.
-	 * \param[in] geometry - Geometrical definition of the problem.
-	 * \param[in] config - Definition of the particular problem.
-	 * \param[in] val_domain - Number of domains for parallelization purposes.		 
+	 * \param[in] config - Definition of the particular problem.		 
 	 */
-	virtual void SetSendReceive(CConfig *config);
+	virtual void SetPeriodicBoundary(CConfig *config);
 
 	/*! 
 	 * \brief A virtual member.
@@ -448,7 +423,7 @@ public:
 	 * \brief A virtual member.
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 */	
-	virtual void SetPsuP(CGeometry *geometry);
+	virtual void SetPoint_Connectivity(CGeometry *geometry);
 
 	/*! 
 	 * \brief A virtual member.
@@ -493,42 +468,41 @@ public:
 	 * \param[in] val_mesh_out_filename - Name of the output file.
 	 */
 	virtual void SetMeshFile(CConfig *config, string val_mesh_out_filename, string val_mesh_in_filename);
-  
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  virtual double Compute_MaxThickness(double *Plane_P0, double *Plane_Normal, unsigned short iSection, vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface);
- 
-  /*!
-	 * \brief A virtual member.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-  virtual double Compute_AoA(double *Plane_P0, double *Plane_Normal, unsigned short iSection, vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface);
 
-  /*!
+	/*! 
 	 * \brief A virtual member.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-  virtual double Compute_Chord(double *Plane_P0, double *Plane_Normal, unsigned short iSection, vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface);
+	virtual void SetBoundSensitivity(CConfig *config);
 
-  /*!
+	/*! 
 	 * \brief A virtual member.
+	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
-   * \param[in] original_surface - <code>TRUE</code> if this is the undeformed surface; otherwise <code>FALSE</code>.
-   * \returns The minimum value of the airfoil thickness.
 	 */
-	virtual double Compute_Thickness(double *Plane_P0, double *Plane_Normal, unsigned short iSection, double Location, vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface);
-	
+	virtual void SetPeriodicBoundary(CGeometry *geometry, CConfig *config);
+
 	/*!
 	 * \brief A virtual member.
 	 * \param[in] config - Definition of the particular problem.
-   * \param[in] original_surface - <code>TRUE</code> if this is the undeformed surface; otherwise <code>FALSE</code>.
-   * \returns The total volume of the airfoil.
 	 */
-	virtual double Compute_Area(double *Plane_P0, double *Plane_Normal, unsigned short iSection, vector<double> &Xcoord_Airfoil, vector<double> &Ycoord_Airfoil, vector<double> &Zcoord_Airfoil, bool original_surface);
+	virtual void SetRotationalVelocity(CConfig *config);
+
+	/*!
+	 * \brief A virtual member.
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] iter - Current physical time step.
+	 */
+	virtual void SetGridVelocity(CConfig *config, unsigned long iter);
   
-	/*! 
+	/*!
+	 * \brief A virtual member.
+   * \param[in] geometry - Geometry of the fine mesh.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void SetRestricted_GridVelocity(CGeometry *fine_mesh, CConfig *config);
+  
+	/*!
 	 * \brief A virtual member.
 	 * \param[in] config - Definition of the particular problem.
 	 */
@@ -709,19 +683,25 @@ public:
    * \param[in] Intersection - Definition of the particular problem.
    * \returns If the intersection has has been successful.
 	 */
-  unsigned short ComputeSegmentPlane_Intersection(double *Segment_P0, double *Segment_P1, double *Plane_P0, double *Plane_Normal, double *Intersection);
+  unsigned short ComputeSegmentPlane_Intersection(double *Segment_P0, double *Segment_P1, double Variable_P0, double Variable_P1,
+                                                  double *Plane_P0, double *Plane_Normal, double *Intersection, double &Variable_Interp);
 
 };
 
-/*! 
+/*!
  * \class CPhysicalGeometry
  * \brief Class for reading a defining the primal grid which is read from the 
  *        grid file in .su2 format.
  * \author F. Palacios.
- * \version 1.1.0
+ * \version 1.2.0
  */
 class CPhysicalGeometry : public CGeometry {
 
+  long *Global_to_Local_Point;				/*!< \brief Global-local indexation for the points. */
+	unsigned long *Local_to_Global_Point;				/*!< \brief Local-global indexation for the points. */
+	unsigned short *Local_to_Global_Marker;	/*!< \brief Local to Global marker. */
+	unsigned short *Global_to_Local_Marker;	/*!< \brief Global to Local marker. */
+  
 public:
 
 	/*! 
@@ -736,13 +716,41 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] val_mesh_filename - Name of the file with the grid information.
 	 * \param[in] val_format - Format of the file with the grid information.
+	 * \param[in] val_iZone - Domain to be read from the grid file.
+	 * \param[in] val_nZone - Total number of domains in the grid file.
 	 */
-	CPhysicalGeometry(CConfig *config);
+	CPhysicalGeometry(CConfig *config, unsigned short val_iZone, unsigned short val_nZone);
 
+  /*!
+	 * \overload
+	 * \brief Reads the geometry of the grid and adjust the boundary
+	 *        conditions with the configuration file.
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] val_mesh_filename - Name of the file with the grid information.
+	 * \param[in] val_format - Format of the file with the grid information.
+	 * \param[in] val_iZone - Domain to be read from the grid file.
+	 * \param[in] val_nZone - Total number of domains in the grid file.
+	 */
+  CPhysicalGeometry(CGeometry *geometry, CConfig *config);
+  
 	/*! 
 	 * \brief Destructor of the class.
 	 */
 	~CPhysicalGeometry(void);
+  
+	/*!
+	 * \brief Get the local index that correspond with the global numbering index.
+	 * \param[in] val_ipoint - Global point.
+	 * \returns Local index that correspond with the global index.
+	 */
+	long GetGlobal_to_Local_Point(long val_ipoint);
+  
+	/*!
+	 * \brief Get the local marker that correspond with the global marker.
+	 * \param[in] val_ipoint - Global marker.
+	 * \returns Local marker that correspond with the global index.
+	 */
+	unsigned short GetGlobal_to_Local_Marker(unsigned short val_imarker);
   
   /*!
 	 * \brief Reads the geometry of the grid and adjust the boundary
@@ -750,8 +758,32 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] val_mesh_filename - Name of the file with the grid information.
 	 * \param[in] val_format - Format of the file with the grid information.
+	 * \param[in] val_iZone - Domain to be read from the grid file.
+	 * \param[in] val_nZone - Total number of domains in the grid file.
 	 */
-	void Read_SU2_Format(CConfig *config, string val_mesh_filename);
+	void Read_SU2_Format(CConfig *config, string val_mesh_filename, unsigned short val_iZone, unsigned short val_nZone);
+  
+  /*!
+	 * \brief Reads the geometry of the grid and adjust the boundary
+	 *        conditions with the configuration file.
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] val_mesh_filename - Name of the file with the grid information.
+	 * \param[in] val_format - Format of the file with the grid information.
+	 * \param[in] val_iZone - Domain to be read from the grid file.
+	 * \param[in] val_nZone - Total number of domains in the grid file.
+	 */
+	void Read_CGNS_Format(CConfig *config, string val_mesh_filename, unsigned short val_iZone, unsigned short val_nZone);
+  
+  /*!
+	 * \brief Reads the geometry of the grid and adjust the boundary
+	 *        conditions with the configuration file.
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] val_mesh_filename - Name of the file with the grid information.
+	 * \param[in] val_format - Format of the file with the grid information.
+	 * \param[in] val_iZone - Domain to be read from the grid file.
+	 * \param[in] val_nZone - Total number of domains in the grid file.
+	 */
+	void Read_NETCDF_Format(CConfig *config, string val_mesh_filename, unsigned short val_iZone, unsigned short val_nZone);
 
 	/*! 
 	 * \brief Find repeated nodes between two elements to identify the common face.
@@ -774,34 +806,29 @@ public:
 	 * \brief Compute surface area (positive z-direction) for force coefficient non-dimensionalization.
 	 * \param[in] config - Definition of the particular problem.
 	 */
-	void ComputeReference_Area(CConfig *config);
-
-	/*! 
-	 * \brief Set elements which surround a point.
-	 */
-	void SetEsuP(void);
+	void SetPositive_ZArea(CConfig *config);
 
 	/*! 
 	 * \brief Set points which surround a point.
 	 */
-	void SetPsuP(void);
-  
+	void SetPoint_Connectivity(void);
+
   /*!
 	 * \brief Set a renumbering using a Reverse Cuthill-McKee Algorithm
    * \param[in] config - Definition of the particular problem.
 	 */
-	void SetRCM(CConfig *config);
+	void SetRCM_Ordering(CConfig *config);
   
 	/*!
 	 * \brief Function declaration to avoid partially overridden classes.
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 */
-	void SetPsuP(CGeometry *geometry);
+	void SetPoint_Connectivity(CGeometry *geometry);
 
 	/*! 
 	 * \brief Set elements which surround an element.
 	 */
-	void SetEsuE(void);
+	void SetElement_Connectivity(void);
 
 	/*! 
 	 * \brief Set the volume element associated to each boundary element.
@@ -827,18 +854,6 @@ public:
 	void SetControlVolume(CConfig *config, unsigned short action);
 
 	/*! 
-	 * \brief Mach the near field boundary condition.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void MatchNearField(CConfig *config);
-
-	/*! 
-	 * \brief Mach the interface boundary condition.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void MatchInterface(CConfig *config);
-
-	/*! 
 	 * \brief Set boundary vertex structure of the control volume.
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] action - Allocate or not the new elements.
@@ -849,30 +864,51 @@ public:
 	 * \brief Set the Tecplot file.
 	 * \param[in] config_filename - Name of the file where the Tecplot 
 	 *            information is going to be stored.
+   * \param[in] new_file - Create a new file.
 	 */
-	void SetTecPlot(char config_filename[200]);
+	void SetTecPlot(char config_filename[200], bool new_file);
 
 	/*! 
 	 * \brief Set the output file for boundaries in Tecplot
 	 * \param[in] config - Definition of the particular problem.		 
 	 * \param[in] mesh_filename - Name of the file where the Tecplot 
-	 *            information is going to be stored.
+	 *            information is going to be stored.   
+   * \param[in] new_file - Create a new file.
 	 */
-	void SetBoundTecPlot(CConfig *config, char mesh_filename[200]);
+	void SetBoundTecPlot(char mesh_filename[200], bool new_file, CConfig *config);
 
 	/*! 
 	 * \brief Set the output file for boundaries in STL CAD format
 	 * \param[in] config - Definition of the particular problem.		 
 	 * \param[in] mesh_filename - Name of the file where the STL 
 	 *            information is going to be stored.
+   * \param[in] new_file - Create a new file.
 	 */
-	void SetBoundSTL(CConfig *config, char mesh_filename[200]);
+	void SetBoundSTL(char mesh_filename[200], bool new_file, CConfig *config) ;
 
 	/*! 
 	 * \brief Check the volume element orientation.
 	 * \param[in] config - Definition of the particular problem.		 
 	 */
 	void Check_Orientation(CConfig *config);
+  
+	/*!
+	 * \brief Set the rotational velocity at each node.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void SetRotationalVelocity(CConfig *config);
+
+	/*! 
+	 * \brief Set the grid velocity via finite differencing at each node.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void SetGridVelocity(CConfig *config, unsigned long iter);
+
+	/*!
+	 * \brief Set the periodic boundary conditions.
+	 * \param[in] config - Definition of the particular problem.		 
+	 */
+	void SetPeriodicBoundary(CConfig *config);
   
 	/*! 
 	 * \brief Do an implicit smoothing of the grid coordinates.
@@ -895,6 +931,12 @@ public:
 	 * \param[in] val_mesh_out_filename - Name of the output file.
 	 */
 	void SetMeshFile(CConfig *config, string val_mesh_out_filename, string val_mesh_in_filename);
+
+	/*! 
+	 * \brief Compute some parameters about the grid quality.
+	 * \param[out] statistics - Information about the grid quality, statistics[0] = (r/R)_min, statistics[1] = (r/R)_ave.		 
+	 */	
+	void GetQualityStatistics(double *statistics);
 
 	/*! 
 	 * \brief Find and store the closest neighbor to a vertex.
@@ -1041,7 +1083,7 @@ public:
  * \brief Class for defining the multigrid geometry, the main delicated part is the 
  *        agglomeration stage, which is done in the declaration.
  * \author F. Palacios.
- * \version 1.1.0
+ * \version 1.2.0
  */
 class CMultiGridGeometry : public CGeometry {
 
@@ -1052,6 +1094,7 @@ public:
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \param[in] config - Definition of the particular problem.
 	 * \param[in] iMesh - Level of the multigrid.
+	 * \param[in] iZone - Current zone in the mesh.
 	 */	
 	CMultiGridGeometry(CGeometry **geometry, CConfig *config_container, unsigned short iMesh);
 
@@ -1099,12 +1142,12 @@ public:
 	 * \brief Set points which surround a point.
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 */	
-	void SetPsuP(CGeometry *geometry);
+	void SetPoint_Connectivity(CGeometry *geometry);
 
 	/*! 
 	 * \brief Function declaration to avoid partially overridden classes.
 	 */	
-	void SetPsuP(void);
+	void SetPoint_Connectivity(void);
 
 	/*! 
 	 * \brief Set the edge structure of the agglomerated control volume.
@@ -1113,18 +1156,6 @@ public:
 	 * \param[in] action - Allocate or not the new elements.
 	 */	
 	void SetControlVolume(CConfig *config, CGeometry *geometry, unsigned short action);
-
-	/*! 
-	 * \brief Mach the near field boundary condition.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void MatchNearField(CConfig *config);
-
-	/*! 
-	 * \brief Mach the interface boundary condition.
-	 * \param[in] config - Definition of the particular problem.
-	 */
-	void MatchInterface(CConfig *config);
 
 	/*! 
 	 * \brief Set boundary vertex structure of the agglomerated control volume.
@@ -1200,10 +1231,115 @@ public:
 };
 
 /*! 
+ * \class CBoundaryGeometry
+ * \brief Class for only defining the boundary of the geometry, this class is only 
+ *        used in case we are not interested in the volumetric grid.
+ * \author F. Palacios.
+ * \version 1.2.0
+ */
+class CBoundaryGeometry : public CGeometry {
+  
+public:
+
+	/*! 
+	 * \brief Constructor of the class.
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] val_mesh_filename - Name of the file with the grid information, be careful 
+	 *            because as input file we don't use a .su2, in this case we use a .csv file.
+	 * \param[in] val_format - Format of the file with the grid information.
+	 */
+	CBoundaryGeometry(CConfig *config, string val_mesh_filename, unsigned short val_format);
+
+	/*! 
+	 * \brief Destructor of the class.
+	 */
+	~CBoundaryGeometry(void);
+
+	/*! 
+	 * \brief Set boundary vertex.
+	 */
+	void SetVertex(void);
+  
+  /*!
+	 * \brief Store boundary points which surround a point.
+	 */
+	void SetPoint_Connectivity(void);
+  
+	/*! 
+	 * \brief Compute the boundary geometrical structure.
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] action - Allocate or not the new elements.
+	 */
+	void SetBoundControlVolume(CConfig *config, unsigned short action);
+
+	/*! 
+	 * \brief Read the sensitivity from an input file.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void SetBoundSensitivity(CConfig *config);
+  
+  /*!
+	 * \brief Set the output file for boundaries in Tecplot with surface curvature.
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] mesh_filename - Name of the file where the Tecplot
+	 *            information is going to be stored.
+   * \param[in] new_file - Create a new file.
+	 */
+	void SetBoundTecPlot(char mesh_filename[200], bool new_file, CConfig *config);
+  
+};
+
+/*! 
+ * \class CPeriodicGeometry
+ * \brief Class for defining a periodic boundary condition.
+ * \author T. Economon, F. Palacios.
+ * \version 1.2.0
+ */
+class CPeriodicGeometry : public CGeometry {
+	CPrimalGrid*** newBoundPer;            /*!< \brief Boundary vector for new periodic elements (primal grid information). */
+	unsigned long *nNewElem_BoundPer;			/*!< \brief Number of new periodic elements of the boundary. */
+
+public:
+
+	/*! 
+	 * \brief Constructor of the class.
+	 * \param[in] geometry - Geometrical definition of the problem.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	CPeriodicGeometry(CGeometry *geometry, CConfig *config);
+
+	/*! 
+	 * \brief Destructor of the class.
+	 */
+	~CPeriodicGeometry(void);
+
+	/*! 
+	 * \brief Set the periodic boundaries of the grid.
+	 * \param[in] geometry - Geometrical definition of the problem.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void SetPeriodicBoundary(CGeometry *geometry, CConfig *config);
+
+	/*! 
+	 * \brief Set the Tecplot file.
+	 * \param[in] config_filename - Name of the file where the Tecplot 
+	 *            information is going to be stored.
+	 */
+	void SetTecPlot(char config_filename[200]);
+
+	/*! 
+	 * \brief Write the .su2 file.
+	 * \param[in] config - Definition of the particular problem.		 
+	 * \param[in] val_mesh_out_filename - Name of the output file.
+	 */
+	void SetMeshFile(CGeometry *geometry, CConfig *config, string val_mesh_out_filename);
+};
+
+/*! 
  * \struct CMultiGridQueue
  * \brief Class for a multigrid queue system
  * \author F. Palacios.
- * \version 1.1.0
+ * \version 1.2.0
  * \date Aug 12, 2012
  */
 class CMultiGridQueue {

@@ -1,27 +1,27 @@
 /*!
  * \file option_structure.hpp
  * \brief Defines classes for referencing options for easy input in CConfig
- * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.1.0
+ * \author Aerospace Design Laboratory (Stanford University).
+ * \version 1.2.0
  *
  * Many of the classes in this file are templated, and therefore must
  * be declared and defined here; to keep all elements together, there
  * is no corresponding .cpp file at this time.
  *
- * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
+ * SU2 EDU, Copyright (C) 2014 Aerospace Design Laboratory (Stanford University).
  *
- * SU2 is free software; you can redistribute it and/or
+ * SU2 EDU is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * SU2 is distributed in the hope that it will be useful,
+ * SU2 EDU is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SU2 EDU. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -88,27 +88,19 @@ inline string StringToUpperCase(const string & str) {
  * \brief different software components of SU2
  */
 enum SU2_COMPONENT {
-  SU2_CFD = 1,	/*!< \brief Running the SU2_CFD software. */
-  SU2_MDC = 2,	/*!< \brief Running the SU2_MDC software. */
-  SU2_GPC = 3,	/*!< \brief Running the SU2_GPC software. */
-  SU2_DDC = 4,	/*!< \brief Running the SU2_DDC software. */
-  SU2_MAC = 5,	/*!< \brief Running the SU2_MAC software. */
-  SU2_GDC = 6,	/*!< \brief Running the SU2_GDC software. */
-  SU2_PBC = 7,	/*!< \brief Running the SU2_PBC software. */
-  SU2_SMC = 8,	/*!< \brief Running the SU2_SMC software. */
+  SU2_EDU = 1,	/*!< \brief Running the SU2_EDU software. */
+  SU2_PRT = 4,	/*!< \brief Running the SU2_PRT software. */
   SU2_SOL = 9,	/*!< \brief Running the SU2_SOL software. */
-  SU2_EDU = 10	/*!< \brief Running the SU2_CFD software. */
 };
 
-const unsigned int MAX_PROCESSORS = 1000;	/*!< \brief Maximum number of processors. */
 const unsigned int MAX_PARAMETERS = 10;		/*!< \brief Maximum number of parameters for a design variable definition. */
-const unsigned int MAX_INDEX_VALUE = 100;	/*!< \brief Maximum value for a marker index. */
-const unsigned int MAX_NUMBER_MARKER = 200;	/*!< \brief Maximum number of domains. */
-const unsigned int MAX_NUMBER_FFD = 10;	/*!< \brief Maximum number of FFDBoxs for the FFD. */
+const unsigned int MAX_NUMBER_MARKER = 5000;	/*!< \brief Maximum number of markers. */
+const unsigned int MAX_NUMBER_PERIODIC = 10;	/*!< \brief Maximum number of periodic boundary conditions. */
+const unsigned int MAX_STRING_SIZE = 200;	/*!< \brief Maximum number of domains. */
+const unsigned int MAX_NUMBER_FFD = 10;	/*!< \brief Maximum number of FFDBoxes for the FFD. */
 const unsigned int MAX_SOLS = 6;		/*!< \brief Maximum number of solutions at the same time (dimension of solution container array). */
 const unsigned int MAX_TERMS = 6;		/*!< \brief Maximum number of terms in the numerical equations (dimension of solver container array). */
 const unsigned int MAX_ZONES = 3; /*!< \brief Maximum number of zones. */
-const unsigned int MAX_OUTPUT_VARS = 20; /*!< \brief Maximum number of output vars for each solution container. */
 const unsigned int NO_RK_ITER = 0;		/*!< \brief No Runge-Kutta iteration. */
 const unsigned int MESH_0 = 0;			/*!< \brief Definition of the finest grid level. */
 const unsigned int MESH_1 = 1;			/*!< \brief Definition of the finest grid level. */
@@ -131,9 +123,6 @@ const double ONE2 = 0.5;			/*!< \brief One divided by two. */
 const double TWO3 = 2.0 / 3.0;			/*!< \brief Two divided by three. */
 const double FOUR3 = 4.0 / 3.0;			/*!< \brief Four divided by three. */
 const double PI_NUMBER = 4.0 * atan(1.0);	/*!< \brief Pi number. */
-const unsigned int MAX_NUMBER_DOMAIN = 1000;	/*!< \brief Maximum number of domains. */
-const unsigned int MAX_COMM_LEVEL = 1000;	/*!< \brief Maximum number of communication levels. */
-const unsigned int MAX_NUMBER_PERIODIC = 10;	/*!< \brief Maximum number of periodic boundary conditions. */
 const int MASTER_NODE = 0;			/*!< \brief Master node for MPI parallelization. */
 const int SINGLE_NODE = 1;			/*!< \brief There is only a node in the MPI parallelization. */
 const int AUX_NODE = 1;			/*!< \brief Computational node that is used for IO stuff. */
@@ -182,7 +171,23 @@ enum ENUM_SOLVER {
   EULER = 1,				/*!< \brief Definition of the Euler's solver. */
   NAVIER_STOKES = 2,			/*!< \brief Definition of the Navier-Stokes' solver. */
   RANS = 3,				/*!< \brief Definition of the Reynolds-averaged Navier-Stokes' (RANS) solver. */
-  TEMPLATE_SOLVER = 4                  /*!< \brief Definition of template solver. */
+  POISSON_EQUATION = 4,       	/*!< \brief Definition of the poisson potential solver. */
+  WAVE_EQUATION = 10,	/*!< \brief Definition of the wave solver. */
+  HEAT_EQUATION = 29,								/*!< \brief Definition of the heat solver. */
+  LINEAR_ELASTICITY = 11,	/*!< \brief Definition of the FEA solver. */
+  FLUID_STRUCTURE_EULER = 12,	/*!< \brief Definition of the FEA solver. */
+  FLUID_STRUCTURE_NAVIER_STOKES = 13,	/*!< \brief Definition of the FEA solver. */
+  FLUID_STRUCTURE_RANS = 14,	/*!< \brief Definition of the FEA solver. */
+  ADJ_EULER = 18,			/*!< \brief Definition of the continuous adjoint Euler's solver. */
+  ADJ_NAVIER_STOKES = 19,		/*!< \brief Definition of the continuous adjoint Navier-Stokes' solver. */
+  ADJ_RANS = 20,				/*!< \brief Definition of the continuous adjoint Reynolds-averaged Navier-Stokes' (RANS) solver. */
+  LIN_EULER = 21,			/*!< \brief Definition of the linear Euler's solver. */
+  LIN_NAVIER_STOKES = 22,		/*!< \brief Definition of the linear Navier-Stokes' solver. */
+  TEMPLATE_SOLVER = 30,                  /*!< \brief Definition of template solver. */
+  TNE2_EULER = 31,
+  TNE2_NAVIER_STOKES = 32,
+  ADJ_TNE2_EULER = 33,
+  ADJ_TNE2_NAVIER_STOKES = 34
 };
 /* BEGIN_CONFIG_ENUMS */
 static const map<string, ENUM_SOLVER> Solver_Map = CCreateMap<string, ENUM_SOLVER>
@@ -190,6 +195,22 @@ static const map<string, ENUM_SOLVER> Solver_Map = CCreateMap<string, ENUM_SOLVE
 ("EULER", EULER)
 ("NAVIER_STOKES", NAVIER_STOKES)
 ("RANS", RANS)
+("POISSON_EQUATION", POISSON_EQUATION)
+("ADJ_EULER", ADJ_EULER)
+("ADJ_NAVIER_STOKES", ADJ_NAVIER_STOKES)
+("ADJ_RANS", ADJ_RANS )
+("LIN_EULER", LIN_EULER)
+("LIN_NAVIER_STOKES", LIN_NAVIER_STOKES)
+("TNE2_EULER", TNE2_EULER)
+("TNE2_NAVIER_STOKES", TNE2_NAVIER_STOKES)
+("ADJ_TNE2_EULER", ADJ_TNE2_EULER)
+("ADJ_TNE2_NAVIER_STOKES", ADJ_TNE2_NAVIER_STOKES)
+("WAVE_EQUATION", WAVE_EQUATION)
+("HEAT_EQUATION", HEAT_EQUATION)
+("LINEAR_ELASTICITY", LINEAR_ELASTICITY)
+("FLUID_STRUCTURE_EULER", FLUID_STRUCTURE_EULER)
+("FLUID_STRUCTURE_NAVIER_STOKES", FLUID_STRUCTURE_NAVIER_STOKES)
+("FLUID_STRUCTURE_RANS", FLUID_STRUCTURE_RANS)
 ("TEMPLATE_SOLVER", TEMPLATE_SOLVER);
 
 /*!
@@ -212,11 +233,39 @@ static const map<string, ENUM_REGIME> Regime_Map = CCreateMap<string, ENUM_REGIM
 enum RUNTIME_TYPE {
   RUNTIME_FLOW_SYS = 2,			/*!< \brief One-physics case, the code is solving the flow equations(Euler and Navier-Stokes). */
   RUNTIME_TURB_SYS = 3,			/*!< \brief One-physics case, the code is solving the turbulence model. */
-  RUNTIME_MULTIGRID_SYS = 4,   	/*!< \brief Full Approximation Storage Multigrid system of equations. */
+  RUNTIME_POISSON_SYS = 4,			/*!< \brief One-physics case, the code is solving the poissonal potential equation. */
+  RUNTIME_ADJPOT_SYS = 5,		/*!< \brief One-physics case, the code is solving the adjoint potential flow equation. */
+  RUNTIME_ADJFLOW_SYS = 6,		/*!< \brief One-physics case, the code is solving the adjoint equations is being solved (Euler and Navier-Stokes). */
+  RUNTIME_ADJTURB_SYS = 7,		/*!< \brief One-physics case, the code is solving the adjoint turbulence model. */
+  RUNTIME_WAVE_SYS = 8,		/*!< \brief One-physics case, the code is solving the wave equation. */
+  RUNTIME_LINPOT_SYS = 9,		/*!< \brief One-physics case, the code is solving the linear potential flow equations. */
+  RUNTIME_LINFLOW_SYS = 10,		/*!< \brief One-physics case, the code is solving the linear equations is being solved (Euler and Navier-Stokes). */
+  RUNTIME_MULTIGRID_SYS = 14,   	/*!< \brief Full Approximation Storage Multigrid system of equations. */
+  RUNTIME_FEA_SYS = 20,		/*!< \brief One-physics case, the code is solving the FEA equation. */
+  RUNTIME_HEAT_SYS = 21,		/*!< \brief One-physics case, the code is solving the heat equation. */
+  RUNTIME_TRANS_SYS = 22,			/*!< \brief One-physics case, the code is solving the turbulence model. */
+  RUNTIME_TNE2_SYS = 23,  /*!< \brief One-physics case, the code is solving the two-temperature model. */
+  RUNTIME_ADJTNE2_SYS = 24  /*!< \brief One-physics case, the code is solving the two-temperature model. */
 };
 
 const int FLOW_SOL = 0;		/*!< \brief Position of the mean flow solution in the solver container array. */
+const int ADJFLOW_SOL = 1;	/*!< \brief Position of the continuous adjoint flow solution in the solver container array. */
+const int LINFLOW_SOL = 1;	/*!< \brief Position of the linearized flow solution in the solution solver array. */
+
 const int TURB_SOL = 2;		/*!< \brief Position of the turbulence model solution in the solver container array. */
+const int ADJTURB_SOL = 3;	/*!< \brief Position of the continuous adjoint turbulence solution in the solver container array. */
+const int LINTURB_SOL = 3;	/*!< \brief Position of the linearized turbulence model in the solver container array. */
+
+const int TNE2_SOL = 0;		/*!< \brief Position of the mean flow solution in the solution container array. */
+const int ADJTNE2_SOL = 1;	/*!< \brief Position of the continuous adjoint flow solution in the solution container array. */
+const int LINTNE2_SOL = 1;	/*!< \brief Position of the linearized flow solution in the solution container array. */
+
+const int TRANS_SOL = 4;	/*!< \brief Position of the transition model solution in the solver container array. */
+const int POISSON_SOL = 2;		/*!< \brief Position of the electronic potential solution in the solver container array. */
+const int WAVE_SOL = 1;		/*!< \brief Position of the wave equation in the solution solver array. */
+const int HEAT_SOL = 2;		/*!< \brief Position of the heat equation in the solution solver array. */
+const int FEA_SOL = 1;		/*!< \brief Position of the FEA equation in the solution solver array. */
+
 const int TEMPLATE_SOL = 0;     /*!< \brief Position of the template solution. */
 
 const int CONV_TERM = 0;	/*!< \brief Position of the convective terms in the numerics container array. */
@@ -225,6 +274,20 @@ const int SOURCE_FIRST_TERM = 2;        /*!< \brief Position of the first source
 const int SOURCE_SECOND_TERM = 3;   /*!< \brief Position of the second source term in the numerics container array. */
 const int CONV_BOUND_TERM = 4;       /*!< \brief Position of the convective boundary terms in the numerics container array. */
 const int VISC_BOUND_TERM = 5;       /*!< \brief Position of the viscous boundary terms in the numerics container array. */
+
+/*!
+ * \brief types of mathematical problem to solve
+ */
+enum ENUM_MATH_PROBLEM {
+  DIRECT_PROBLEM = 0,		/*!< \brief Direct problem */
+  ADJOINT_PROBLEM = 1,		/*!< \brief Adjoint problem */
+  LINEARIZED_PROBLEM = 2 /*< \brief Linearized numerical method */
+};
+static const map<string, ENUM_MATH_PROBLEM> Math_Problem_Map = CCreateMap<string, ENUM_MATH_PROBLEM>
+("DIRECT", DIRECT_PROBLEM)
+("ADJOINT", ADJOINT_PROBLEM)
+("LINEARIZED", LINEARIZED_PROBLEM);
+
 
 /*!
  * \brief types of spatial discretizations
@@ -252,6 +315,7 @@ enum ENUM_GASMODEL {
   AIR5 = 6,
   ARGON_SID = 7,
   ONESPECIES = 8
+  
 };
 static const map<string, ENUM_GASMODEL> GasModel_Map = CCreateMap<string, ENUM_GASMODEL>
 ("NONE", NO_MODEL)
@@ -277,7 +341,8 @@ enum ENUM_GRIDMOVEMENT {
   AEROELASTIC = 6,    /*!< \brief Simulation with aeroelastic motion. */
   MOVING_WALL = 7,    /*!< \brief Simulation with moving walls (translation/rotation). */
   ROTATING_FRAME = 8,    /*!< \brief Simulation in a rotating frame. */
-  ELASTICITY = 9    /*!< \brief Linear Elasticity. */
+  ELASTICITY = 9,    /*!< \brief Linear Elasticity. */
+  AEROELASTIC_RIGID_MOTION = 10 /*!< \brief Simulation with rotation and aeroelastic motion. */
   
 };
 static const map<string, ENUM_GRIDMOVEMENT> GridMovement_Map = CCreateMap<string, ENUM_GRIDMOVEMENT>
@@ -290,22 +355,27 @@ static const map<string, ENUM_GRIDMOVEMENT> GridMovement_Map = CCreateMap<string
 ("AEROELASTIC", AEROELASTIC)
 ("ROTATING_FRAME", ROTATING_FRAME)
 ("ELASTICITY", ELASTICITY)
-("MOVING_WALL", MOVING_WALL);
+("MOVING_WALL", MOVING_WALL)
+("AEROELASTIC_RIGID_MOTION", AEROELASTIC_RIGID_MOTION);
 
 /*!
  * \brief type of wind gusts
  */
 enum ENUM_GUST_TYPE {
-  NO_GUST = 0,        /*!< \brief _______. */
-  TOP_HAT = 1, 		/*!< \brief Top-hat function shaped gust  */
-  SINE = 2,  		/*!< \brief  Sine shaped gust */
+  NO_GUST = 0,      /*!< \brief _______. */
+  TOP_HAT = 1,      /*!< \brief Top-hat function shaped gust  */
+  SINE = 2,         /*!< \brief  Sine shaped gust */
   ONE_M_COSINE = 3, /*!< \brief  1-cosine shaped gust */
+  VORTEX = 4,       /*!< \brief  A gust made from vortices */
+  EOG = 5           /*!< \brief  An extreme operating gust */
 };
 static const map<string, ENUM_GUST_TYPE> Gust_Type_Map = CCreateMap<string, ENUM_GUST_TYPE>
 ("NONE", NO_GUST)
 ("TOP_HAT", TOP_HAT)
 ("SINE", SINE)
-("ONE_M_COSINE", ONE_M_COSINE);
+("ONE_M_COSINE", ONE_M_COSINE)
+("VORTEX", VORTEX)
+("EOG", EOG);
 
 /*!
  * \brief type of wind direction
@@ -318,76 +388,78 @@ static const map<string, ENUM_GUST_DIR> Gust_Dir_Map = CCreateMap<string, ENUM_G
 ("X_DIR", X_DIR)
 ("Y_DIR", Y_DIR);
 
+// If you add to ENUM_CENTERED, you must also add the option to ENUM_CONVECTIVE
 /*!
  * \brief types of centered spatial discretizations
  */
 enum ENUM_CENTERED {
-  NO_CENTERED = 0,               /*!< \brief No centered scheme is used. */
-  JST = 1,			/*!< \brief Jameson-Smith-Turkel centered numerical method. */
-  LAX = 2			/*!< \brief Lax-Friedrich centered numerical method. */
+  NO_CENTERED = 0,    /*!< \brief No centered scheme is used. */
+  JST = 1,            /*!< \brief Jameson-Smith-Turkel centered numerical method. */
+  LAX = 2,            /*!< \brief Lax-Friedrich centered numerical method. */
+  JST_KE = 4          /*!< \brief Kinetic Energy preserving Jameson-Smith-Turkel centered numerical method. */
 };
 static const map<string, ENUM_CENTERED> Centered_Map = CCreateMap<string, ENUM_CENTERED>
 ("NONE", NO_CENTERED)
 ("JST", JST)
+("JST_KE", JST_KE)
 ("LAX-FRIEDRICH", LAX);
 
+
+// If you add to ENUM_UPWIND, you must also add the option to ENUM_CONVECTIVE
 /*!
  * \brief types of upwind spatial discretizations
  */
 enum ENUM_UPWIND {
-  NO_UPWIND = 0,                /*!< \brief No upwind scheme is used. */
-  ROE_1ST = 1,			/*!< \brief First order Roe's upwind numerical method. */
-  ROE_2ND = 2,			/*!< \brief Second order Roe's upwind numerical method. */
-  SCALAR_UPWIND_1ST = 3,	/*!< \brief First order scalar upwind numerical method. */
-  SCALAR_UPWIND_2ND = 4,	/*!< \brief Second order scalar upwind numerical method. */
-  CONVECTIVE_TEMPLATE = 5,       /*!< \brief Template for new numerical method . */
-  AUSM_1ST = 6,			/*!< \brief First order AUSM numerical method. */
-  AUSM_2ND = 7,			/*!< \brief Second order AUSM numerical method. */
-  HLLC_1ST = 8,			/*!< \brief First order HLLC numerical method. */
-  HLLC_2ND = 9,			/*!< \brief Second order HLLC numerical method. */
-  SW_1ST = 10,			/*!< \brief First order Steger-Warming method. */
-  SW_2ND = 11,      /*!< \brief Second order Steger-Warming method. */
-  MSW_1ST = 12,     /*!< \brief First order Modified Steger-Warming method. */
-  MSW_2ND = 13,     /*!< \brief Second order Modified Steger-Warming method. */
-  ROE_TURKEL_1ST = 14,			/*!< \brief First order Roe-Turkel's upwind numerical method. */
-  ROE_TURKEL_2ND = 15,			/*!< \brief Second order Roe-Turkel's upwind numerical method. */
-  AUSMPWPLUS_1ST = 16,  /*!< \brief First order AUSMPW+ numerical method. */
-  AUSMPWPLUS_2ND = 17   /*!< \brief Second order AUSMPW+ numerical method. */
-  
+  NO_UPWIND = 0,              /*!< \brief No upwind scheme is used. */
+  ROE = 1,                    /*!< \brief Roe's upwind numerical method. */
+  SCALAR_UPWIND = 2,          /*!< \brief Scalar upwind numerical method. */
+  AUSM = 3,                   /*!< \brief AUSM numerical method. */
+  HLLC = 4,                   /*!< \brief HLLC numerical method. */
+  SW = 5,                     /*!< \brief Steger-Warming method. */
+  MSW = 6,                    /*!< \brief Modified Steger-Warming method. */
+  TURKEL = 7,                 /*!< \brief Roe-Turkel's upwind numerical method. */
+  AUSMPWPLUS = 8,             /*!< \brief AUSMPW+ numerical method. */
+  CUSP = 9,                   /*!< \brief Convective upwind and split pressure numerical method. */
+  CONVECTIVE_TEMPLATE = 10    /*!< \brief Template for new numerical method . */
 };
 static const map<string, ENUM_UPWIND> Upwind_Map = CCreateMap<string, ENUM_UPWIND>
 ("NONE", NO_UPWIND)
-("ROE-1ST_ORDER", ROE_1ST)
-("ROE-2ND_ORDER", ROE_2ND)
-("ROE_TURKEL_1ST", ROE_TURKEL_1ST)
-("ROE_TURKEL_2ND", ROE_TURKEL_2ND)
-("AUSM-1ST_ORDER", AUSM_1ST)
-("AUSM-2ND_ORDER", AUSM_2ND)
-("AUSMPW+-1ST_ORDER", AUSMPWPLUS_1ST)
-("AUSMPW+-2ND_ORDER", AUSMPWPLUS_2ND)
-("HLLC-1ST_ORDER", HLLC_1ST)
-("HLLC-2ND_ORDER", HLLC_2ND)
-("SW-1ST_ORDER", SW_1ST)
-("SW-2ND_ORDER", SW_2ND)
-("MSW-1ST_ORDER", MSW_1ST)
-("MSW-2ND_ORDER", MSW_2ND)
-("SCALAR_UPWIND-1ST_ORDER", SCALAR_UPWIND_1ST)
-("SCALAR_UPWIND-2ND_ORDER", SCALAR_UPWIND_2ND)
+("ROE", ROE)
+("TURKEL_PREC", TURKEL)
+("AUSM", AUSM)
+("AUSMPW+", AUSMPWPLUS)
+("HLLC", HLLC)
+("SW", SW)
+("MSW", MSW)
+("CUSP", CUSP)
+("SCALAR_UPWIND", SCALAR_UPWIND)
 ("CONVECTIVE_TEMPLATE", CONVECTIVE_TEMPLATE);
+
+/*!
+ * \brief Spatial numerical order integration
+ */
+enum ENUM_SPATIAL_ORDER {
+  FIRST_ORDER = 0,        /*!< \brief First order */
+  SECOND_ORDER = 1,        /*!< \brief Second order. */
+  SECOND_ORDER_LIMITER = 2 /*!< \brief Second order with limiter. */
+};
+static const map<string, ENUM_SPATIAL_ORDER> SpatialOrder_Map = CCreateMap<string, ENUM_SPATIAL_ORDER>
+("1ST_ORDER", FIRST_ORDER)
+("2ND_ORDER", SECOND_ORDER)
+("2ND_ORDER_LIMITER", SECOND_ORDER_LIMITER);
 
 /*!
  * \brief types of slope limiters
  */
 enum ENUM_LIMITER {
-  NO_LIMITER = 0,       /*!< \brief No slope limiter */
-  VENKATAKRISHNAN = 1,	/*!< \brief Slope limiter using Venkatakrisnan method. */
-  MINMOD = 2,           /*!< \brief Slope limiter using minmod method. */
-  SHARP_EDGES = 3       /*!< \brief Slope limiter using sharp edges. */
+  VENKATAKRISHNAN = 0,	/*!< \brief Slope limiter using Venkatakrisnan method. */
+  MINMOD = 1,           /*!< \brief Slope limiter using minmod method. */
+  SHARP_EDGES = 2       /*!< \brief Slope limiter using sharp edges. */
 };
 static const map<string, ENUM_LIMITER> Limiter_Map = CCreateMap<string, ENUM_LIMITER>
-("NONE", NO_LIMITER)
 ("VENKATAKRISHNAN", VENKATAKRISHNAN)
-("MINMOD", MINMOD);
+("MINMOD", MINMOD)
+("SHARP_EDGES", SHARP_EDGES);
 
 /*!
  * \brief types of viscous term discretizations
@@ -395,12 +467,14 @@ static const map<string, ENUM_LIMITER> Limiter_Map = CCreateMap<string, ENUM_LIM
 enum ENUM_VISCOUS {
   NO_VISCOUS = 0,               /*!< \brief No viscous term computation. */
   AVG_GRAD = 1,			/*!< \brief Average of gradients method for viscous term computation. */
-  AVG_GRAD_CORRECTED = 2	/*!< \brief Average of gradients with correction for viscous term computation. */
+  AVG_GRAD_CORRECTED = 2,	/*!< \brief Average of gradients with correction for viscous term computation. */
+  GALERKIN = 3			/*!< \brief Galerkin method for viscous term computation. */
 };
 static const map<string, ENUM_VISCOUS> Viscous_Map = CCreateMap<string, ENUM_VISCOUS>
 ("NONE", NO_VISCOUS)
 ("AVG_GRAD", AVG_GRAD)
-("AVG_GRAD_CORRECTED", AVG_GRAD_CORRECTED);
+("AVG_GRAD_CORRECTED", AVG_GRAD_CORRECTED)
+("GALERKIN", GALERKIN);
 
 /*!
  * \brief types of source term methods to use
@@ -408,11 +482,13 @@ static const map<string, ENUM_VISCOUS> Viscous_Map = CCreateMap<string, ENUM_VIS
 enum ENUM_SOURCE {
   NO_SOURCE = 0,                /*!< \brief No source term. */
   PIECEWISE_CONSTANT = 1,	/*!< \brief Numerical method for source term in flow equations. */
+  CHARGE_DIST = 2,		/*!< \brief Numerical method for source term in charge distribution. */
   SOURCE_TEMPLATE = 4           /*!< \brief Template for New numerical method for source term. */
 };
 static const map<string, ENUM_SOURCE> Source_Map = CCreateMap<string, ENUM_SOURCE>
 ("NONE", NO_SOURCE)
 ("PIECEWISE_CONSTANT", PIECEWISE_CONSTANT)
+("CHARGE_DIST", CHARGE_DIST)
 ("TEMPLATE_SOURCE_METHOD", SOURCE_TEMPLATE);
 
 /*!
@@ -434,12 +510,14 @@ static const map<string, ENUM_SOURCEJAC> SourceJac_Map = CCreateMap<string, ENUM
 enum ENUM_TURB_MODEL {
   NO_TURB_MODEL = 0,            /*!< \brief No turbulence model. */
   SA = 1,                       /*!< \brief Kind of Turbulent model (Spalart-Allmaras). */
-  SST = 2       		/*!< \brief Kind of Turbulence model (Menter SST). */
+  SST = 2,       		/*!< \brief Kind of Turbulence model (Menter SST). */
+  ML  = 3       		/*!< \brief Kind of Turbulence model (Machine Learning). */
 };
 static const map<string, ENUM_TURB_MODEL> Turb_Model_Map = CCreateMap<string, ENUM_TURB_MODEL>
 ("NONE", NO_TURB_MODEL)
 ("SA", SA)
-("SST", SST);
+("SST", SST)
+("ML", ML);
 
 /*!
  * \brief types of transition models
@@ -466,13 +544,13 @@ static const map<string, ENUM_TIME_INT> Time_Int_Map = CCreateMap<string, ENUM_T
 ("EULER_IMPLICIT", EULER_IMPLICIT);
 
 /*!
- * \brief types of schemes to compute the gradient
+ * \brief types of schemes to compute the flow gradient
  */
-enum ENUM_GRADIENT {
+enum ENUM_FLOW_GRADIENT {
   GREEN_GAUSS = 1,		/*!< \brief Gradients computation using Green Gauss theorem. */
   WEIGHTED_LEAST_SQUARES = 2	/*!< \brief Gradients computation using Weighted Least Squares. */
 };
-static const map<string, ENUM_GRADIENT> Gradient_Map = CCreateMap<string, ENUM_GRADIENT>
+static const map<string, ENUM_FLOW_GRADIENT> Gradient_Map = CCreateMap<string, ENUM_FLOW_GRADIENT>
 ("GREEN_GAUSS", GREEN_GAUSS)
 ("WEIGHTED_LEAST_SQUARES", WEIGHTED_LEAST_SQUARES);
 
@@ -523,6 +601,12 @@ enum BC_TYPE {
   ISOTHERMAL = 28,      /*!< \brief No slip isothermal wall boundary condition. */
   HEAT_FLUX  = 29,      /*!< \brief No slip constant heat flux wall boundary condition. */
   PRESSURE_BOUNDARY = 30,   	/*!< \brief Pressure boundary condition. */
+  HEAT_FLUX_NONCATALYTIC = 31, /*!< \brief No-slip, constant heat flux, noncatalytic bc. */
+  HEAT_FLUX_CATALYTIC= 32, /*!< \brief No-slip, constant heat flux, catalytic bc. */
+  ISOTHERMAL_NONCATALYTIC = 33, /*!< \brief No-slip, constant temperature, noncatalytic bc. */
+  ISOTHERMAL_CATALYTIC = 34, /*!< \brief No-slip, constant temperature, catalytic bc. */
+  ACTDISK_INLET = 35,	/*!< \brief Actuator disk inlet boundary definition. */
+  ACTDISK_OUTLET = 36,	/*!< \brief Actuator disk outlet boundary definition. */
   SEND_RECEIVE = 99		/*!< \brief Boundary send-receive definition. */
 };
 
@@ -555,42 +639,41 @@ enum GEO_TYPE {
  * \brief types of objective functions
  */
 enum ENUM_OBJECTIVE {
-  DRAG_COEFFICIENT = 1, 	/*!< \brief Drag objective function definition. */
-  LIFT_COEFFICIENT = 2, 	/*!< \brief Lift objective function definition. */
-  SIDEFORCE_COEFFICIENT = 3,	/*!< \brief Side force objective function definition. */
-  EFFICIENCY = 4,		/*!< \brief Efficiency objective function definition. */
-  PRESSURE_COEFFICIENT = 5,	/*!< \brief Pressure objective function definition. */
-  MOMENT_X_COEFFICIENT = 6,	/*!< \brief Pitching moment objective function definition. */
-  MOMENT_Y_COEFFICIENT = 7,	/*!< \brief Rolling moment objective function definition. */
-  MOMENT_Z_COEFFICIENT = 8,	/*!< \brief Yawing objective function definition. */
-  EQUIVALENT_AREA = 9,		/*!< \brief Equivalent area objective function definition. */
-  NEARFIELD_PRESSURE = 10,	/*!< \brief NearField Pressure objective function definition. */
-  FORCE_X_COEFFICIENT = 12,	/*!< \brief X-direction force objective function definition. */
-  FORCE_Y_COEFFICIENT = 13,	/*!< \brief Y-direction force objective function definition. */
-  FORCE_Z_COEFFICIENT = 14,	/*!< \brief Z-direction force objective function definition. */
-  THRUST_COEFFICIENT = 15,		/*!< \brief Thrust objective function definition. */
-  TORQUE_COEFFICIENT = 16,		/*!< \brief Torque objective function definition. */
-  FIGURE_OF_MERIT = 17,		/*!< \brief Rotor Figure of Merit objective function definition. */
-  FREE_SURFACE = 18,				/*!< \brief Free Surface objective function definition. */
-  MAX_THICKNESS = 20,       /*!< \brief Maximum thickness. */
-  TOTAL_VOLUME = 21,       /*!< \brief Total volume. */
-  CLEARANCE = 22,       /*!< \brief Clearance. */
-  MIN_THICKNESS = 23,       /*!< \brief Minimum thickness. */
-  HEAT_LOAD = 24,        /*!< \brief Integrated heat flux (heat load). */
-  MAX_HEAT_FLUX = 25,    /*!< \brief Maximum heat flux. */
-  MAX_THICK_SEC1 = 26,       /*!< \brief Maximum thickness in section 1. */
-  MAX_THICK_SEC2 = 27,       /*!< \brief Maximum thickness in section 2. */
-  MAX_THICK_SEC3 = 28,       /*!< \brief Maximum thickness in section 3. */
-  MAX_THICK_SEC4 = 29,       /*!< \brief Maximum thickness in section 4. */
-  MAX_THICK_SEC5 = 30       /*!< \brief Maximum thickness in section 5. */
+  DRAG_COEFFICIENT = 1, 	      /*!< \brief Drag objective function definition. */
+  LIFT_COEFFICIENT = 2, 	      /*!< \brief Lift objective function definition. */
+  SIDEFORCE_COEFFICIENT = 3,	  /*!< \brief Side force objective function definition. */
+  EFFICIENCY = 4,		            /*!< \brief Efficiency objective function definition. */
+  INVERSE_DESIGN_PRESSURE = 5,	/*!< \brief Pressure objective function definition (inverse design). */
+  INVERSE_DESIGN_HEATFLUX = 6,  /*!< \brief Heat flux objective function definition (inverse design). */
+  TOTAL_HEATFLUX = 7,           /*!< \brief Total heat flux. */
+  MAXIMUM_HEATFLUX = 8,         /*!< \brief Maximum heat flux. */
+  MOMENT_X_COEFFICIENT = 9,	    /*!< \brief Pitching moment objective function definition. */
+  MOMENT_Y_COEFFICIENT = 10,    /*!< \brief Rolling moment objective function definition. */
+  MOMENT_Z_COEFFICIENT = 11,    /*!< \brief Yawing objective function definition. */
+  EQUIVALENT_AREA = 12,		      /*!< \brief Equivalent area objective function definition. */
+  NEARFIELD_PRESSURE = 13,	    /*!< \brief NearField Pressure objective function definition. */
+  FORCE_X_COEFFICIENT = 14,	    /*!< \brief X-direction force objective function definition. */
+  FORCE_Y_COEFFICIENT = 15,	    /*!< \brief Y-direction force objective function definition. */
+  FORCE_Z_COEFFICIENT = 16,	    /*!< \brief Z-direction force objective function definition. */
+  THRUST_COEFFICIENT = 17,		  /*!< \brief Thrust objective function definition. */
+  TORQUE_COEFFICIENT = 18,		  /*!< \brief Torque objective function definition. */
+  FIGURE_OF_MERIT = 19,		      /*!< \brief Rotor Figure of Merit objective function definition. */
+  FREE_SURFACE = 20,				    /*!< \brief Free Surface objective function definition. */
+  MAX_THICKNESS = 21,           /*!< \brief Maximum thickness. */
+  MIN_THICKNESS = 22,           /*!< \brief Minimum thickness. */
+  MAX_THICK_SEC1 = 23,          /*!< \brief Maximum thickness in section 1. */
+  MAX_THICK_SEC2 = 24,          /*!< \brief Maximum thickness in section 2. */
+  MAX_THICK_SEC3 = 25,          /*!< \brief Maximum thickness in section 3. */
+  MAX_THICK_SEC4 = 26,          /*!< \brief Maximum thickness in section 4. */
+  MAX_THICK_SEC5 = 27           /*!< \brief Maximum thickness in section 5. */
 };
-
 static const map<string, ENUM_OBJECTIVE> Objective_Map = CCreateMap<string, ENUM_OBJECTIVE>
 ("DRAG", DRAG_COEFFICIENT)
 ("LIFT", LIFT_COEFFICIENT)
 ("SIDEFORCE", SIDEFORCE_COEFFICIENT)
 ("EFFICIENCY", EFFICIENCY)
-("PRESSURE", PRESSURE_COEFFICIENT)
+("INVERSE_DESIGN_PRESSURE", INVERSE_DESIGN_PRESSURE)
+("INVERSE_DESIGN_HEATFLUX", INVERSE_DESIGN_HEATFLUX)
 ("MOMENT_X", MOMENT_X_COEFFICIENT)
 ("MOMENT_Y", MOMENT_Y_COEFFICIENT)
 ("MOMENT_Z", MOMENT_Z_COEFFICIENT)
@@ -601,12 +684,11 @@ static const map<string, ENUM_OBJECTIVE> Objective_Map = CCreateMap<string, ENUM
 ("FORCE_Z", FORCE_Z_COEFFICIENT)
 ("THRUST", THRUST_COEFFICIENT)
 ("TORQUE", TORQUE_COEFFICIENT)
-("HEAT_LOAD", HEAT_LOAD)
+("TOTAL_HEATFLUX", TOTAL_HEATFLUX)
+("MAXIMUM_HEATFLUX", MAXIMUM_HEATFLUX)
 ("FIGURE_OF_MERIT", FIGURE_OF_MERIT)
 ("FREE_SURFACE", FREE_SURFACE)
-("TOTAL_VOLUME", TOTAL_VOLUME)
 ("MAX_THICKNESS", MAX_THICKNESS)
-("CLEARANCE", CLEARANCE)
 ("MIN_THICKNESS", MIN_THICKNESS)
 ("MAX_THICK_SEC1", MAX_THICK_SEC1)
 ("MAX_THICK_SEC2", MAX_THICK_SEC2)
@@ -620,9 +702,7 @@ static const map<string, ENUM_OBJECTIVE> Objective_Map = CCreateMap<string, ENUM
 enum ENUM_CONTINUOUS_EQNS {
   EULER_EQNS= 1, 	/*!< \brief Euler equations. */
   NAVIER_STOKES_EQNS = 2 	/*!< \brief Navier Stokes equations. */
-  
 };
-
 static const map<string, ENUM_CONTINUOUS_EQNS> ContinuousEqns_Map = CCreateMap<string, ENUM_CONTINUOUS_EQNS>
 ("EULER", EULER_EQNS)
 ("NAVIER_STOKES", NAVIER_STOKES_EQNS);
@@ -634,14 +714,11 @@ enum ENUM_DISCRETE_EQNS {
   NONE_EQNS= 1, 	/*!< \brief No equations. */
   SA_EQNS = 2, 	/*!< \brief Spallart-Almaras equations. */
   SST_EQNS = 2 	/*!< \brief SST equations. */
-  
 };
-
 static const map<string, ENUM_DISCRETE_EQNS> DiscreteEqns_Map = CCreateMap<string, ENUM_DISCRETE_EQNS>
 ("NONE", NONE_EQNS)
 ("SA", SA_EQNS)
 ("SST", SST_EQNS);
-
 
 /*!
  * \brief types of sensitivities to compute
@@ -688,7 +765,8 @@ enum ENUM_ADAPT {
   WAKE = 12,			/*!< \brief Do a grid refinement on the wake. */
   SMOOTHING = 14,		/*!< \brief Do a grid smoothing of the geometry. */
   SUPERSONIC_SHOCK = 15,	/*!< \brief Do a grid smoothing. */
-  TWOPHASE = 16			/*!< \brief Do a grid refinement on the free surface interphase. */
+  PERIODIC = 16,	/*!< \brief Do a grid smoothing. */
+  TWOPHASE = 17			/*!< \brief Do a grid refinement on the free surface interphase. */
 };
 static const map<string, ENUM_ADAPT> Adapt_Map = CCreateMap<string, ENUM_ADAPT>
 ("NONE", NO_ADAPT)
@@ -706,6 +784,7 @@ static const map<string, ENUM_ADAPT> Adapt_Map = CCreateMap<string, ENUM_ADAPT>
 ("WAKE", WAKE)
 ("SMOOTHING", SMOOTHING)
 ("SUPERSONIC_SHOCK", SUPERSONIC_SHOCK)
+("PERIODIC", PERIODIC)
 ("TWOPHASE", TWOPHASE);
 
 /*!
@@ -730,16 +809,14 @@ enum ENUM_OUTPUT {
   TECPLOT = 1,  		/*!< \brief Tecplot format for the solution output. */
   EXCEL = 2,			/*!< \brief Excel format for the solution output. */
   CSV = 3,			/*!< \brief Comma-separated values format for the solution output. */
-  STL = 4,				/*!< \brief STL CAD format for the solution output. */
-  TECPLOT_BINARY = 5,  		/*!< \brief Tecplot binary format for the solution output. */
-  CGNS_SOL = 6,  		/*!< \brief CGNS format for the solution output. */
-  PARAVIEW = 7  		/*!< \brief Paraview format for the solution output. */
+  TECPLOT_BINARY = 4,  		/*!< \brief Tecplot binary format for the solution output. */
+  CGNS_SOL = 5,  		/*!< \brief CGNS format for the solution output. */
+  PARAVIEW = 6  		/*!< \brief Paraview format for the solution output. */
 };
 static const map<string, ENUM_OUTPUT> Output_Map = CCreateMap<string, ENUM_OUTPUT>
 ("TECPLOT", TECPLOT)
 ("EXCEL", EXCEL)
 ("CSV", CSV)
-("STL", STL)
 ("TECPLOT_BINARY", TECPLOT_BINARY)
 ("CGNS", CGNS_SOL)
 ("PARAVIEW", PARAVIEW);
@@ -773,9 +850,8 @@ static const map<string, ENUM_OUTPUT_VARS> Output_Vars_Map = CCreateMap<string, 
  * \brief types of design parameterizations
  */
 enum ENUM_PARAM {
-  NO_DEFORMATION = 0,		/*!< \brief No surface deformation. */
+  FFD_SETTING = 0,		/*!< \brief No surface deformation. */
   HICKS_HENNE = 1,		/*!< \brief Hicks-Henne bump function for airfoil deformation. */
-  MACH_NUMBER = 5,		/*!< \brief Mach number as design variable. */
   NACA_4DIGITS = 6,		/*!< \brief The four digits NACA airfoil family as design variables. */
   DISPLACEMENT = 8,		/*!< \brief Surface movement as design variable. */
   ROTATION = 9,			/*!< \brief Surface rotation as design variable. */
@@ -785,7 +861,6 @@ enum ENUM_PARAM {
   FFD_ROTATION = 13,		/*!< \brief Free form deformation for 3D design (rotation around a line). */
   FFD_CAMBER = 14,		/*!< \brief Free form deformation for 3D design (camber change). */
   FFD_THICKNESS = 15,		/*!< \brief Free form deformation for 3D design (thickness change). */
-  FFD_VOLUME = 16,		/*!< \brief Free form deformation for 3D design (volume change). */
   PARABOLIC = 17,		/*!< \brief Parabolic airfoil definition as design variables. */
   OBSTACLE = 18,		        /*!< \brief Obstacle for free surface optimization. */
   STRETCH = 19,		        /*!< \brief Stretch one side of a channel. */
@@ -793,13 +868,18 @@ enum ENUM_PARAM {
   COSINE_BUMP = 21,		/*!< \brief Gauss bump function for airfoil deformation. */
   FOURIER = 22,		/*!< \brief Fourier function for airfoil deformation. */
   SPHERICAL = 23,		/*!< \brief Spherical geometry parameterization with spline-based radial profile. */
-  AIRFOIL = 24		/*!< \brief Airfoil definition as design variables. */
+  AIRFOIL = 24,		/*!< \brief Airfoil definition as design variables. */
+  FFD_CONTROL_POINT_2D = 25,	/*!< \brief Free form deformation for 2D design (change a control point). */
+  FFD_CAMBER_2D = 26,		/*!< \brief Free form deformation for 3D design (camber change). */
+  FFD_THICKNESS_2D = 27		/*!< \brief Free form deformation for 3D design (thickness change). */
 };
 static const map<string, ENUM_PARAM> Param_Map = CCreateMap<string, ENUM_PARAM>
-("NO_DEFORMATION", NO_DEFORMATION)
+("FFD_SETTING", FFD_SETTING)
+("FFD_CONTROL_POINT_2D", FFD_CONTROL_POINT_2D)
+("FFD_CAMBER_2D", FFD_CAMBER_2D)
+("FFD_THICKNESS_2D", FFD_THICKNESS_2D)
 ("HICKS_HENNE", HICKS_HENNE)
 ("SPHERICAL", SPHERICAL)
-("MACH_NUMBER", MACH_NUMBER)
 ("NACA_4DIGITS", NACA_4DIGITS)
 ("DISPLACEMENT", DISPLACEMENT)
 ("ROTATION", ROTATION)
@@ -809,7 +889,6 @@ static const map<string, ENUM_PARAM> Param_Map = CCreateMap<string, ENUM_PARAM>
 ("FFD_ROTATION", FFD_ROTATION)
 ("FFD_CAMBER", FFD_CAMBER)
 ("FFD_THICKNESS", FFD_THICKNESS)
-("FFD_VOLUME", FFD_VOLUME)
 ("PARABOLIC", PARABOLIC)
 ("OBSTACLE", OBSTACLE)
 ("STRETCH", STRETCH)
@@ -827,7 +906,13 @@ enum ENUM_LINEAR_SOLVER {
   QUASI_NEWTON = 3,		/*!< \brief Quasi Newton method for point inversion algorithm (Free-Form). */
   CONJUGATE_GRADIENT = 4,	/*!< \brief Preconditionated conjugate gradient method for grid deformation. */
   FGMRES = 5,    	/*!< \brief Flexible Generalized Minimal Residual method. */
-  BCGSTAB = 6	/*!< \brief BCGSTAB - Biconjugate Gradient Stabilized Method (main solver). */
+  BCGSTAB = 6,	/*!< \brief BCGSTAB - Biconjugate Gradient Stabilized Method (main solver). */
+  RFGMRES = 7,  /*!< \brief Flexible Generalized Minimal Residual method with restart. */
+  MULTIGRID = 8,    	/*!< \brief Linear Multigrid solver. */
+  SMOOTHER_LUSGS = 9,  /*!< \brief LU_SGS smoother. */
+  SMOOTHER_JACOBI = 10,  /*!< \brief Jacobi smoother. */
+  SMOOTHER_ILU = 11,  /*!< \brief ILU smoother. */
+  SMOOTHER_LINELET = 12  /*!< \brief Linelet smoother. */
 };
 static const map<string, ENUM_LINEAR_SOLVER> Linear_Solver_Map = CCreateMap<string, ENUM_LINEAR_SOLVER>
 ("STEEPEST_DESCENT", STEEPEST_DESCENT)
@@ -835,7 +920,13 @@ static const map<string, ENUM_LINEAR_SOLVER> Linear_Solver_Map = CCreateMap<stri
 ("QUASI_NEWTON", QUASI_NEWTON)
 ("CONJUGATE_GRADIENT", CONJUGATE_GRADIENT)
 ("BCGSTAB", BCGSTAB)
-("FGMRES", FGMRES);
+("FGMRES", FGMRES)
+("RFGMRES", RFGMRES)
+("MULTIGRID", MULTIGRID)
+("SMOOTHER_LUSGS", SMOOTHER_LUSGS)
+("SMOOTHER_JACOBI", SMOOTHER_JACOBI)
+("SMOOTHER_LINELET", SMOOTHER_LINELET)
+("SMOOTHER_ILU0", SMOOTHER_ILU);
 
 /*!
  * \brief types of sensitivity smoothing
@@ -856,12 +947,14 @@ static const map<string, ENUM_SENS_SMOOTHING> Sens_Smoothing_Map = CCreateMap<st
 enum ENUM_LINEAR_SOLVER_PREC {
   JACOBI = 1,		/*!< \brief Jacobi preconditioner. */
   LU_SGS = 2,		/*!< \brief LU SGS preconditioner. */
-  LINELET = 3		/*!< \brief Line implicit preconditioner. */
+  LINELET = 3,  /*!< \brief Line implicit preconditioner. */
+  ILU = 4       /*!< \brief ILU(0) preconditioner. */
 };
 static const map<string, ENUM_LINEAR_SOLVER_PREC> Linear_Solver_Prec_Map = CCreateMap<string, ENUM_LINEAR_SOLVER_PREC>
 ("JACOBI", JACOBI)
 ("LU_SGS", LU_SGS)
-("LINELET", LINELET);
+("LINELET", LINELET)
+("ILU0", ILU);
 
 /*!
  * \brief types of analytic definitions for various geometries
@@ -879,6 +972,19 @@ static const map<string, ENUM_GEO_ANALYTIC> Geo_Analytic_Map = CCreateMap<string
 ("NACA4412_AIRFOIL", NACA4412_AIRFOIL)
 ("CYLINDER", CYLINDER)
 ("BIPARABOLIC", BIPARABOLIC);
+
+/*!
+ * \brief types of axis orientation
+ */
+enum ENUM_AXIS_ORIENTATION {
+  X_AXIS = 0,   /*!< \brief X axis orientation. */
+  Y_AXIS = 1, 	/*!< \brief Y axis orientation. */
+  Z_AXIS = 2    /*!< \brief Z axis orientation. */
+};
+static const map<string, ENUM_AXIS_ORIENTATION> Axis_Orientation_Map = CCreateMap<string, ENUM_AXIS_ORIENTATION>
+("X_AXIS", X_AXIS)
+("Y_AXIS", Y_AXIS)
+("Z_AXIS", Z_AXIS);
 
 /*!
  * \brief types of schemes for unsteady computations
@@ -911,7 +1017,1237 @@ static const map<string, ENUM_CONVERGE_CRIT> Converge_Crit_Map = CCreateMap<stri
 ("CAUCHY", CAUCHY)
 ("RESIDUAL", RESIDUAL);
 
+/*!
+ * \brief types of element stiffnesses imposed for FEA mesh deformation
+ */
+enum ENUM_DEFORM_STIFFNESS {
+  CONSTANT_STIFFNESS = 0,               /*!< \brief Impose a constant stiffness for each element (steel). */
+  INVERSE_VOLUME = 1,			/*!< \brief Impose a stiffness for each element that is inversely proportional to cell volume. */
+  WALL_DISTANCE = 2			/*!< \brief Impose a stiffness for each element that is proportional to the distance from the deforming surface. */
+};
+static const map<string, ENUM_DEFORM_STIFFNESS> Deform_Stiffness_Map = CCreateMap<string, ENUM_DEFORM_STIFFNESS>
+("CONSTANT_STIFFNESS", CONSTANT_STIFFNESS)
+("INVERSE_VOLUME", INVERSE_VOLUME)
+("WALL_DISTANCE", WALL_DISTANCE);
+
 /* END_CONFIG_ENUMS */
+
+
+
+
+
+
+
+
+
+
+
+
+class COptionBase{
+private:
+public:
+  COptionBase(){};
+  virtual  ~COptionBase() = 0;
+  //  virtual string SetValue(string){SU2MPI::PrintAndFinalize("shouldn't be here"); return "";};
+  virtual string SetValue(vector<string>) = 0;
+  virtual void SetDefault() = 0;
+  
+  string optionCheckMultipleValues(vector<string> & option_value, string type_id, string option_name){
+    if (option_value.size() != 1){
+      string newString;
+      newString.append(option_name);
+      newString.append(": multiple values for type ");
+      newString.append(type_id);
+      return newString;
+    }
+    return "";
+  }
+  
+  string badValue(vector<string> & option_value, string type_id, string option_name){
+    string newString;
+    newString.append(option_name);
+    newString.append(": improper option value for type ");
+    newString.append(type_id);
+    return newString;
+  }
+};
+
+inline COptionBase::~COptionBase(){}
+
+
+template <class Tenum>
+class COptionEnum : public COptionBase{
+  
+  map<string, Tenum> m;
+  unsigned short & field; // Reference to the feildname
+  Tenum def; // Default value
+  string name; // identifier for the option
+  
+public:
+  COptionEnum(string option_field_name, const map<string, Tenum> m, unsigned short & option_field, Tenum default_value) : field(option_field){
+    this->m = m;
+    this->def = default_value;
+    this->name = option_field_name;
+  }
+  
+  ~COptionEnum(){};
+  string SetValue(vector<string> option_value){
+    // Check if there is more than one string
+    string out = optionCheckMultipleValues(option_value, "enum", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    
+    // Check to see if the enum value is in the map
+    if (this->m.find(option_value[0]) == m.end()){
+      string str;
+      str.append(this->name);
+      str.append(": invalid option value ");
+      str.append(option_value[0]);
+      return str;
+    }
+    // If it is there, set the option value
+    Tenum val = this->m[option_value[0]];
+    this->field = val;
+    return "";
+  }
+  
+  void SetDefault(){
+    this->field = this->def;
+  }
+};
+
+class COptionDouble : public COptionBase{
+  double & field; // Reference to the fieldname
+  double def; // Default value
+  string name; // identifier for the option
+  
+public:
+  COptionDouble(string option_field_name, double & option_field, double default_value) : field(option_field){
+    this->def = default_value;
+    this->name = option_field_name;
+  }
+  
+  ~COptionDouble(){};
+  string SetValue(vector<string> option_value){
+    // check if there is more than one value
+    string out = optionCheckMultipleValues(option_value, "double", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    istringstream is(option_value[0]);
+    double val;
+    if (is >> val){
+      this->field = val;
+      return "";
+    }
+    return badValue(option_value, "double", this->name);
+  }
+  void SetDefault(){
+    this->field = this->def;
+  }
+};
+
+class COptionString : public COptionBase{
+  string & field; // Reference to the fieldname
+  string def; // Default value
+  string name; // identifier for the option
+  
+public:
+  COptionString(string option_field_name, string & option_field, string default_value) : field(option_field){
+    this->def = default_value;
+    this->name = option_field_name;
+  }
+  
+  ~COptionString(){};
+  string SetValue(vector<string> option_value){
+    // check if there is more than one value
+    string out = optionCheckMultipleValues(option_value, "double", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    this->field.assign(option_value[0]);
+    return "";
+  }
+  void SetDefault(){
+    this->field = this->def;
+  }
+};
+
+class COptionInt : public COptionBase{
+  int & field; // Reference to the feildname
+  int def; // Default value
+  string name; // identifier for the option
+  
+public:
+  COptionInt(string option_field_name, int & option_field, int default_value) : field(option_field){
+    this->def = default_value;
+    this->name = option_field_name;
+  }
+  
+  ~COptionInt(){};
+  string SetValue(vector<string> option_value){
+    string out = optionCheckMultipleValues(option_value, "int", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    istringstream is(option_value[0]);
+    int val;
+    if (is >> val){
+      this->field = val;
+      return "";
+    }
+    return badValue(option_value, "int", this->name);
+  }
+  void SetDefault(){
+    this->field = this->def;
+  }
+};
+
+class COptionULong : public COptionBase{
+  unsigned long & field; // Reference to the feildname
+  unsigned long def; // Default value
+  string name; // identifier for the option
+  
+public:
+  COptionULong(string option_field_name, unsigned long & option_field, unsigned long default_value) : field(option_field){
+    this->def = default_value;
+    this->name = option_field_name;
+  }
+  
+  ~COptionULong(){};
+  string SetValue(vector<string> option_value){
+    string out = optionCheckMultipleValues(option_value, "unsigned long", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    istringstream is(option_value[0]);
+    unsigned long val;
+    if (is >> val){
+      this->field = val;
+      return "";
+    }
+    return badValue(option_value, "unsigned long", this->name);
+  }
+  void SetDefault(){
+    this->field = this->def;
+  }
+};
+
+class COptionUShort : public COptionBase{
+  unsigned short & field; // Reference to the feildname
+  unsigned short def; // Default value
+  string name; // identifier for the option
+  
+public:
+  COptionUShort(string option_field_name, unsigned short & option_field, unsigned short default_value) : field(option_field){
+    this->def = default_value;
+    this->name = option_field_name;
+  }
+  
+  ~COptionUShort(){};
+  string SetValue(vector<string> option_value){
+    string out = optionCheckMultipleValues(option_value, "unsigned short", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    istringstream is(option_value[0]);
+    unsigned short val;
+    if (is >> val){
+      this->field = val;
+      return "";
+    }
+    return badValue(option_value, "unsigned short", this->name);
+  }
+  void SetDefault(){
+    this->field = this->def;
+  }
+};
+
+class COptionLong : public COptionBase{
+  long & field; // Reference to the feildname
+  long def; // Default value
+  string name; // identifier for the option
+  
+public:
+  COptionLong(string option_field_name, long & option_field, long default_value) : field(option_field){
+    this->def = default_value;
+    this->name = option_field_name;
+  }
+  
+  ~COptionLong(){};
+  string SetValue(vector<string> option_value){
+    string out = optionCheckMultipleValues(option_value, "long", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    istringstream is(option_value[0]);
+    long val;
+    if (is >> val){
+      this->field = val;
+      return "";
+    }
+    return badValue(option_value, "long", this->name);
+  }
+  void SetDefault(){
+    this->field = this->def;
+  }
+};
+
+
+class COptionBool : public COptionBase{
+  bool & field; // Reference to the feildname
+  bool def; // Default value
+  string name; // identifier for the option
+  
+public:
+  COptionBool(string option_field_name, bool & option_field, bool default_value) : field(option_field){
+    this->def = default_value;
+    this->name = option_field_name;
+  }
+  
+  ~COptionBool(){};
+  string SetValue(vector<string> option_value){
+    // check if there is more than one value
+    string out = optionCheckMultipleValues(option_value, "bool", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    if (option_value[0].compare("YES") == 0){
+      this->field = true;
+      return "";
+    }
+    if (option_value[0].compare("NO") == 0){
+      this->field = false;
+      return "";
+    }
+    return badValue(option_value, "bool", this->name);
+  }
+  void SetDefault(){
+    this->field = this->def;
+  }
+};
+
+template <class Tenum>
+class COptionEnumList : public COptionBase{
+  
+  map<string, Tenum> m;
+  unsigned short * & field; // Reference to the feildname
+  string name; // identifier for the option
+  unsigned short & size;
+  
+public:
+  COptionEnumList(string option_field_name, const map<string, Tenum> m, unsigned short * & option_field, unsigned short & list_size) : field(option_field) , size(list_size){
+    this->m = m;
+    this->name = option_field_name;
+  }
+  
+  ~COptionEnumList(){};
+  string SetValue(vector<string> option_value){
+    if (option_value.size() == 1 && option_value[0].compare("NONE")==0){
+      this->size = 0;
+      return "";
+    }
+    // size is the length of the option list
+    this->size = option_value.size();
+    unsigned short * enums = new unsigned short[size];
+    for(int i  = 0; i < this->size; i++){
+      // Check to see if the enum value is in the map
+      if (this->m.find(option_value[i]) == m.end()){
+        string str;
+        str.append(this->name);
+        str.append(": invalid option value ");
+        str.append(option_value[0]);
+        return str;
+      }
+      // If it is there, set the option value
+      enums[i] = this->m[option_value[0]];
+    }
+    this->field = enums;
+    return "";
+  }
+  
+  void SetDefault(){
+    // No default to set
+    size = 0;
+  }
+};
+
+class COptionDoubleArray : public COptionBase{
+  double * & field; // Reference to the feildname
+  string name; // identifier for the option
+  const int size;
+  double * default_value;
+  
+public:
+  COptionDoubleArray(string option_field_name, const int list_size, double * & option_field, double * default_value) : field(option_field), size(list_size){
+    this->name = option_field_name;
+    this->default_value = default_value;
+  }
+  
+  ~COptionDoubleArray(){};
+  string SetValue(vector<string> option_value){
+    // Check that the size is correct
+    if (option_value.size() != this->size){
+      string newstring;
+      newstring.append(this->name);
+      newstring.append(": wrong number of arguments: ");
+      stringstream ss;
+      ss << this->size;
+      newstring.append(ss.str());
+      newstring.append(" expected, ");
+      stringstream ss2;
+      ss2 << option_value.size();
+      newstring.append(ss2.str());
+      newstring.append(" found");
+      return newstring;
+    }
+    double * vals = new double[this->size];
+    for(int i  = 0; i < this->size; i++){
+      istringstream is(option_value[i]);
+      double val;
+      if (!(is >> val)){
+        delete [] vals;
+        return badValue(option_value, "double array", this->name);
+      }
+      vals[i] = val;
+    }
+    this->field = vals;
+    return "";
+  }
+  
+  void SetDefault(){
+    this->field = this->default_value;
+  }
+};
+
+class COptionDoubleList : public COptionBase{
+  double * & field; // Reference to the feildname
+  string name; // identifier for the option
+  unsigned short & size;
+  
+public:
+  COptionDoubleList(string option_field_name, unsigned short & list_size, double * & option_field) : field(option_field), size(list_size){
+    this->name = option_field_name;
+  }
+  
+  ~COptionDoubleList(){};
+  string SetValue(vector<string> option_value){
+    // The size is the length of option_value
+    unsigned long option_size = option_value.size();
+    if (option_size == 1 && option_value[0].compare("NONE")==0){
+      // No options
+      this->size = 0;
+      return "";
+    }
+    
+    this->size = option_size;
+    
+    // Parse all of the options
+    double * vals = new double[option_size];
+    for(int i  = 0; i < option_size; i++){
+      istringstream is(option_value[i]);
+      double val;
+      if (!(is >> val)){
+        delete [] vals;
+        return badValue(option_value, "double list", this->name);
+      }
+      vals[i] = val;
+    }
+    this->field = vals;
+    return "";
+  }
+  
+  void SetDefault(){
+    this->size = 0; // There is no default value for list
+  }
+};
+
+class COptionUShortList : public COptionBase{
+  unsigned short * & field; // Reference to the feildname
+  string name; // identifier for the option
+  unsigned short & size;
+  
+public:
+  COptionUShortList(string option_field_name, unsigned short & list_size, unsigned short * & option_field) : field(option_field), size(list_size){
+    this->name = option_field_name;
+  }
+  
+  ~COptionUShortList(){};
+  string SetValue(vector<string> option_value){
+    // The size is the length of option_value
+    unsigned long option_size = option_value.size();
+    if (option_size == 1 && option_value[0].compare("NONE")==0){
+      // No options
+      this->size = 0;
+      return "";
+    }
+    this->size = option_size;
+    
+    // Parse all of the options
+    unsigned short * vals = new unsigned short[option_size];
+    for(int i  = 0; i < option_size; i++){
+      istringstream is(option_value[i]);
+      unsigned short val;
+      if (!(is >> val)){
+        delete [] vals;
+        return badValue(option_value, "unsigned short", this->name);
+      }
+      vals[i] = val;
+    }
+    this->field = vals;
+    return "";
+  }
+  
+  void SetDefault(){
+    this->size = 0; // There is no default value for list
+  }
+};
+
+class COptionStringList : public COptionBase{
+  string * & field; // Reference to the feildname
+  string name; // identifier for the option
+  unsigned short & size;
+  
+public:
+  COptionStringList(string option_field_name, unsigned short & list_size, string * & option_field) : field(option_field), size(list_size){
+    this->name = option_field_name;
+  }
+  
+  ~COptionStringList(){};
+  string SetValue(vector<string> option_value){
+    // The size is the length of option_value
+    unsigned long option_size = option_value.size();
+    if (option_size == 1 && option_value[0].compare("NONE")==0){
+      this->size = 0;
+      return "";
+    }
+    this->size = option_size;
+    
+    // Parse all of the options
+    string * vals = new string[option_size];
+    for(int i  = 0; i < option_size; i++){
+      vals[i].assign(option_value[i]);
+    }
+    this->field = vals;
+    return "";
+  }
+  
+  void SetDefault(){
+    this->size = 0; // There is no default value for list
+  }
+};
+
+class COptionConvect : public COptionBase{
+  string name; // identifier for the option
+  unsigned short & space;
+  unsigned short & centered;
+  unsigned short & upwind;
+  
+public:
+  COptionConvect(string option_field_name, unsigned short & space_field, unsigned short & centered_field, unsigned short & upwind_field) : space(space_field), centered(centered_field), upwind(upwind_field){
+    this->name = option_field_name;
+  }
+  
+  ~COptionConvect(){};
+  string SetValue(vector<string> option_value){
+    
+    string out = optionCheckMultipleValues(option_value, "unsigned short", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    
+    if (Centered_Map.count(option_value[0])) {
+      this->space = Space_Map.find("SPACE_CENTERED")->second;
+      this->centered = Centered_Map.find(option_value[0])->second;
+      this->upwind = NO_UPWIND;
+      return "";
+    }
+    if (Upwind_Map.count(option_value[0])) {
+      this->space = Space_Map.find("SPACE_UPWIND")->second;
+      this->upwind = Upwind_Map.find(option_value[0])->second;
+      this->centered = NO_CENTERED;
+      return "";
+    }
+    // Make them defined in case something weird happens
+    this->centered = NO_CENTERED;
+    this->upwind = NO_UPWIND;
+    this->space = SPACE_CENTERED;
+    return badValue(option_value, "convect", this->name);
+    
+  }
+  
+  void SetDefault(){
+    this->centered = NO_CENTERED;
+    this->upwind = NO_UPWIND;
+    this->space = SPACE_CENTERED;
+  }
+};
+
+class COptionMathProblem : public COptionBase{
+  string name; // identifier for the option
+  bool & adjoint;
+  bool & oneshot;
+  bool & linearized;
+  bool & restart;
+  bool adjoint_def;
+  bool oneshot_def;
+  bool linearized_def;
+  bool restart_def;
+  
+public:
+  COptionMathProblem(string option_field_name, bool & adjoint_field, bool adjoint_default, bool & oneshot_field, bool oneshot_default, bool & linearized_field, bool linearized_default, bool & restart_field, bool restart_default) : adjoint(adjoint_field), oneshot(oneshot_field), linearized(linearized_field), restart(restart_field) {
+    this->name = option_field_name;
+    this->adjoint_def = adjoint_default;
+    this->oneshot_def = oneshot_default;
+    this->linearized_def = linearized_default;
+    this->restart_def = restart_default;
+  }
+  
+  ~COptionMathProblem(){};
+  string SetValue(vector<string> option_value){
+    string out = optionCheckMultipleValues(option_value, "unsigned short", this->name);
+    if (out.compare("") != 0){
+      return out;
+    }
+    if (Math_Problem_Map.find(option_value[0]) == Math_Problem_Map.end()){
+      return badValue(option_value, "math problem", this->name);
+    }
+    if (option_value[0] == "DIRECT") {
+      this->adjoint = false;
+      this->oneshot = false;
+      this->linearized = false;
+      this->restart = false;
+      return "";
+    }
+    if (option_value[0] == "ADJOINT") {
+      this->adjoint= true;
+      this->restart= true;
+      this->oneshot = false;
+      this->linearized = false;
+      return "";
+    }
+    if (option_value[0] == "LINEARIZED") {
+      this->linearized = true;
+      this->restart = true;
+      this->adjoint= false;
+      this->oneshot = false;
+      return "";
+    }
+    return "option in math problem map not considered in constructor";
+  }
+  
+  void SetDefault(){
+    this->adjoint = this->adjoint_def;
+    this->oneshot = this->oneshot_def;
+    this->linearized = this->linearized_def;
+    this->restart = this->restart_def;
+  }
+};
+
+class COptionDVParam : public COptionBase{
+  string name; // identifier for the option
+  unsigned short & nDV;
+  double ** & paramDV;
+  unsigned short* & design_variable;
+  
+public:
+  COptionDVParam(string option_field_name, unsigned short & nDV_field, double** & paramDV_field, unsigned short * & design_variable_field) : nDV(nDV_field), paramDV(paramDV_field), design_variable(design_variable_field){
+    this->name = option_field_name;
+  }
+  
+  ~COptionDVParam(){};
+  string SetValue(vector<string> option_value){
+    if ((option_value.size() == 1) && (option_value[0].compare("NONE") == 0)){
+      this->nDV = 0;
+      return "";
+    }
+    
+    // Cannot have ; at the beginning or the end
+    if (option_value[0].compare(";") == 0){
+      string newstring;
+      newstring.append(this->name);
+      newstring.append(": may not have beginning semicolon");
+      return newstring;
+    }
+    if (option_value[option_value.size()-1].compare(";") == 0){
+      string newstring;
+      newstring.append(this->name);
+      newstring.append(": may not have ending semicolon");
+      return newstring;
+    }
+    
+    
+    // use the ";" token to determine the number of design variables
+    // This works because semicolon is not one of the delimiters in tokenize string
+    this->nDV = 0;
+    //unsigned int num_semi = 0;
+    for (unsigned int i = 0; i < static_cast<unsigned int>(option_value.size()); i++) {
+      if (option_value[i].compare(";") == 0) {
+        this->nDV++;
+        //        num_semi++;
+      }
+    }
+    
+    // One more design variable than semicolon
+    this->nDV++;
+    
+    if ( (this->nDV > 0) && (this->design_variable == NULL) ) {
+      string newstring;
+      newstring.append(this->name);
+      newstring.append(": Design_Variable array has not been allocated. Check that DV_KIND appears before DV_PARAM in configuration file.");
+      return newstring;
+    }
+    /*
+     #if 0
+     cout << "Found " << (*nDV_) << " DV parameters" << endl;
+     cout << "DV param value = ";
+     for (unsigned int i = 0; i < value.size(); i++)
+     cout << value[i] << ", ";
+     cout << endl;
+     #endif
+     */
+    
+    
+    
+    this->paramDV = new double*[this->nDV];
+    for (unsigned short iDV = 0; iDV < this->nDV; iDV++){
+      this->paramDV[iDV] = new double[MAX_PARAMETERS];
+    }
+    
+    unsigned short nParamDV = 0;
+    stringstream ss;
+    unsigned int i = 0;
+    for (unsigned short iDV = 0; iDV < this->nDV; iDV++) {
+      switch (this->design_variable[iDV]) {
+        case FFD_SETTING: nParamDV = 0; break;
+        case FFD_CONTROL_POINT_2D: nParamDV = 5; break;
+        case FFD_CAMBER_2D: nParamDV = 2; break;
+        case FFD_THICKNESS_2D: nParamDV = 2; break;
+        case HICKS_HENNE: nParamDV = 2; break;
+        case SPHERICAL: nParamDV = 3; break;
+        case COSINE_BUMP: nParamDV = 3; break;
+        case FOURIER: nParamDV = 3; break;
+        case DISPLACEMENT: nParamDV = 3; break;
+        case ROTATION: nParamDV = 6; break;
+        case NACA_4DIGITS: nParamDV = 3; break;
+        case PARABOLIC: nParamDV = 2; break;
+        case OBSTACLE: nParamDV = 2; break;
+        case AIRFOIL: nParamDV = 2; break;
+        case STRETCH: nParamDV = 2; break;
+        case FFD_CONTROL_POINT: nParamDV = 7; break;
+        case FFD_DIHEDRAL_ANGLE: nParamDV = 7; break;
+        case FFD_TWIST_ANGLE: nParamDV = 7; break;
+        case FFD_ROTATION: nParamDV = 7; break;
+        case FFD_CAMBER: nParamDV = 3; break;
+        case FFD_THICKNESS: nParamDV = 3; break;
+        case SURFACE_FILE: nParamDV = 0; break;
+        default : {
+          string newstring;
+          newstring.append(this->name);
+          newstring.append(": undefined design variable type found in configuration file.");
+          return newstring;
+        }
+      }
+      
+      // ?? Not sure what's going on. Didn't touch it.
+      for (unsigned short iParamDV = 0; iParamDV < nParamDV; iParamDV++) {
+        ss << option_value[i] << " ";
+        ss >> this->paramDV[iDV][iParamDV];
+        i++;
+      }
+      if (iDV < (this->nDV-1)) {
+        if (option_value[i].compare(";") != 0) {
+          string newstring;
+          newstring.append(this->name);
+          newstring.append(": a design variable in the configuration file has the wrong number of parameters");
+          return newstring;
+        }
+        i++;
+      }
+    }
+    
+    // Need to return something...
+    return "";
+  }
+  
+  void SetDefault(){
+    this->nDV = 0;
+    this->paramDV = NULL;
+    // Don't mess with the Design_Variable because it's an input, not modified
+  }
+};
+
+
+// Class where the option is represented by (String, double, string, double, ...)
+class COptionStringDoubleList : public COptionBase{
+  string name; // identifier for the option
+  unsigned short & size; // how many strings are there (same as number of doubles)
+  
+  string * & s_f; // Reference to the string fields
+  double* & d_f; // reference to the double fields
+  
+public:
+  COptionStringDoubleList(string option_field_name, unsigned short & list_size, string * & string_field, double* & double_field) : size(list_size), s_f(string_field), d_f(double_field){
+    this->name = option_field_name;
+  }
+  
+  ~COptionStringDoubleList(){};
+  string SetValue(vector<string> option_value){
+    // There must be an even number of entries (same number of strings and doubles
+    unsigned long totalVals = option_value.size();
+    if ((totalVals % 2) != 0){
+      if ((totalVals == 1) && (option_value[0].compare("NONE") == 0)){
+        // It's okay to say its NONE
+        this->size = 0;
+        return "";
+      }
+      string newstring;
+      newstring.append(this->name);
+      newstring.append(": must have an even number of entries");
+      return newstring;
+    }
+    unsigned long nVals = totalVals / 2;
+    this->size = nVals;
+    this->s_f = new string[nVals];
+    this->d_f = new double[nVals];
+    
+    for (int i = 0; i < nVals; i++){
+      this->s_f[i].assign(option_value[2*i]); // 2 because have double and string
+      istringstream is(option_value[2*i + 1]);
+      double val;
+      if (!(is >> val)){
+        return badValue(option_value, "string double", this->name);
+      }
+      this->d_f[i] = val;
+    }
+    // Need to return something...
+    return "";
+  }
+  
+  void SetDefault(){
+    this->size = 0; // There is no default value for list
+  }
+};
+
+class COptionInlet : public COptionBase{
+  string name; // identifier for the option
+  unsigned short & size;
+  string * & marker;
+  double * & ttotal;
+  double * & ptotal;
+  double ** & flowdir;
+  
+public:
+  COptionInlet(string option_field_name, unsigned short & nMarker_Inlet, string* & Marker_Inlet, double* & Ttotal, double* & Ptotal, double** & FlowDir) : size(nMarker_Inlet), marker(Marker_Inlet), ttotal(Ttotal), ptotal(Ptotal), flowdir(FlowDir){
+    this->name = option_field_name;
+  }
+  
+  ~COptionInlet(){};
+  string SetValue(vector<string> option_value){
+    
+    unsigned long totalVals = option_value.size();
+    if ((totalVals == 1) && (option_value[0].compare("NONE") == 0)){
+      this->size = 0;
+      this->marker = NULL;
+      this->ttotal = NULL;
+      this->ptotal = NULL;
+      this->flowdir = NULL;
+      return "";
+    }
+    
+    if (totalVals % 6 != 0){
+      string newstring;
+      newstring.append(this->name);
+      newstring.append(": must have a number of entries divisible by 6");
+      this->size = 0;
+      this->marker = NULL;
+      this->ttotal = NULL;
+      this->ptotal = NULL;
+      this->flowdir = NULL;
+      return newstring;
+    }
+    
+    unsigned long nVals = totalVals / 6;
+    this->size = nVals;
+    this->marker = new string[nVals];
+    this->ttotal = new double[nVals];
+    this->ptotal = new double[nVals];
+    this->flowdir = new double*[nVals];
+    for (int i = 0; i < nVals; i++){
+      this->flowdir[i] = new double[3];
+    }
+    
+    stringstream ss;
+    for (int i = 0; i < nVals; i++){
+      this->marker[i].assign(option_value[6*i]);
+      ss << option_value[6*i + 1] << " ";
+      if(!(ss >> this->ttotal[i])){
+        return badValue(option_value, "inlet", this->name);
+      }
+      ss << option_value[6*i + 2] << " ";
+      if(!(ss >> this->ptotal[i])){
+        return badValue(option_value, "inlet", this->name);
+      }
+      ss << option_value[6*i + 3] << " ";
+      if (!(ss >> this->flowdir[i][0])){
+        return badValue(option_value, "inlet", this->name);
+      }
+      ss << option_value[6*i + 4] << " ";
+      if (!(ss >> this->flowdir[i][1])){
+        return badValue(option_value, "inlet", this->name);
+      }
+      ss << option_value[6*i + 5] << " ";
+      if (!(ss >> this->flowdir[i][2])){
+        return badValue(option_value, "inlet", this->name);
+      }
+    }
+    
+    return "";
+  }
+  
+  void SetDefault(){
+    this->marker = NULL;
+    this->ttotal = NULL;
+    this->ptotal = NULL;
+    this->flowdir = NULL;
+    this->size = 0; // There is no default value for list
+  }
+};
+
+//Inlet condition where the input direction is assumed
+class COptionInletFixed : public COptionBase{
+  string name; // identifier for the option
+  unsigned short & size;
+  string * & marker;
+  double * & ttotal;
+  double * & ptotal;
+  
+public:
+  COptionInletFixed(string option_field_name, unsigned short & nMarker_Inlet, string* & Marker_Inlet, double* & Ttotal, double* & Ptotal) : size(nMarker_Inlet), marker(Marker_Inlet), ttotal(Ttotal), ptotal(Ptotal){
+    this->name = option_field_name;
+  }
+  
+  ~COptionInletFixed(){};
+  string SetValue(vector<string> option_value){
+    
+    unsigned long totalVals = option_value.size();
+    if ((totalVals == 1) && (option_value[0].compare("NONE") == 0)){
+      this->size = 0;
+      this->marker = NULL;
+      this->ttotal = NULL;
+      this->ptotal = NULL;
+      return "";
+    }
+    
+    if (totalVals % 3 != 0){
+      string newstring;
+      newstring.append(this->name);
+      newstring.append(": must have a number of entries divisible by 3");
+      this->size = 0;
+      this->marker = NULL;
+      this->ttotal = NULL;
+      this->ptotal = NULL;
+      return newstring;
+    }
+    
+    unsigned long nVals = totalVals / 3;
+    this->size = nVals;
+    this->marker = new string[nVals];
+    this->ttotal = new double[nVals];
+    this->ptotal = new double[nVals];
+    stringstream ss;
+    for (int i = 0; i < nVals; i++){
+      this->marker[i].assign(option_value[3*i]);
+      ss << option_value[3*i + 1] << " ";
+      if (!(ss >> this->ttotal[i])){
+        return badValue(option_value, "inlet fixed", this->name);
+      }
+      ss << option_value[3*i + 2] << " ";
+      if (!(ss >> this->ptotal[i])){
+        return badValue(option_value, "inlet fixed", this->name);
+      }
+    }
+    return "";
+  }
+  
+  void SetDefault(){
+    this->marker = NULL;
+    this->ttotal = NULL;
+    this->ptotal = NULL;
+    this->size = 0; // There is no default value for list
+  }
+};
+
+class COptionPeriodic : public COptionBase{
+  string name; // identifier for the option
+  unsigned short & size;
+  string * & marker_bound;
+  string * & marker_donor;
+  double ** & rot_center;
+  double ** & rot_angles;
+  double ** & translation;
+  
+public:
+  COptionPeriodic(const string option_field_name, unsigned short & nMarker_PerBound,
+                  string* & Marker_PerBound, string* & Marker_PerDonor,
+                  double** & RotCenter, double** & RotAngles, double** & Translation) : size(nMarker_PerBound), marker_bound(Marker_PerBound), marker_donor(Marker_PerDonor), rot_center(RotCenter), rot_angles(RotAngles), translation(Translation){
+    this->name = option_field_name;
+  }
+  
+  ~COptionPeriodic(){};
+  string SetValue(vector<string> option_value){
+    
+    const int mod_num = 11;
+    
+    unsigned long totalVals = option_value.size();
+    if ((totalVals == 1) && (option_value[0].compare("NONE") == 0)){
+      this->size = 0;
+      this->marker_bound = NULL;
+      this->marker_donor = NULL;
+      this->rot_center = NULL;
+      this->rot_angles = NULL;
+      this->translation = NULL;
+      return "";
+    }
+    
+    if (totalVals % mod_num != 0){
+      string newstring;
+      newstring.append(this->name);
+      newstring.append(": must have a number of entries divisible by 11");
+      this->size = 0;
+      this->marker_bound = NULL;
+      this->marker_donor = NULL;
+      this->rot_center = NULL;
+      this->rot_angles = NULL;
+      this->translation = NULL;
+      return newstring;
+    }
+    
+    unsigned long nVals = 2 * (totalVals / mod_num); // To account for periodic and donor
+    this->size = nVals;
+    this->marker_bound = new string[nVals];
+    this->marker_donor = new string[nVals];
+    this->rot_center = new double*[nVals];
+    this->rot_angles = new double*[nVals];
+    this->translation = new double*[nVals];
+    for (int i = 0; i < nVals; i++){
+      this->rot_center[i] = new double[3];
+      this->rot_angles[i] = new double[3];
+      this->translation[i] = new double[3];
+    }
+    
+    double deg2rad = PI_NUMBER/180.0;
+    stringstream ss;
+    for (int i = 0; i < (nVals/2); i++){
+      this->marker_bound[i].assign(option_value[mod_num*i]);
+      this->marker_donor[i].assign(option_value[mod_num*i+1]);
+      ss << option_value[mod_num*i + 2] << " ";
+      if (!(ss >> this->rot_center[i][0])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*i + 3] << " ";
+      if (!(ss >> this->rot_center[i][1])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*i + 4] << " ";
+      if (!(ss >> this->rot_center[i][2])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*i + 5] << " ";
+      if (!(ss >> this->rot_angles[i][0])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*i + 6] << " ";
+      if (!(ss >> this->rot_angles[i][1])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*i + 7] << " ";
+      if (!(ss >> this->rot_angles[i][2])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*i + 8] << " ";
+      if (!(ss >> this->translation[i][0])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*i + 9] << " ";
+      if (!(ss >> this->translation[i][1])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*i + 10] << " ";
+      if (!(ss >> this->translation[i][2])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      this->rot_angles[i][0] *= deg2rad;
+      this->rot_angles[i][1] *= deg2rad;
+      this->rot_angles[i][2] *= deg2rad;
+    }
+    
+    for (unsigned long i = (nVals/2); i < nVals; i++){
+      this->marker_bound[i].assign(option_value[mod_num*(i-nVals/2)+1]);
+      this->marker_donor[i].assign(option_value[mod_num*(i-nVals/2)]);
+      ss << option_value[mod_num*(i-nVals/2) + 2] << " ";
+      if (!(ss >> this->rot_center[i][0])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*(i-nVals/2) + 3] << " ";
+      if (!(ss >> this->rot_center[i][1])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*(i-nVals/2) + 4] << " ";
+      if (!(ss >> this->rot_center[i][2])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*(i-nVals/2) + 5] << " ";
+      if (!(ss >> this->rot_angles[i][0])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*(i-nVals/2) + 6] << " ";
+      if (!(ss >> this->rot_angles[i][1])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*(i-nVals/2) + 7] << " ";
+      if (!(ss >> this->rot_angles[i][2])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*(i-nVals/2) + 8] << " ";
+      if (!(ss >> this->translation[i][0])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*(i-nVals/2) + 9] << " ";
+      if (!(ss >> this->translation[i][1])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      ss << option_value[mod_num*(i-nVals/2) + 10] << " ";
+      if (!(ss >> this->translation[i][2])){
+        return badValue(option_value, "periodic", this->name);
+      }
+      /*--- Mirror the rotational angles and translation vector (rotational 
+       center does not need to move) ---*/
+      this->rot_center[i][0] *= 1.0;
+      this->rot_center[i][1] *= 1.0;
+      this->rot_center[i][2] *= 1.0;
+      this->rot_angles[i][0] *= -deg2rad;
+      this->rot_angles[i][1] *= -deg2rad;
+      this->rot_angles[i][2] *= -deg2rad;
+      this->translation[i][0] *= -1.0;
+      this->translation[i][1] *= -1.0;
+      this->translation[i][2] *= -1.0;
+    }
+    
+    return "";
+  }
+  
+  void SetDefault(){
+    this->size = 0;
+    this->marker_bound = NULL;
+    this->marker_donor = NULL;
+    this->rot_center = NULL;
+    this->rot_angles = NULL;
+    this->translation = NULL;
+  }
+};
+
+class COptionActuatorDisk : public COptionBase{
+  string name; // identifier for the option
+  unsigned short & inlet_size;
+  unsigned short & outlet_size;
+  string * & marker_inlet;
+  string * & marker_outlet;
+  double ** & origin;
+  double * & root_radius;
+  double * & tip_radius;
+  double * & ct;
+  double * & omega;
+  
+public:
+  COptionActuatorDisk(const string name, unsigned short & nMarker_ActDisk_Inlet, unsigned short & nMarker_ActDisk_Outlet, string * & Marker_ActDisk_Inlet, string * & Marker_ActDisk_Outlet, double ** & ActDisk_Origin, double * & ActDisk_RootRadius, double * & ActDisk_TipRadius, double * & ActDisk_CT, double * & ActDisk_Omega) : inlet_size(nMarker_ActDisk_Inlet),outlet_size(nMarker_ActDisk_Outlet), marker_inlet(Marker_ActDisk_Inlet), marker_outlet(Marker_ActDisk_Outlet), origin(ActDisk_Origin), root_radius(ActDisk_RootRadius), tip_radius(ActDisk_TipRadius), ct(ActDisk_CT), omega(ActDisk_Omega) {
+    this->name = name;
+  }
+  
+  ~COptionActuatorDisk(){};
+  string SetValue(vector<string> option_value){
+    const int mod_num = 9;
+    unsigned long totalVals = option_value.size();
+    if ((totalVals == 1) && (option_value[0].compare("NONE") == 0)){
+      this->SetDefault();
+      return "";
+    }
+    
+    if (totalVals % mod_num != 0){
+      string newstring;
+      newstring.append(this->name);
+      newstring.append(": must have a number of entries divisible by 9");
+      this->SetDefault();
+      return newstring;
+    }
+    
+    unsigned long nVals = totalVals / mod_num;
+    this->inlet_size = nVals;
+    this->outlet_size = nVals;
+    this->marker_inlet = new string[this->inlet_size];
+    this->marker_outlet = new string[this->outlet_size];
+    this->root_radius = new double[this->inlet_size];
+    this->tip_radius = new double[this->inlet_size];
+    this->ct = new double[this->outlet_size];
+    this->omega = new double[this->inlet_size];
+    
+    this->origin = new double*[this->inlet_size];
+    for (int i = 0; i < this->inlet_size; i++){
+      this->origin[i] = new double[3];
+    }
+    
+    string tname = "actuator disk";
+    stringstream ss;
+    for (int i = 0; i < this->inlet_size; i++){
+      this->marker_inlet[i].assign(option_value[mod_num*i]);
+      this->marker_outlet[i].assign(option_value[mod_num*i+1]);
+      ss << option_value[mod_num*i + 2] << " ";
+      if (!(ss >> this->origin[i][0])){
+        return badValue(option_value, tname, this->name);
+      }
+      ss << option_value[mod_num*i + 3] << " ";
+      if (!(ss >> this->origin[i][1])){
+        return badValue(option_value, tname, this->name);
+      }
+      ss << option_value[mod_num*i + 4] << " ";
+      if (!(ss >> this->origin[i][2])){
+        return badValue(option_value, tname, this->name);
+      }
+      ss << option_value[mod_num*i + 5] << " ";
+      if (!(ss >> this->root_radius[i])){
+        return badValue(option_value, tname, this->name);
+      }
+      ss << option_value[mod_num*i + 6] << " ";
+      if (!(ss >> this->tip_radius[i])){
+        return badValue(option_value, tname, this->name);
+      }
+      ss << option_value[mod_num*i + 7] << " ";
+      if (!(ss >> this->ct[i])){
+        return badValue(option_value, tname, this->name);
+      }
+      ss << option_value[mod_num*i + 8] << " ";
+      if (!(ss >> this->omega[i])){
+        return badValue(option_value, tname, this->name);
+      }
+    }
+    return "";
+  }
+  void SetDefault(){
+    this->inlet_size = 0;
+    this->outlet_size = 0;
+    this->marker_inlet = NULL;
+    this->marker_outlet = NULL;
+    this->origin = NULL;
+    this->root_radius = NULL;
+    this->tip_radius = NULL;
+    this->ct = NULL;
+    this->omega = NULL;
+  }
+};
+
+
+
 
 /*!
  * \class CAnyOptionRef
@@ -1169,14 +2505,18 @@ public:
    * \param[in] value - a set of strings used to define the option
    */
   void SetValue(const vector<string> & value) {
-        
+    
+    int rank = MASTER_NODE;
+    
     typename map<string,Tenum>::const_iterator it;
     if (ref_dim_ == NULL) {
       // this is a scalar enum option
       it = Tmap_->find(StringToUpperCase(value[0]));
       if (it == Tmap_->end()) {
+        if (rank == MASTER_NODE) {
           cerr << "ERROR: Cannot find value " << value[0] << " in given map." << endl;
           cerr << "Please check the name of the variable in the config file." << endl;
+        }
         exit(1);
       }
       *(*ref_) = it->second;
@@ -1187,8 +2527,10 @@ public:
       for (unsigned short i = 0; i < *ref_dim_; i++) {
         it = Tmap_->find(StringToUpperCase(value[i]));
         if (it == Tmap_->end()) {
+          if (rank == MASTER_NODE) {
             cerr << "ERROR: Cannot find value " << value[i] << " in given map." << endl;
             cerr << "Please check the name of the variable in the config file." << endl;
+          }
           exit(1);
         }
         (*ref_)[i] = it->second;
@@ -1368,6 +2710,145 @@ public:
    */
   void WriteValue() {
     cout << "CMarkerPeriodicRef::WriteValue(): not implemented yet" << endl;
+  }
+  
+};
+
+/*!
+ * \class CMarkerPeriodicRef
+ * \brief Specialized option for periodic boundary markers
+ * \author J. Hicken
+ */
+class CMarkerActuatorDiskRef : public CAnyOptionRef {
+private:
+  unsigned short* nMarker_ActDisk_Inlet_; /*!< \brief Number of periodic boundary markers. */
+  unsigned short* nMarker_ActDisk_Outlet_; /*!< \brief Number of periodic boundary markers. */
+  
+  string** Marker_ActDisk_Inlet_; /*!< \brief Name of the inlet surface for the actuator disk. */
+  string** Marker_ActDisk_Outlet_; /*!< \brief Name of the outlet surface for the actuator disk. */
+  double*** ActDisk_Origin_; /*!< \brief Origin of the actuator disk. */
+  double** ActDisk_RootRadius_; /*!< \brief Root radius of the actuator disk. */
+  double** ActDisk_TipRadius_; /*!< \brief Tip radius of the actuator disk. */
+  double** ActDisk_CT_; /*!< \brief _____________________________. */
+  double** ActDisk_Omega_; /*!< \brief _____________________________. */
+  
+public:
+  
+  /*!
+   * \brief constructor for periodic marker option
+   * \param[in] nMarker_ActDisk_Inlet - ________________________
+   * \param[in] nMarker_ActDisk_Outlet - ________________________
+   * \param[in] Marker_ActDisk_Inlet - ________________________
+   * \param[in] Marker_ActDisk_Outlet - ________________________
+   * \param[in] ActDisk_Origin - ________________________
+   * \param[in] ActDisk_RootRadius -________________________
+   * \param[in] ActDisk_TipRadius - ________________________
+   * \param[in] ActDisk_CT - ________________________
+   * \param[in] ActDisk_Omega - ________________________
+   */
+  CMarkerActuatorDiskRef(unsigned short & nMarker_ActDisk_Inlet, unsigned short & nMarker_ActDisk_Outlet,
+                         string* & Marker_ActDisk_Inlet, string* & Marker_ActDisk_Outlet,
+                         double** & ActDisk_Origin, double* & ActDisk_RootRadius, double* & ActDisk_TipRadius,
+                         double* & ActDisk_CT, double* & ActDisk_Omega) {
+    nMarker_ActDisk_Inlet_ = &nMarker_ActDisk_Inlet;
+    nMarker_ActDisk_Outlet_ = &nMarker_ActDisk_Outlet;
+    
+    Marker_ActDisk_Inlet_ = &Marker_ActDisk_Inlet;
+    *Marker_ActDisk_Inlet_ = NULL;
+    
+    Marker_ActDisk_Outlet_ = &Marker_ActDisk_Outlet;
+    *Marker_ActDisk_Outlet_ = NULL;
+    
+    ActDisk_Origin_ = &ActDisk_Origin;
+    *ActDisk_Origin_ = NULL;
+    
+    ActDisk_RootRadius_ = &ActDisk_RootRadius;
+    *ActDisk_RootRadius_ = NULL;
+    
+    ActDisk_TipRadius_ = &ActDisk_TipRadius;
+    *ActDisk_TipRadius_ = NULL;
+    
+    ActDisk_CT_ = &ActDisk_CT;
+    *ActDisk_CT_ = NULL;
+    
+    ActDisk_Omega_ = &ActDisk_Omega;
+    *ActDisk_Omega_ = NULL;
+  }
+  
+  /*!
+   * \brief sets the value of the periodic boundary parameters given the vector of strings
+   * \param[in] value - a set of strings used to define the option
+   */
+  void SetValue(const vector<string> & value) {
+    if ( (*Marker_ActDisk_Inlet_ != NULL) || (*Marker_ActDisk_Outlet_ != NULL) ||
+        (*ActDisk_Origin_ != NULL) ||
+        (*ActDisk_RootRadius_ != NULL) || (*ActDisk_TipRadius_ != NULL) ||
+        (*ActDisk_CT_ != NULL) || (*ActDisk_Omega_ != NULL) ) {
+      cerr << "Error in CMarkerPeriodicRef::SetValue(): "
+      << "one or more periodic-marker option arrays have already been allocated."
+      << endl;
+      throw(-1);
+    }
+    if (static_cast<int>(value.size()) % 9 != 0) {
+      if (value[0].compare("NONE") == 0) {
+        *nMarker_ActDisk_Inlet_ = 0;
+        return;
+      }
+      if (value[0].compare("NONE") == 0) {
+        *nMarker_ActDisk_Outlet_ = 0;
+        return;
+      }
+      cerr << "Error in CMarkerActuatorDiskRef::SetValue(): "
+      << "incorrect number of MARKER_ACTDISK parameters in the configuration file."
+      << endl;
+      throw(-1);
+    }
+    
+    *nMarker_ActDisk_Inlet_ = static_cast<unsigned short>(value.size())/9;
+    *nMarker_ActDisk_Outlet_ = static_cast<unsigned short>(value.size())/9;
+    
+    (*Marker_ActDisk_Inlet_)  = new string[*nMarker_ActDisk_Inlet_];
+    (*Marker_ActDisk_Outlet_) = new string[*nMarker_ActDisk_Outlet_];
+    
+    (*ActDisk_Origin_)  = new double*[*nMarker_ActDisk_Inlet_];
+    for (unsigned short iMarker_ActDisk = 0; iMarker_ActDisk < *nMarker_ActDisk_Inlet_; iMarker_ActDisk++) {
+      (*ActDisk_Origin_)[iMarker_ActDisk] = new double[3];
+    }
+    
+    (*ActDisk_RootRadius_)  = new double[*nMarker_ActDisk_Inlet_];
+    (*ActDisk_TipRadius_)   = new double[*nMarker_ActDisk_Inlet_];
+    (*ActDisk_CT_)      = new double[*nMarker_ActDisk_Inlet_];
+    (*ActDisk_Omega_)   = new double[*nMarker_ActDisk_Inlet_];
+    
+    stringstream ss;
+    unsigned short i = 0;
+    for (unsigned short iMarker_ActDisk = 0; iMarker_ActDisk < *nMarker_ActDisk_Inlet_; iMarker_ActDisk++) {
+      ss << value[i++] << " ";
+      ss >> (*Marker_ActDisk_Inlet_)[iMarker_ActDisk];
+      ss << value[i++] << " ";
+      ss >> (*Marker_ActDisk_Outlet_)[iMarker_ActDisk];
+      ss << value[i++] << " ";
+      ss >> (*ActDisk_Origin_)[iMarker_ActDisk][0];
+      ss << value[i++] << " ";
+      ss >> (*ActDisk_Origin_)[iMarker_ActDisk][1];
+      ss << value[i++] << " ";
+      ss >> (*ActDisk_Origin_)[iMarker_ActDisk][2];
+      ss << value[i++] << " ";
+      ss >> (*ActDisk_RootRadius_)[iMarker_ActDisk];
+      ss << value[i++] << " ";
+      ss >> (*ActDisk_TipRadius_)[iMarker_ActDisk];
+      ss << value[i++] << " ";
+      ss >> (*ActDisk_CT_)[iMarker_ActDisk];
+      ss << value[i++] << " ";
+      ss >> (*ActDisk_Omega_)[iMarker_ActDisk];
+    }
+  }
+  
+  /*!
+   * \brief write the value of the option to std out (mostly for debugging)
+   */
+  void WriteValue() {
+    cout << "CMarkerActuatorDiskRef::WriteValue(): not implemented yet" << endl;
   }
   
 };
@@ -1957,6 +3438,7 @@ public:
     } else {
       cerr << "Error in CConvOptionRef::SetValue(): "
       << value[0] << " is an invalid space discretization" << endl;
+      cerr << "Please, check that the config file is compatible with SU2 3.1.0 \"eagle\"" << endl;
       throw(-1);
     }
   }
@@ -2100,7 +3582,10 @@ public:
     unsigned int i = 0;
     for (unsigned short iDV = 0; iDV < *nDV_; iDV++) {
       switch ((*Design_Variable_)[iDV]) {
-        case NO_DEFORMATION: nParamDV = 0; break;
+        case FFD_SETTING: nParamDV = 0; break;
+        case FFD_CONTROL_POINT_2D: nParamDV = 5; break;
+        case FFD_CAMBER_2D: nParamDV = 2; break;
+        case FFD_THICKNESS_2D: nParamDV = 2; break;
         case HICKS_HENNE: nParamDV = 2; break;
         case SPHERICAL: nParamDV = 3; break;
         case COSINE_BUMP: nParamDV = 3; break;
@@ -2118,7 +3603,6 @@ public:
         case FFD_ROTATION: nParamDV = 7; break;
         case FFD_CAMBER: nParamDV = 3; break;
         case FFD_THICKNESS: nParamDV = 3; break;
-        case FFD_VOLUME: nParamDV = 3; break;
         case SURFACE_FILE: nParamDV = 0; break;
         default : {
           cerr << "Error in CDVParamOptionRef::SetValue(): "
@@ -2147,11 +3631,14 @@ public:
    * \brief write the value of the option to std out (mostly for debugging)
    */
   void WriteValue() {
-    //cout << "CDVParamOptionRef::WriteValue(): not implemented yet" << endl;
+    
     for (unsigned short iDV = 0; iDV < *nDV_; iDV++) {
       unsigned short nParamDV = 0;
       switch ((*Design_Variable_)[iDV]) {
-        case NO_DEFORMATION: nParamDV = 0; break;
+        case FFD_SETTING: nParamDV = 0; break;
+        case FFD_CONTROL_POINT_2D: nParamDV = 5; break;
+        case FFD_CAMBER_2D: nParamDV = 2; break;
+        case FFD_THICKNESS_2D: nParamDV = 2; break;
         case HICKS_HENNE: nParamDV = 2; break;
         case SPHERICAL: nParamDV = 3; break;
         case COSINE_BUMP: nParamDV = 3; break;
@@ -2166,7 +3653,6 @@ public:
         case FFD_ROTATION: nParamDV = 7; break;
         case FFD_CAMBER: nParamDV = 3; break;
         case FFD_THICKNESS: nParamDV = 3; break;
-        case FFD_VOLUME: nParamDV = 3; break;
         default : {
           cerr << "Error in CDVParamOptionRef::SetValue(): "
           << "undefined design variable type found in configuration file." << endl; break;

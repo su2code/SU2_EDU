@@ -5,7 +5,7 @@
  *        technique definition). The subroutines and functions are in 
  *        the <i>grid_movement_structure.cpp</i> file.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.1.0
+ * \version 1.2.0
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -44,7 +44,7 @@ using namespace std;
  * \brief Class for moving the surface and volumetric 
  *        numerical grid (2D and 3D problems).
  * \author F. Palacios.
- * \version 1.1.0
+ * \version 1.2.0
  */
 class CGridMovement {
 public:
@@ -73,7 +73,7 @@ public:
  * \class CVolumetricMovement
  * \brief Class for moving the volumetric numerical grid.
  * \author F. Palacios, A. Bueno, T. Economon, S. Padron.
- * \version 1.1.0
+ * \version 1.2.0
  */
 class CVolumetricMovement : public CGridMovement {
 protected:
@@ -126,7 +126,7 @@ public:
 	 * \param[in] geometry - Geometrical definition of the problem.
 	 * \return Value of the length of the smallest edge of the grid.
 	 */
-	double SetFEAMethodContributions_Elem(CGeometry *geometry);
+	double SetFEAMethodContributions_Elem(CGeometry *geometry, CConfig *config);
   
   /*!
 	 * \brief Build the stiffness matrix for a 3-D hexahedron element. The result will be placed in StiffMatrix_Elem.
@@ -134,7 +134,7 @@ public:
    * \param[in] StiffMatrix_Elem - Element stiffness matrix to be filled.
 	 * \param[in] CoordCorners[8][3] - Index value for Node 1 of the current hexahedron.
 	 */
-  bool SetFEA_StiffMatrix3D(CGeometry *geometry, double **StiffMatrix_Elem, double CoordCorners[8][3], unsigned short nNodes, double scale);
+  void SetFEA_StiffMatrix3D(CGeometry *geometry, CConfig *config, double **StiffMatrix_Elem, unsigned long PointCorners[8], double CoordCorners[8][3], unsigned short nNodes, double scale);
 	
   /*!
 	 * \brief Build the stiffness matrix for a 3-D hexahedron element. The result will be placed in StiffMatrix_Elem.
@@ -142,7 +142,7 @@ public:
    * \param[in] StiffMatrix_Elem - Element stiffness matrix to be filled.
 	 * \param[in] CoordCorners[8][3] - Index value for Node 1 of the current hexahedron.
 	 */
-  bool SetFEA_StiffMatrix2D(CGeometry *geometry, double **StiffMatrix_Elem, double CoordCorners[8][3], unsigned short nNodes, double scale);
+  void SetFEA_StiffMatrix2D(CGeometry *geometry, CConfig *config, double **StiffMatrix_Elem, unsigned long PointCorners[8], double CoordCorners[8][3], unsigned short nNodes, double scale);
   
   /*!
 	 * \brief Shape functions and derivative of the shape functions
@@ -285,7 +285,7 @@ public:
  * \class CSurfaceMovement
  * \brief Class for moving the surface numerical grid.
  * \author F. Palacios, T. Economon.
- * \version 1.1.0
+ * \version 1.2.0
  */
 class CSurfaceMovement : public CGridMovement {
 protected:

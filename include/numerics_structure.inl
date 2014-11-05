@@ -1,23 +1,23 @@
 /*!
  * \file numerics_structure.inl
  * \brief In-Line subroutines of the <i>numerics_structure.hpp</i> file.
- * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.1.0
+ * \author Aerospace Design Laboratory (Stanford University).
+ * \version 1.2.0
  *
- * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
+ * SU2 EDU, Copyright (C) 2014 Aerospace Design Laboratory (Stanford University).
  *
- * SU2 is free software; you can redistribute it and/or
+ * SU2 EDU is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * SU2 is distributed in the hope that it will be useful,
+ * SU2 EDU is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SU2 EDU. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -38,36 +38,30 @@ inline void CNumerics::ComputeResidual(double *val_residual_i, double *val_resid
 
 inline void CNumerics::ComputeResidual(double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config) { }
 
-inline void CNumerics::ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j,
-                                       CConfig *config) { }
+inline void CNumerics::ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, 
+                                   CConfig *config) { }
 
 inline void CNumerics::ComputeResidual(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j,
-                                       double **val_JacobianMeanFlow_i, double **val_JacobianMeanFlow_j, CConfig *config) { }
+                                   double **val_JacobianMeanFlow_i, double **val_JacobianMeanFlow_j, CConfig *config) { }
 
-inline void CNumerics::ComputeResidual(double *val_resconv, double *val_resvisc, double **val_Jacobian_i,
-                                       double **val_Jacobian_j, CConfig *config) { }
+inline void CNumerics::ComputeResidual(double *val_resconv, double *val_resvisc, double **val_Jacobian_i, 
+								   double **val_Jacobian_j, CConfig *config) { }
 
-inline void CNumerics::ComputeResidual(double *val_residual_i, double *val_residual_j,
-                                       double **val_Jacobian_ii, double **val_Jacobian_ij,
-                                       double **val_Jacobian_ji, double **val_Jacobian_jj, CConfig *config) { }
-
-inline void CNumerics::ComputeResidual(double *val_resconv_i, double *val_resvisc_i, double *val_resconv_j,
-                                       double *val_resvisc_j, double **val_Jacobian_ii, double **val_Jacobian_ij,
-                                       double **val_Jacobian_ji, double **val_Jacobian_jj, CConfig *config) { }
-
+inline void CNumerics::ComputeResidual(double *val_residual_i, double *val_residual_j, 
+								   double **val_Jacobian_ii, double **val_Jacobian_ij, 
+								   double **val_Jacobian_ji, double **val_Jacobian_jj, CConfig *config) { }
+							
+inline void CNumerics::ComputeResidual(double *val_resconv_i, double *val_resvisc_i, double *val_resconv_j, 
+								   double *val_resvisc_j, double **val_Jacobian_ii, double **val_Jacobian_ij, 
+								   double **val_Jacobian_ji, double **val_Jacobian_jj, CConfig *config) { }
+							
 inline void CNumerics::ComputeResidual(double **val_stiffmatrix_elem, CConfig *config) { }
 
 inline void CNumerics::GetEq_Rxn_Coefficients(double **EqnRxnConstants, CConfig *config) { };
-
+														
 inline void CNumerics::ComputeResidual(double *val_residual, double **val_Jacobian_i, CConfig *config) { }
 
 inline void CNumerics::ComputeResidual_TransLM(double *val_residual, double **val_Jacobian_i, double **val_Jacobian_j, CConfig *config, double &gamma_sep) {}
-
-inline void CNumerics::ComputeResidual_Axisymmetric(double *val_residual, CConfig *config) { }
-
-inline void CNumerics::ComputeResidual_Axisymmetric_ad(double *val_residual, double *val_residuald, CConfig *config) { }
-
-inline void CNumerics::SetJacobian_Axisymmetric(double **val_Jacobian_i, CConfig *config) { }
 
 inline void CNumerics::ComputeVibRelaxation(double *val_residual, double **val_Jacobian_i, CConfig *config) { }
 
@@ -86,15 +80,15 @@ inline void CNumerics::SetRhoIndex(unsigned short val_Index) { RHO_INDEX = val_I
 inline void CNumerics::SetPIndex(unsigned short val_Index) { P_INDEX = val_Index; }
 
 inline void CNumerics::SetTIndex(unsigned short val_Index) { T_INDEX = val_Index; }
-
+  
 inline void CNumerics::SetTveIndex(unsigned short val_Index) { TVE_INDEX = val_Index; }
 
 inline void CNumerics::SetVelIndex(unsigned short val_Index) { VEL_INDEX = val_Index; }
-
+  
 inline void CNumerics::SetHIndex(unsigned short val_Index) { H_INDEX = val_Index; }
-
+  
 inline void CNumerics::SetAIndex(unsigned short val_Index) { A_INDEX = val_Index; }
-
+  
 inline void CNumerics::SetRhoCvtrIndex(unsigned short val_Index) { RHOCVTR_INDEX = val_Index; }
 
 inline void CNumerics::SetRhoCvveIndex(unsigned short val_Index) { RHOCVVE_INDEX = val_Index; }
@@ -104,10 +98,10 @@ inline void CNumerics::SetdPdU(double *val_dPdU_i, double *val_dPdU_j) { dPdU_i 
 inline void CNumerics::SetdTdU(double *val_dTdU_i, double *val_dTdU_j) { dTdU_i = val_dTdU_i; dTdU_j = val_dTdU_j; }
 
 inline void CNumerics::SetdTvedU(double *val_dTvedU_i, double *val_dTvedU_j) { dTvedU_i = val_dTvedU_i; dTvedU_j = val_dTvedU_j; }
-
+	
 inline void CNumerics::SetUndivided_Laplacian(double *val_und_lapl_i, double *val_und_lapl_j) {
-	Und_Lapl_i = val_und_lapl_i;
-	Und_Lapl_j = val_und_lapl_j;
+	Und_Lapl_i = val_und_lapl_i; 
+	Und_Lapl_j = val_und_lapl_j; 
 }
 
 inline void CNumerics::SetSensor( double val_sensor_i, double val_sensor_j) {
@@ -149,6 +143,8 @@ inline void CNumerics::SetVelocity2_Inf(double velocity2) {
 
 inline void CNumerics::SetTimeStep(double val_timestep) {TimeStep = val_timestep;}
 
+inline void CNumerics::SetElec_Cond() {}
+
 inline void CNumerics::SetLaminarViscosity(double val_lam_viscosity_i, double val_lam_viscosity_j) {
 	Laminar_Viscosity_i = val_lam_viscosity_i;
 	Laminar_Viscosity_j = val_lam_viscosity_j;
@@ -157,6 +153,11 @@ inline void CNumerics::SetLaminarViscosity(double val_lam_viscosity_i, double va
 inline void CNumerics::SetThermalConductivity(double val_therm_conductivity_i, double val_therm_conductivity_j) {
 	Thermal_Conductivity_i = val_therm_conductivity_i;
 	Thermal_Conductivity_j = val_therm_conductivity_j;
+}
+
+inline void CNumerics::SetThermalConductivity_ve(double val_therm_conductivity_ve_i, double val_therm_conductivity_ve_j) {
+	Thermal_Conductivity_ve_i = val_therm_conductivity_ve_i;
+	Thermal_Conductivity_ve_j = val_therm_conductivity_ve_j;
 }
 
 inline void CNumerics::SetDiffusionCoeff(double* val_diffusioncoeff_i, double* val_diffusioncoeff_j) {
@@ -270,19 +271,19 @@ inline void CNumerics::SetCoord(double *val_coord_i, double *val_coord_j) {
 	Coord_j = val_coord_j;
 }
 
-inline void CNumerics::SetCoord(double *val_coord_0, double *val_coord_1,
-                                double *val_coord_2) {
+inline void CNumerics::SetCoord(double *val_coord_0, double *val_coord_1, 
+									 double *val_coord_2) {
 	Coord_0 = val_coord_0;
 	Coord_1 = val_coord_1;
 	Coord_2 = val_coord_2;
 }
 
-inline void CNumerics::SetCoord(double *val_coord_0, double *val_coord_1,
-                                double *val_coord_2, double *val_coord_3) {
+inline void CNumerics::SetCoord(double *val_coord_0, double *val_coord_1, 
+									 double *val_coord_2, double *val_coord_3) {
 	Coord_0 = val_coord_0;
 	Coord_1 = val_coord_1;
 	Coord_2 = val_coord_2;
-	Coord_3 = val_coord_3;
+	Coord_3 = val_coord_3;	
 }
 
 inline void CNumerics::SetGridVel(double *val_gridvel_i, double *val_gridvel_j) {
@@ -293,6 +294,16 @@ inline void CNumerics::SetGridVel(double *val_gridvel_i, double *val_gridvel_j) 
 inline void CNumerics::SetPressure(double val_pressure_i, double val_pressure_j) {
 	Pressure_i = val_pressure_i;
 	Pressure_j = val_pressure_j;
+}
+
+inline void CNumerics::SetDensityInc(double val_densityinc_i, double val_densityinc_j) {
+	DensityInc_i = val_densityinc_i;
+	DensityInc_j = val_densityinc_j;
+}
+
+inline void CNumerics::SetBetaInc2(double val_betainc2_i, double val_betainc2_j) {
+	BetaInc2_i = val_betainc2_i;
+	BetaInc2_j = val_betainc2_j;
 }
 
 inline void CNumerics::SetSoundSpeed(double val_soundspeed_i, double val_soundspeed_j) {
@@ -339,13 +350,13 @@ inline void CNumerics::SetNormal(double *val_normal) { Normal = val_normal; }
 
 inline void CNumerics::SetVolume(double val_volume) { Volume = val_volume; }
 
-inline void CSourcePieceWise_TurbSST::SetF1blending(double val_F1_i, double val_F1_j){
-	F1_i = val_F1_i;
+inline void CSourcePieceWise_TurbSST::SetF1blending(double val_F1_i, double val_F1_j){ 
+	F1_i = val_F1_i; 
 	F1_j = val_F1_j;
 }
 
-inline void CSourcePieceWise_TurbSST::SetF2blending(double val_F2_i, double val_F2_j){
-	F2_i = val_F2_i;
+inline void CSourcePieceWise_TurbSST::SetF2blending(double val_F2_i, double val_F2_j){ 
+	F2_i = val_F2_i; 
 	F2_j = val_F2_j;
 }
 
@@ -355,7 +366,7 @@ inline void CSourcePieceWise_TurbSST::SetStrainMag(double val_StrainMag_i, doubl
 
 inline void CSourcePieceWise_TurbSST::SetCrossDiff(double val_CDkw_i, double val_CDkw_j){
 	CDkw = val_CDkw_i;
-}
+}			
 
 inline void CSourcePieceWise_TurbSA::SetIntermittency(double intermittency_in) { intermittency = intermittency_in; }
 
@@ -371,9 +382,13 @@ inline double CSourcePieceWise_TurbSA::GetDestruction(void) { return Destruction
 
 inline double CSourcePieceWise_TurbSA::GetCrossProduction(void) { return CrossProduction; }
 
-inline double CUpwRoeTurkel_Flow::GetPrecond_Beta() { return Beta; }
+inline double CUpwTurkel_Flow::GetPrecond_Beta() { return Beta; }
+
+inline double CNumerics::GetElec_CondIntegral() {return 0;}
+
+inline void CNumerics::SetElec_CondIntegralsqr(double val_var) {}
 
 inline void CNumerics::ComputeResidual(double **val_Jacobian_i, double *val_Jacobian_mui, double ***val_Jacobian_gradi, CConfig *config) { }
 
-inline void CNumerics::ComputeResidual(double **val_Jacobian_i, double *val_Jacobian_mui, double ***val_Jacobian_gradi,
-                                       double **val_Jacobian_j, double *val_Jacobian_muj, double ***val_Jacobian_gradj, CConfig *config) { }
+inline void CNumerics::ComputeResidual(double **val_Jacobian_i, double *val_Jacobian_mui, double ***val_Jacobian_gradi, 
+									double **val_Jacobian_j, double *val_Jacobian_muj, double ***val_Jacobian_gradj, CConfig *config) { }

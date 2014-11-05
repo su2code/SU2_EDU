@@ -3,23 +3,23 @@
  * \brief Headers of the main subroutines for space and time integration. 
  *        The subroutines and functions are in the <i>integration_structure.cpp</i>, 
  *        <i>integration_time.cpp</i>, and <i>integration_notime.cpp</i> files.
- * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.1.0
+ * \author Aerospace Design Laboratory (Stanford University).
+ * \version 1.2.0
  *
- * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
+ * SU2 EDU, Copyright (C) 2014 Aerospace Design Laboratory (Stanford University).
  *
- * SU2 is free software; you can redistribute it and/or
+ * SU2 EDU is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * SU2 is distributed in the hope that it will be useful,
+ * SU2 EDU is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+ * License along with SU2 EDU. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -39,7 +39,7 @@ using namespace std;
  * \brief Main class for doing the space integration, time integration, and monitoring 
  *        of a system of Partial Differential Equations (PDE).
  * \author F. Palacios.
- * \version 1.1.0
+ * \version 1.2.0
  */
 class CIntegration {
 protected:
@@ -50,6 +50,7 @@ protected:
 	double Old_Func,	/*!< \brief Old value of the objective function (the function which is monitored). */
 	New_Func;			/*!< \brief Current value of the objective function (the function which is monitored). */
 	bool Convergence,		/*!< \brief To indicate if the flow solver (direct, adjoint, or linearized) has converged or not. */
+	Convergence_OneShot,	/*!< \brief To indicate if the one-shot method has converged. */
 	Convergence_FullMG;		/*!< \brief To indicate if the Full Multigrid has converged and it is necessary to add a new level. */
 	double InitResidual;	/*!< \brief Initial value of the residual to evaluate the convergence level. */
 
@@ -87,8 +88,19 @@ public:
 	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
 	 * \param[in] Iteration - Current iteration.
 	 */
-	void Time_Integration(CGeometry *geometry, CSolver **solver_container, CConfig *config, 
-						  unsigned short iRKStep, unsigned short RunTime_EqSystem, unsigned long Iteration);
+	void Time_Integration(CGeometry **geometry, CSolver ***solver_container, CConfig *config,
+						  unsigned short iRKStep, unsigned short RunTime_EqSystem, unsigned long Iteration, unsigned short iMesh);
+	
+	/*! 
+	 * \brief Initialize the adjoint solution using the primal problem.
+	 * \param[in] geometry - Geometrical definition of the problem.
+	 * \param[in] solver_container - Container vector with all the solutions.
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
+	 * \param[in] Iteration - Current iteration.
+	 */
+	void Adjoint_Setup(CGeometry ***geometry, CSolver ****solver_container, CConfig **config,
+                     unsigned short RunTime_EqSystem, unsigned long Iteration, unsigned short iZone);
 
 	/*! 
 	 * \brief Do the convergence analisys to determine if the code must stop the execution.
@@ -119,6 +131,13 @@ public:
 	 *            otherwise <code>FALSE</code>.
 	 */
 	void SetConvergence(bool value);
+	
+	/*! 
+	 * \brief Get the indicator of the convergence for the one-shot problem.
+	 * \return <code>TRUE</code> means that the convergence criteria is satisfied; 
+	 *         otherwise <code>FALSE</code>.
+	 */
+	bool GetConvergence_OneShot(void);
 	
 	/*! 
 	 * \brief Get the indicator of the convergence for the full multigrid problem.
@@ -182,6 +201,29 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	virtual void SetProlongated_Correction(CSolver *sol_fine, CGeometry *geo_fine, CConfig *config);
+
+	/*! 
+	 * \brief A virtual member.
+	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
+	 * \param[out] sol_fine - Pointer to the solution on the fine grid.
+	 * \param[in] sol_coarse - Pointer to the solution on the coarse grid.
+	 * \param[in] geo_fine - Geometrical definition of the fine grid.
+	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void SetProlongated_Solution(unsigned short RunTime_EqSystem, CSolver **sol_fine, CSolver **sol_coarse, 
+										 CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
+	
+	/*! 
+	 * \brief A virtual member.
+	 * \param[in] sol_fine - Pointer to the solution on the fine grid.
+	 * \param[out] sol_coarse - Pointer to the solution on the coarse grid.
+	 * \param[in] geo_fine - Geometrical definition of the fine grid.
+	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void SetRestricted_Residual(CSolver *sol_fine, CSolver *sol_coarse, CGeometry *geo_fine, 
+										CGeometry *geo_coarse, CConfig *config);
 	
 	/*! 
 	 * \brief A virtual member.
@@ -195,6 +237,18 @@ public:
 	 * \param[in] InclSharedDomain - Include the shared domain in the interpolation.
 	 */
 	virtual void SetRestricted_Solution(unsigned short RunTime_EqSystem, CSolver **sol_fine, CSolver **sol_coarse, CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
+
+	/*! 
+	 * \brief A virtual member.
+	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
+	 * \param[in] sol_fine - Pointer to the solution on the fine grid.
+	 * \param[out] sol_coarse - Pointer to the solution on the coarse grid.
+	 * \param[in] geo_fine - Geometrical definition of the fine grid.
+	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void SetRestricted_Gradient(unsigned short RunTime_EqSystem, CSolver **sol_fine, CSolver **sol_coarse, 
+										CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
 	
 	/*! 
 	 * \brief A virtual member.
@@ -225,6 +279,30 @@ public:
 	 */
 	virtual void SingleGrid_Iteration(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container,
 								  CConfig *config, unsigned short RunTime_EqSystem, unsigned long Iteration);
+	
+	/*! 
+	 * \brief A virtual member.
+	 * \param[in] geometry - Geometrical definition of the problem.
+	 * \param[in] solver_container - Container vector with all the solutions.
+	 * \param[in] numerics_container - Description of the numerical method (the way in which the equations are solved).
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
+	 * \param[in] iMesh - Index of the mesh in multigrid computations.
+	 */
+	virtual void SetPotential_Solver(CGeometry ***geometry, CSolver ****solver_container, CNumerics *****numerics_container,
+                                   CConfig **config, unsigned short RunTime_EqSystem, unsigned short iMesh, unsigned short iZone);
+  
+  /*!
+	 * \brief A virtual member.
+	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
+	 * \param[in] solution - Container vector with all the solutions on the finest grid.
+	 * \param[in] geometry - Geometrical definition of the problem.
+	 * \param[in] val_nSmooth - Number of smoothing iterations.
+	 * \param[in] val_smooth_coeff - Relaxation factor.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	virtual void Smooth_Solution(unsigned short RunTime_EqSystem, CSolver **solver, CGeometry *geometry,
+                       unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config);
 
 };
 
@@ -232,7 +310,7 @@ public:
  * \class CMultiGridIntegration
  * \brief Class for doing the numerical integration using a multigrid method.
  * \author F. Palacios.
- * \version 1.1.0
+ * \version 1.2.0
  */
 class CMultiGridIntegration : public CIntegration {
 protected:
@@ -277,6 +355,20 @@ public:
                      CConfig *config, unsigned short iMesh, unsigned short mu, unsigned short RunTime_EqSystem,
                      unsigned long Iteration);
 	
+  /*!
+	 * \brief Perform a Full-Approximation Storage (FAS) Multigrid.
+	 * \param[in] geometry - Geometrical definition of the problem.
+	 * \param[in] solver_container - Container vector with all the solutions.
+	 * \param[in] numerics_container - Description of the numerical method (the way in which the equations are solved).
+	 * \param[in] config - Definition of the particular problem.
+	 * \param[in] iMesh - Index of the mesh in multigrid computations.
+	 * \param[in] mu - Variable for controlling the kind of multigrid algorithm.
+	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
+	 * \param[in] Iteration - Current iteration.
+	 */
+  void SingleGrid_Iteration(CGeometry **geometry, CSolver ***solver_container,
+                                                    CNumerics ****numerics_container, CConfig *config, unsigned short RunTime_EqSystem, unsigned long Iteration);
+  
 	/*! 
 	 * \brief Compute the non-dimensional parameters.
 	 * \param[in] geometry - Geometrical definition of the problem.
@@ -289,6 +381,18 @@ public:
 	void NonDimensional_Parameters(CGeometry **geometry, CSolver ***solver_container, CNumerics ****numerics_container, 
 																 CConfig *config, unsigned short FinestMesh, unsigned short RunTime_EqSystem, unsigned long Iteration, 
 																 double *monitor);
+
+	/*! 
+	 * \brief Compute the fine solution from a coarse solution. 
+	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
+	 * \param[out] sol_fine - Pointer to the solution on the fine grid.
+	 * \param[in] sol_coarse - Pointer to the solution on the coarse grid.
+	 * \param[in] geo_fine - Geometrical definition of the fine grid.
+	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void SetProlongated_Solution(unsigned short RunTime_EqSystem, CSolver *sol_fine, CSolver *sol_coarse, 
+								 CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
 	
 	/*! 
 	 * \brief Compute the fine grid correction from the coarse solution. 
@@ -312,6 +416,18 @@ public:
 	 */
 	void SmoothProlongated_Correction(unsigned short RunTime_EqSystem, CSolver *solver, CGeometry *geometry,
 																		 unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config);
+  
+  /*!
+	 * \brief Do an implicit smoothing of the solution.
+	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
+	 * \param[in] solution - Container vector with all the solutions on the finest grid.
+	 * \param[in] geometry - Geometrical definition of the problem.
+	 * \param[in] val_nSmooth - Number of smoothing iterations.
+	 * \param[in] val_smooth_coeff - Relaxation factor.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void Smooth_Solution(unsigned short RunTime_EqSystem, CSolver *solver, CGeometry *geometry,
+                                    unsigned short val_nSmooth, double val_smooth_coeff, CConfig *config);
 
 	/*!
 	 * \brief Set the value of the corrected fine grid solution.
@@ -320,6 +436,17 @@ public:
 	 * \param[in] config - Definition of the particular problem.
 	 */
 	void SetProlongated_Correction(CSolver *sol_fine, CGeometry *geo_fine, CConfig *config);
+
+	/*! 
+	 * \brief Compute truncation error in the coarse grid using the fine grid information. 
+	 * \param[in] sol_fine - Pointer to the solution on the fine grid.
+	 * \param[out] sol_coarse - Pointer to the solution on the coarse grid.
+	 * \param[in] geo_fine - Geometrical definition of the fine grid.
+	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void SetRestricted_Residual(CSolver *sol_fine, CSolver *sol_coarse, CGeometry *geo_fine, 
+								CGeometry *geo_coarse, CConfig *config);
 
 	/*! 
 	 * \brief Restrict solution from fine grid to a coarse grid. 
@@ -333,6 +460,18 @@ public:
 	 * \param[in] InclSharedDomain - Include the shared domain in the interpolation.
 	 */
 	void SetRestricted_Solution(unsigned short RunTime_EqSystem, CSolver *sol_fine, CSolver *sol_coarse, CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
+	
+	/*! 
+	 * \brief Compute the gradient in coarse grid using the fine grid information. 
+	 * \param[in] RunTime_EqSystem - System of equations which is going to be solved.
+	 * \param[in] sol_fine - Pointer to the solution on the fine grid.
+	 * \param[out] sol_coarse - Pointer to the solution on the coarse grid.
+	 * \param[in] geo_fine - Geometrical definition of the fine grid.
+	 * \param[in] geo_coarse - Geometrical definition of the coarse grid.
+	 * \param[in] config - Definition of the particular problem.
+	 */
+	void SetRestricted_Gradient(unsigned short RunTime_EqSystem, CSolver **sol_fine, CSolver **sol_coarse, 
+								CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config);
 
 	/*! 
 	 * \brief Add the truncation error to the residual. 
@@ -357,7 +496,7 @@ public:
  * \class CSingleGridIntegration
  * \brief Class for doing the numerical integration of the turbulence model.
  * \author A. Bueno.
- * \version 1.1.0
+ * \version 1.2.0
  */
 class CSingleGridIntegration : public CIntegration {
 public:

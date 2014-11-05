@@ -2,7 +2,7 @@
  * \file primal_grid_structure.inl
  * \brief In-Line subroutines of the <i>primal_grid_structure.hpp</i> file.
  * \author Aerospace Design Laboratory (Stanford University) <http://su2.stanford.edu>.
- * \version 1.1.0
+ * \version 3.1.0 "eagle"
  *
  * SU2, Copyright (C) 2012-2014 Aerospace Design Laboratory (ADL).
  *
@@ -40,9 +40,9 @@ inline double CPrimalGrid::GetCG(unsigned short val_dim) { return Coord_CG[val_d
 
 inline double CPrimalGrid::GetFaceCG(unsigned short val_face, unsigned short val_dim) { return Coord_FaceElems_CG[val_face][val_dim]; }
 
-inline void CPrimalGrid::SetDivide (bool val_divide) {	Divide = val_divide; }
+inline void CPrimalGrid::SetDivide(bool val_divide) {	Divide = val_divide; }
 
-inline bool CPrimalGrid::GetDivide (void) { return Divide; }
+inline bool CPrimalGrid::GetDivide(void) { return Divide; }
 
 inline void CPrimalGrid::SetNode(unsigned short val_node, unsigned long val_point) { }
 
