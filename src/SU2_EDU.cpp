@@ -134,6 +134,12 @@ int main(int argc, char *argv[]) {
   
   cout << endl <<"------------------------- Solver Preprocessing --------------------------" << endl;
   
+  /*--- Computation of wall distances for turbulence modeling ---*/
+  
+  if (config_container->GetKind_Solver() == RANS) {
+    geometry_container[MESH_0]->ComputeWall_Distance(config_container);
+  }
+  
   /*--- Definition of the solver class: solver_container[#MG_GRIDS][#EQ_SYSTEMS].
    The solver classes are specific to a particular set of governing equations,
    and they contain the subroutines with instructions for computing each spatial
