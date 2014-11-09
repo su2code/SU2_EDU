@@ -6,47 +6,31 @@
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>6D5D11E8-6E33-4789-8BF8-C17C56384A83</string>
-	<key>IDESourceControlProjectName</key>
-	<string>SU2_EDU</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>6548554E-BB85-4761-B037-2133F1DD5C23</key>
+		<key>8ED49EFD43ED82F1325A556C62D1386A078F1F30</key>
 		<string>https://github.com/su2code/SU2_EDU.git</string>
-		<key>BBE8543F-7310-4BF1-8900-530E7F1B2E85</key>
-		<string>https://github.com/su2code/SU2.git</string>
 	</dict>
-	<key>IDESourceControlProjectPath</key>
-	<string>SU2_EDU.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>6548554E-BB85-4761-B037-2133F1DD5C23</key>
-		<string>../..</string>
-		<key>BBE8543F-7310-4BF1-8900-530E7F1B2E85</key>
-		<string>../../../SU2/trunk</string>
+		<key>8ED49EFD43ED82F1325A556C62D1386A078F1F30</key>
+		<string>SU2_edu/</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/su2code/SU2_EDU.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>6548554E-BB85-4761-B037-2133F1DD5C23</string>
+	<string>8ED49EFD43ED82F1325A556C62D1386A078F1F30</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>6548554E-BB85-4761-B037-2133F1DD5C23</string>
+			<string>8ED49EFD43ED82F1325A556C62D1386A078F1F30</string>
 			<key>IDESourceControlWCCName</key>
-			<string>SU2_EDU</string>
-		</dict>
-		<dict>
-			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
-			<string>public.vcs.git</string>
-			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>BBE8543F-7310-4BF1-8900-530E7F1B2E85</string>
-			<key>IDESourceControlWCCName</key>
-			<string>trunk</string>
+			<string>SU2_edu</string>
 		</dict>
 	</array>
 </dict>

@@ -1736,7 +1736,7 @@ void CConfig::SetPostprocessing(unsigned short val_software, unsigned short val_
     nMG_PreSmooth = nMultiLevel+1;
     MG_PreSmooth = new unsigned short[nMG_PreSmooth];
     for (unsigned int i = 0; i < nMG_PreSmooth; i++)
-      MG_PreSmooth[i] = i+1;
+      MG_PreSmooth[i] = 1;
   }
   
   if ((nMG_PostSmooth != nMultiLevel+1) && (nMG_PostSmooth != 0)) {
