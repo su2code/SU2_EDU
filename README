@@ -36,9 +36,9 @@ To build SU2_EDU from the source code, just open a terminal and run the './confi
 
 After building, the SU2_EDU binary executable can be found in the SU2_EDU/bin/ directory. To run SU2_EDU, follow these steps:
 
-1. Prepare an airfoil definition by either obtaining a set of airfoil coordinates or creating your own definition. An example airfoil definition is included in the bin/ directory within the airfoil_e174.dat file. We also recommend the excellent airfoil database website hosted by the UIUC Applied Aerodynamics Group (http://aerospace.illinois.edu/m-selig/ads/coord_database.html), which contains nearly 1,600 airfoil definitions.
+1. Prepare an airfoil definition by either obtaining a set of airfoil coordinates or creating your own definition. An example airfoil definition is included in the bin/ directory within the airfoil_e174.dat file. We also recommend the excellent airfoil database website hosted by the UIUC Applied Aerodynamics Group (http://m-selig.ae.illinois.edu/ads/coord_database.html), which contains nearly 1,600 airfoil definitions.
 
-2. Adapt the default configuration files for your particular problem. For inviscid flow, modify the Inviscid_ConfigFile.cfg file, and for viscous flow, modify Viscous_ConfigFile.cfg. For example, you may wish to modify the angle of attack, Mach number, or Reynolds number.
+2. Adapt the default configuration files for your particular problem. For inviscid flow, modify the ConfigFile_INV.cfg file, and for viscous flow, modify ConfigFile_RANS.cfg. For example, you may wish to modify the angle of attack, Mach number, or Reynolds number.
 
 3. Run the executable by entering "./SU2_EDU" at the command line in the terminal. You will be prompted for your airfoil definition filename, format, and trailing edge type. SU2_EDU will then compute the flow around the airfoil and print the convergence history to the console in the process.
 
