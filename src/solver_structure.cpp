@@ -1226,8 +1226,7 @@ CBaselineSolver::CBaselineSolver(CGeometry *geometry, CConfig *config, unsigned 
   /*--- Set the number of variables, one per field in the
    restart file (without including the PointID) ---*/
   nVar = config->fields.size() - 1;
-  double Solution[nVar];
-  
+  Solution  =  new double[nVar];
   /*--- Read all lines in the restart file ---*/
   iPoint_Global = 0;
   while (getline (restart_file, text_line)) {
